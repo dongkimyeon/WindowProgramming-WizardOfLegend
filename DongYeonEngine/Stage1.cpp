@@ -1,34 +1,37 @@
 #pragma once
-#include "PlayScene.h"
+#include "Stage1.h"
 #include "Input.h"
 
-PlayScene::PlayScene()
+Stage1::Stage1()
 {
     player.SetPosition(1920 / 2, 1080 / 2);
+    archer.SetPosition(100, 100);
+    swordman.SetPosition(200, 100);
+    wizard.SetPosition(300, 100);
 }
 
-PlayScene::~PlayScene()
+Stage1::~Stage1()
 {
 }
 
-void PlayScene::Initialize()
+void Stage1::Initialize()
 {
     
 }
 
-void PlayScene::Update()
+void Stage1::Update()
 {
     player.Update();
 
 
 }
 
-void PlayScene::LateUpdate()
+void Stage1::LateUpdate()
 {
     Scene::LateUpdate();
 }
 
-void PlayScene::Render(HDC hdc)
+void Stage1::Render(HDC hdc)
 {
     player.Render(hdc);
  

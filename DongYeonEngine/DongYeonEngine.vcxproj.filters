@@ -33,7 +33,7 @@
     <ClInclude Include="Game.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
-    <ClInclude Include="PlayScene.h">
+    <ClInclude Include="Stage1.h">
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
@@ -66,7 +66,13 @@
     <ClInclude Include="Player.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy.h">
+    <ClInclude Include="Archer.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="SwordMan.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Wizard.h">
       <Filter>Object</Filter>
     </ClInclude>
   </ItemGroup>
@@ -74,7 +80,7 @@
     <ClCompile Include="Game.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="PlayScene.cpp">
+    <ClCompile Include="Stage1.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
@@ -110,7 +116,13 @@
     <ClCompile Include="Player.cpp">
       <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="SwordMan.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Wizard.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Archer.cpp">
       <Filter>Object</Filter>
     </ClCompile>
   </ItemGroup>
@@ -136,6 +148,9 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="resources\Player\Left\Dash\LEFT_COMPLETE_05.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="..\Stage\Monster\SwordMan\SwordMan_Effect\SWORDMAN_ATTACK_0.png">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

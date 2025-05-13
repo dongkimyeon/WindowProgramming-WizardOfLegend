@@ -1,13 +1,12 @@
 #pragma once
 #include "SceneManager.h"
-#include "PlayScene.h"
+#include "Stage1.h"
 #include "TitleScene.h"
 
 
 void LoadScenes()
 {
-	SceneManager::CreateScene<PlayScene>(L"PlayScene");
-	//SceneManager::CreateScene<EndScene>(L"EndScene");
+	SceneManager::CreateScene<Stage1>(L"Stage1");
 	SceneManager::CreateScene<TitleScene>(L"TitleScene");
 
 	SceneManager::LoadScene(L"TitleScene");

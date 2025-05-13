@@ -127,7 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Archer.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="CommonInclude.h" />
@@ -135,15 +135,17 @@
     <ClInclude Include="LoadScenes.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayScene.h" />
+    <ClInclude Include="Stage1.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="SwordMan.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Wizard.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Archer.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -152,16 +154,19 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayScene.cpp" />
+    <ClCompile Include="Stage1.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="Wizard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DongYeonEngine.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\Stage\Monster\SwordMan\SwordMan_Effect\SWORDMAN_ATTACK_0.png" />
     <Image Include="DongYeonEngine.ico" />
     <Image Include="resources\Player\Back\Dash\BACK_COMPLETE_07.png" />
     <Image Include="resources\Player\Back\Idle\BACK_COMPLETE_00.png" />

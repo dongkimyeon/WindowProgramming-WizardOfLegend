@@ -6,7 +6,7 @@ class GameObject
 public:
 	GameObject();
 	~GameObject();
-	enum PlayerState { FRONT, BACK, LEFT, RIGHT };
+	 enum PlayerState { FRONT, BACK, LEFT, RIGHT };
 	 virtual void Update();
 	 virtual void LateUpdate();
 	 virtual void Render(HDC hdc);

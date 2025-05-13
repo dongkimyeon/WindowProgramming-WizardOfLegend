@@ -39,7 +39,7 @@ void TitleScene::Update()
     // 스페이스 키 입력 시 PlayScene으로 전환
     if (GetAsyncKeyState(VK_SPACE) & 0x8000)
     {
-        SceneManager::LoadScene(L"PlayScene");
+        SceneManager::LoadScene(L"Stage1");
     }
 }
 

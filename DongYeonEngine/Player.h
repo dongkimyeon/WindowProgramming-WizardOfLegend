@@ -52,11 +52,12 @@ private:
 	CImage mBackHitAnimation[2];
 	CImage mBackWalkAnimation[10];
 
-	PlayerState state = FRONT;
+	PlayerState state = PlayerState::FRONT;
 
 	//움직임 변수
 	bool mIsMoving;
 	int mCurrentWalkFrame;
+
 	//대쉬 변수
 	bool mIsDashing;        // 대쉬 상태 여부
 	int mCurrentDashFrame;  // 현재 Dash 애니메이션 프레임
@@ -64,7 +65,7 @@ private:
 
 	float speed;
 	RECT rect;
-	COLORREF color;
+	
 
 };
 
