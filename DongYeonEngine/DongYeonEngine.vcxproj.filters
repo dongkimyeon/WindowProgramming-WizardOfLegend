@@ -25,6 +25,9 @@
     <Filter Include="Object">
       <UniqueIdentifier>{b98ca5f2-f22f-430f-b5fc-9e87db494359}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Monster">
+      <UniqueIdentifier>{2b900adf-2178-4b5e-93f7-4ac8fac617b2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -67,13 +70,13 @@
       <Filter>Object</Filter>
     </ClInclude>
     <ClInclude Include="Archer.h">
-      <Filter>Object</Filter>
+      <Filter>Object\Monster</Filter>
     </ClInclude>
     <ClInclude Include="SwordMan.h">
-      <Filter>Object</Filter>
+      <Filter>Object\Monster</Filter>
     </ClInclude>
     <ClInclude Include="Wizard.h">
-      <Filter>Object</Filter>
+      <Filter>Object\Monster</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -116,14 +119,14 @@
     <ClCompile Include="Player.cpp">
       <Filter>Object</Filter>
     </ClCompile>
+    <ClCompile Include="Archer.cpp">
+      <Filter>Object\Monster</Filter>
+    </ClCompile>
     <ClCompile Include="SwordMan.cpp">
-      <Filter>Object</Filter>
+      <Filter>Object\Monster</Filter>
     </ClCompile>
     <ClCompile Include="Wizard.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="Archer.cpp">
-      <Filter>Object</Filter>
+      <Filter>Object\Monster</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,21 +139,6 @@
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="DongYeonEngine.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Back\Idle\BACK_COMPLETE_00.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Front\Idle\FRONT_COMPLETE_00.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Back\Dash\BACK_COMPLETE_07.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Left\Dash\LEFT_COMPLETE_05.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="..\Stage\Monster\SwordMan\SwordMan_Effect\SWORDMAN_ATTACK_0.png">
       <Filter>리소스 파일</Filter>
     </Image>
   </ItemGroup>

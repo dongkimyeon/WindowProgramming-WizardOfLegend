@@ -2,15 +2,27 @@
 #include "Input.h"
 #include "Time.h"
 
-
 Player::Player()
 {
     mX = 1920 / 2;
     mY = 1080 / 2;
     rect = { (int)(mX - 20), (int)(mY + 200), (int)(mX + 20), (int)(mY + 20) };
-    color = RGB(0, 0, 255);
     speed = 200.0f;
-    state = FRONT;
+    state = PlayerState::FRONT;
+    hp = 100;
+    mIsMoving = false;
+    mIsDashing = false;
+    mIsAttack = false;
+    mIsHit = false;
+    mIsDead = false;
+    mCurrentWalkFrame = 0;
+    mCurrentDashFrame = 0;
+    mCurrentAttackFrame = 0;
+    mCurrentHitFrame = 0;
+    mCurrentDieFrame = 0;
+    mDashTimer = 0.0f;
+    mAttackTimer = 0.0f;
+    mHitTimer = 0.0f;
 
     // Front 애니메이션 로드
     mFrontIdleAnimation.Load(L"resources/Player/Front/Idle/FRONT_COMPLETE_00.png");
@@ -150,42 +162,97 @@ Player::Player()
 
 void Player::Update()
 {
+    if (mIsDead) {
+        // 사망 상태: Die 애니메이션 업데이트 (한 번만 재생)
+        static float dieTimer = 0.0f;
+        if (mCurrentDieFrame < 6) { // 마지막 프레임(6)까지 재생
+            dieTimer += Time::DeltaTime();
+            if (dieTimer >= 0.1f) {
+                mCurrentDieFrame++; // 프레임 증가
+                dieTimer = 0.0f;
+            }
+        }
+        return; // 사망 시 다른 로직 실행 안 함
+    }
+
     bool isMoving = false;
     float deltaTime = Time::DeltaTime();
     static float animationTimer = 0.0f;
-    static int walkFrame = 0;
-    static int dashFrame = 0;
     const float walkFrameDuration = 0.1f;  // Walk 애니메이션 프레임 지속 시간
-    const float dashDuration = 0.4f;       // 대쉬 지속 시간 (0.5초)
-    const float dashFrameDuration = dashDuration / 8.0f; // Dash 애니메이션 프레임당 지속 시간
-    float currentSpeed = speed;            // 기본 속도
+    const float dashDuration = 0.4f;       // 대쉬 지속 시간
+    const float dashFrameDuration = dashDuration / 8.0f; // Dash 프레임당 지속 시간
+    const float attackDuration = 0.8f;     // 공격 지속 시간 (16프레임)
+    const float attackFrameDuration = attackDuration / 16.0f; // 공격 프레임당 지속 시간
+    const float hitDuration = 0.2f;        // 피격 지속 시간 (2프레임)
+    const float hitFrameDuration = hitDuration / 2.0f; // 피격 프레임당 지속 시간
+    float currentSpeed = speed;
 
-    // 대쉬 중이 아닌 경우에만 대쉬 시작 가능
-    if (!mIsDashing && Input::GetKeyDown(eKeyCode::SPACE))
-    {
-        mIsDashing = true;
-        mDashTimer = dashDuration;
-        dashFrame = 0; // 대쉬 시작 시 프레임 리셋
-        animationTimer = 0.0f; // 타이머 리셋
+    // rect 업데이트
+    int imageWidth = mFrontIdleAnimation.GetWidth();
+    int imageHeight = mFrontIdleAnimation.GetHeight();
+    rect.left = static_cast<int>(mX - imageWidth / 2.0f) + 30;
+    rect.top = static_cast<int>(mY - imageHeight / 2.0f) + 10;
+    rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 18;
+    rect.bottom = static_cast<int>(mY + imageHeight / 2.0f);
+
+    // 피격 상태 처리
+    if (mIsHit) {
+        mHitTimer -= deltaTime;
+        if (mHitTimer <= 0.0f) {
+            mIsHit = false;
+        }
+        animationTimer += deltaTime;
+        if (animationTimer >= hitFrameDuration) {
+            mCurrentHitFrame = (mCurrentHitFrame + 1) % 2; // 2프레임
+            animationTimer = 0.0f;
+        }
+        return; // 피격 중에는 다른 입력 처리 안 함
+    }
+
+    // 공격 처리
+    if (!mIsAttack && Input::GetKeyDown(eKeyCode::LButton)) {
+        mIsAttack = true;
+        mAttackTimer = attackDuration;
+        mCurrentAttackFrame = 0;
+        animationTimer = 0.0f;
+    }
+    if (mIsAttack) {
+        mAttackTimer -= deltaTime;
+        if (mAttackTimer <= 0.0f) {
+            mIsAttack = false;
+        }
+        animationTimer += deltaTime;
+        if (animationTimer >= attackFrameDuration) {
+            mCurrentAttackFrame = (mCurrentAttackFrame + 1) % 16; // 16프레임
+            animationTimer = 0.0f;
+        }
+        return; // 공격 중에는 이동 처리 안 함
     }
 
     // 대쉬 처리
-    if (mIsDashing)
-    {
-        currentSpeed = 400.0f; // 대쉬 속도는 6배
+    if (!mIsDashing && Input::GetKeyDown(eKeyCode::SPACE)) {
+        mIsDashing = true;
+        mDashTimer = dashDuration;
+        mCurrentDashFrame = 0;
+        animationTimer = 0.0f;
+    }
+    if (mIsDashing) {
+        currentSpeed = 400.0f;
         mDashTimer -= deltaTime;
-        if (mDashTimer <= 0.0f)
-        {
-            mIsDashing = false; // 대쉬 종료
+        if (mDashTimer <= 0.0f) {
+            mIsDashing = false;
+        }
+        animationTimer += deltaTime;
+        if (animationTimer >= dashFrameDuration) {
+            mCurrentDashFrame = (mCurrentDashFrame + 1) % 8; // 8프레임
+            animationTimer = 0.0f;
         }
     }
-    //asd
+
     // 이동 로직
-    if (mIsDashing)
-    {
+    if (mIsDashing) {
         // 대쉬 중에는 현재 state 방향으로만 이동
-        switch (state)
-        {
+        switch (state) {
         case PlayerState::BACK:
             mY -= currentSpeed * deltaTime;
             break;
@@ -198,74 +265,46 @@ void Player::Update()
         case PlayerState::RIGHT:
             mX += currentSpeed * deltaTime;
             break;
-        default:
-            break;
         }
         isMoving = true;
     }
-    else
-    {
-        // 대쉬 중이 아닐 때만 이동 입력 처리
-        if (Input::GetKey(eKeyCode::W))
-        {
+    else {
+        // 대쉬 중이 아닐 때 입력 처리
+        if (Input::GetKey(eKeyCode::W)) {
             state = PlayerState::BACK;
             mY -= currentSpeed * deltaTime;
             isMoving = true;
         }
-        if (Input::GetKey(eKeyCode::A))
-        {
+        if (Input::GetKey(eKeyCode::A)) {
             state = PlayerState::LEFT;
             mX -= currentSpeed * deltaTime;
             isMoving = true;
         }
-        if (Input::GetKey(eKeyCode::S))
-        {
+        if (Input::GetKey(eKeyCode::S)) {
             state = PlayerState::FRONT;
             mY += currentSpeed * deltaTime;
             isMoving = true;
         }
-        if (Input::GetKey(eKeyCode::D))
-        {
+        if (Input::GetKey(eKeyCode::D)) {
             state = PlayerState::RIGHT;
             mX += currentSpeed * deltaTime;
             isMoving = true;
         }
     }
 
-    // rect 업데이트
-    rect = { (int)(mX + 28), (int)(mY)+11, (int)(mX + 63), (int)(mY + 80) };
-
-    // 애니메이션 프레임 업데이트
-    if (isMoving)
-    {
+    // 이동 애니메이션 (대쉬/공격/피격이 아닐 때)
+    if (isMoving && !mIsDashing && !mIsAttack && !mIsHit) {
         animationTimer += deltaTime;
-        if (mIsDashing)
-        {
-            if (animationTimer >= dashFrameDuration)
-            {
-                dashFrame = (dashFrame + 1) % 8; // Dash 애니메이션은 8프레임
-                animationTimer -= dashFrameDuration;
-            }
-        }
-        else
-        {
-            if (animationTimer >= walkFrameDuration)
-            {
-                walkFrame = (walkFrame + 1) % 10; // Walk 애니메이션은 10프레임
-                animationTimer -= walkFrameDuration;
-            }
+        if (animationTimer >= walkFrameDuration) {
+            mCurrentWalkFrame = (mCurrentWalkFrame + 1) % 10; // 10프레임
+            animationTimer = 0.0f;
         }
     }
-    else
-    {
-        walkFrame = 0; // 이동하지 않을 때는 첫 프레임으로 리셋
-        dashFrame = 0;
+    else if (!mIsDashing && !mIsAttack && !mIsHit) {
+        mCurrentWalkFrame = 0;
         animationTimer = 0.0f;
     }
 
-    // 현재 프레임 및 상태 저장
-    mCurrentWalkFrame = walkFrame;
-    mCurrentDashFrame = dashFrame;
     mIsMoving = isMoving;
 }
 
@@ -273,73 +312,108 @@ void Player::LateUpdate()
 {
 }
 
-
-
 void Player::Render(HDC hdc)
 {
     Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
-    if (mIsMoving)
-    {
-        if (mIsDashing)
-        {
-            switch (state)
-            {
+
+    CImage* currentImage = nullptr;
+    int imageWidth = 0;
+    int imageHeight = 0;
+
+    // 상태에 따라 이미지 선택
+    if (mIsDead) {
+        currentImage = &mFrontDieAnimation[mCurrentDieFrame]; // Die는 Front만 사용
+    }
+    else if (mIsHit) {
+        switch (state) {
+        case PlayerState::FRONT:
+            currentImage = &mFrontHitAnimation[mCurrentHitFrame];
+            break;
+        case PlayerState::BACK:
+            currentImage = &mBackHitAnimation[mCurrentHitFrame];
+            break;
+        case PlayerState::LEFT:
+            currentImage = &mLeftHitAnimation[mCurrentHitFrame];
+            break;
+        case PlayerState::RIGHT:
+            currentImage = &mRightHitAnimation[mCurrentHitFrame];
+            break;
+        }
+    }
+    else if (mIsAttack) {
+        switch (state) {
+        case PlayerState::FRONT:
+            currentImage = &mFrontAttackAnimation[mCurrentAttackFrame];
+            break;
+        case PlayerState::BACK:
+            currentImage = &mBackAttackAnimation[mCurrentAttackFrame];
+            break;
+        case PlayerState::LEFT:
+            currentImage = &mLeftAttackAnimation[mCurrentAttackFrame];
+            break;
+        case PlayerState::RIGHT:
+            currentImage = &mRightAttackAnimation[mCurrentAttackFrame];
+            break;
+        }
+    }
+    else if (mIsMoving) {
+        if (mIsDashing) {
+            switch (state) {
             case PlayerState::FRONT:
-                mFrontDashAnimation[mCurrentDashFrame].Draw(hdc, mX, mY, mFrontDashAnimation[mCurrentDashFrame].GetWidth(), mFrontDashAnimation[mCurrentDashFrame].GetHeight());
+                currentImage = &mFrontDashAnimation[mCurrentDashFrame];
                 break;
             case PlayerState::BACK:
-                mBackDashAnimation[mCurrentDashFrame].Draw(hdc, mX, mY, mBackDashAnimation[mCurrentDashFrame].GetWidth(), mBackDashAnimation[mCurrentDashFrame].GetHeight());
+                currentImage = &mBackDashAnimation[mCurrentDashFrame];
                 break;
             case PlayerState::LEFT:
-                mLeftDashAnimation[mCurrentDashFrame].Draw(hdc, mX, mY, mLeftDashAnimation[mCurrentDashFrame].GetWidth(), mLeftDashAnimation[mCurrentDashFrame].GetHeight());
+                currentImage = &mLeftDashAnimation[mCurrentDashFrame];
                 break;
             case PlayerState::RIGHT:
-                mRightDashAnimation[mCurrentDashFrame].Draw(hdc, mX, mY, mRightDashAnimation[mCurrentDashFrame].GetWidth(), mRightDashAnimation[mCurrentDashFrame].GetHeight());
-                break;
-            default:
+                currentImage = &mRightDashAnimation[mCurrentDashFrame];
                 break;
             }
         }
-        else
-        {
-            switch (state)
-            {
+        else {
+            switch (state) {
             case PlayerState::FRONT:
-                mFrontWalkAnimation[mCurrentWalkFrame].Draw(hdc, mX, mY, mFrontWalkAnimation[mCurrentWalkFrame].GetWidth(), mFrontWalkAnimation[mCurrentWalkFrame].GetHeight());
+                currentImage = &mFrontWalkAnimation[mCurrentWalkFrame];
                 break;
             case PlayerState::BACK:
-                mBackWalkAnimation[mCurrentWalkFrame].Draw(hdc, mX, mY, mBackWalkAnimation[mCurrentWalkFrame].GetWidth(), mBackWalkAnimation[mCurrentWalkFrame].GetHeight());
+                currentImage = &mBackWalkAnimation[mCurrentWalkFrame];
                 break;
             case PlayerState::LEFT:
-                mLeftWalkAnimation[mCurrentWalkFrame].Draw(hdc, mX, mY, mLeftWalkAnimation[mCurrentWalkFrame].GetWidth(), mLeftWalkAnimation[mCurrentWalkFrame].GetHeight());
+                currentImage = &mLeftWalkAnimation[mCurrentWalkFrame];
                 break;
             case PlayerState::RIGHT:
-                mRightWalkAnimation[mCurrentWalkFrame].Draw(hdc, mX, mY, mRightWalkAnimation[mCurrentWalkFrame].GetWidth(), mRightWalkAnimation[mCurrentWalkFrame].GetHeight());
-                break;
-            default:
+                currentImage = &mRightWalkAnimation[mCurrentWalkFrame];
                 break;
             }
         }
     }
-    else
-    {
-        switch (state)
-        {
+    else {
+        switch (state) {
         case PlayerState::FRONT:
-            mFrontIdleAnimation.Draw(hdc, mX, mY, mFrontIdleAnimation.GetWidth(), mFrontIdleAnimation.GetHeight());
+            currentImage = &mFrontIdleAnimation;
             break;
         case PlayerState::BACK:
-            mBackIdleAnimation.Draw(hdc, mX, mY, mBackIdleAnimation.GetWidth(), mBackIdleAnimation.GetHeight());
+            currentImage = &mBackIdleAnimation;
             break;
         case PlayerState::LEFT:
-            mLeftIdleAnimation.Draw(hdc, mX, mY, mLeftIdleAnimation.GetWidth(), mLeftIdleAnimation.GetHeight());
+            currentImage = &mLeftIdleAnimation;
             break;
         case PlayerState::RIGHT:
-            mRightIdleAnimation.Draw(hdc, mX, mY, mRightIdleAnimation.GetWidth(), mRightIdleAnimation.GetHeight());
-            break;
-        default:
+            currentImage = &mRightIdleAnimation;
             break;
         }
+    }
+
+    // 이미지 렌더링
+    if (currentImage != nullptr) {
+        imageWidth = currentImage->GetWidth();
+        imageHeight = currentImage->GetHeight();
+        int drawX = static_cast<int>(mX - imageWidth / 2.0f);
+        int drawY = static_cast<int>(mY - imageHeight / 2.0f);
+        currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
     }
 }
 
@@ -349,6 +423,28 @@ void Player::SetPosition(float x, float y)
     mY = y;
     position.x = x;
     position.y = y;
+}
+
+void Player::TakeDamage(int d)
+{
+    if (mIsDead) return;
+    hp -= d;
+    if (hp <= 0) {
+        hp = 0;
+        mIsDead = true;
+        mIsHit = false;
+        mIsAttack = false;
+        mIsDashing = false;
+        mIsMoving = false;
+        mCurrentDieFrame = 0;
+    }
+    else {
+        mIsHit = true;
+        mHitTimer = 0.2f; // 피격 애니메이션 0.2초
+        mCurrentHitFrame = 0;
+        mIsAttack = false;
+        mIsDashing = false;
+    }
 }
 
 float Player::GetPositionX()

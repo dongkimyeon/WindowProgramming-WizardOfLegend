@@ -166,12 +166,7 @@
     <ResourceCompile Include="DongYeonEngine.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Stage\Monster\SwordMan\SwordMan_Effect\SWORDMAN_ATTACK_0.png" />
     <Image Include="DongYeonEngine.ico" />
-    <Image Include="resources\Player\Back\Dash\BACK_COMPLETE_07.png" />
-    <Image Include="resources\Player\Back\Idle\BACK_COMPLETE_00.png" />
-    <Image Include="resources\Player\Front\Idle\FRONT_COMPLETE_00.png" />
-    <Image Include="resources\Player\Left\Dash\LEFT_COMPLETE_05.png" />
     <Image Include="small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

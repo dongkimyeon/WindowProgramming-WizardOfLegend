@@ -18,5 +18,5 @@ private:
     Wizard wizard;
     SwordMan swordman;
     Archer archer;
-
+    float swordmanAttackCooldown; // 스워드맨 공격 쿨타임
 };

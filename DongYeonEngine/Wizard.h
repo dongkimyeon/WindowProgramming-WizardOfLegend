@@ -1,6 +1,6 @@
 #pragma once
 #include "GameObject.h"
-
+#include "Player.h"
 class Wizard: public GameObject
 {
 public:
@@ -8,9 +8,12 @@ public:
 	Wizard();
 	enum EnemyState { LEFT, RIGHT };
 
-	void Update() override;
+	void Update(Player& p);
 	void LateUpdate() override;
 	void Render(HDC hdc) override;
+
+	void SetHp(int playerDamage) { hp -= playerDamage; }
+	float GetDamamge() { return damage; }
 
 	void SetPosition(float x, float y) override;
 	EnemyState GetState() { return state; }
@@ -23,7 +26,8 @@ private:
 	float mX;
 	float mY;
 	Vector2 position;
-
+	int hp;
+	int damage;
 	// Right 애니메이션
 	CImage mRightIdleAnimation;
 	CImage mRightAttackAnimation[4];
@@ -50,7 +54,8 @@ private:
 	int mCurrentDeadFrame;
 	bool mIsHit;
 	int mCurrentHitFrame;
-
+	
+	float PlayerDetectRange;
 
 	float speed;
 	RECT rect;

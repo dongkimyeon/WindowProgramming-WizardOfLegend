@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Player.h"
 
 class Archer : public GameObject
 {
@@ -7,11 +8,14 @@ public:
 
 	Archer();
 	enum EnemyState { LEFT, RIGHT };
-	void Update() override;
+	void Update(Player& p);
 	void LateUpdate() override;
 	void Render(HDC hdc) override;
 
 	void SetPosition(float x, float y) override;
+
+	void SetHp(int playerDamage) { hp -= playerDamage; }
+	float GetDamamge() { return damage; }
 
 	EnemyState GetState() { return state; }
 	float GetPositionX() override { return mX; } 
@@ -23,7 +27,8 @@ private:
 	float mX;
 	float mY;
 	Vector2 position;
-
+	int hp;
+	int damage;
 	// Right 애니메이션
 	CImage mRightIdleAnimation;
 	CImage mRightAttackAnimation[4];
@@ -51,6 +56,8 @@ private:
 	int mCurrentDeadFrame;
 	bool mIsHit;
 	int mCurrentHitFrame;
+
+	float PlayerDetectRange;
 
 	float speed;
 	RECT rect;

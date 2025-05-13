@@ -1,5 +1,5 @@
 ﻿#include "Archer.h"
-
+#include "Time.h"
 Archer::Archer()
 {
     mX = 1920 / 2;
@@ -73,20 +73,118 @@ Archer::Archer()
     }
 }
 
-void Archer::Update()
+void Archer::Update(Player& p)
 {
+    // rect 업데이트 (이미지 중심에 맞게)
+    int imageWidth = mRightIdleAnimation.GetWidth(); // 기본적으로 Idle 이미지 크기 기준
+    int imageHeight = mRightIdleAnimation.GetHeight();
+    rect.left = static_cast<int>(mX - imageWidth / 2.0f) + 45;
+    rect.top = static_cast<int>(mY - imageHeight / 2.0f) + 40;
+    rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 54;
+    rect.bottom = static_cast<int>(mY + imageHeight / 2.0f) - 33;
+
+    // 애니메이션 프레임 업데이트
+    static float frameTime = 0.0f;
+    frameTime += Time::DeltaTime(); // Time.h에서 제공되는 DeltaTime 사용
+
+    if (mIsdead)
+    {
+        if (frameTime >= 0.1f)
+        {
+            mCurrentDeadFrame = (mCurrentDeadFrame + 1) % 6; // Die: 6프레임
+            frameTime = 0.0f;
+        }
+    }
+    else if (mIsHit)
+    {
+        if (frameTime >= 0.1f)
+        {
+            mCurrentHitFrame = (mCurrentHitFrame + 1) % 2; // Hit: 2프레임
+            frameTime = 0.0f;
+        }
+    }
+    else if (mIsAttack)
+    {
+        if (frameTime >= 0.1f)
+        {
+            mCurrenAttackFrame = (mCurrenAttackFrame + 1) % 3; // Attack: 3프레임
+            frameTime = 0.0f;
+        }
+    }
+    else if (mIsMoving)
+    {
+        if (frameTime >= 0.1f)
+        {
+            mCurrentWalkFrame = (mCurrentWalkFrame + 1) % 6; // Walk: 6프레임
+            frameTime = 0.0f;
+        }
+    }
 }
 
 void Archer::LateUpdate()
 {
 }
 
-
-
 void Archer::Render(HDC hdc)
 {
+    // 충돌 영역 사각형
+    Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+
+    CImage* currentImage = nullptr;
+
+    // 상태에 따라 렌더링할 이미지 선택
+    if (mIsdead)
+    {
+        if (state == EnemyState::RIGHT)
+            currentImage = &mRightDieAnimaion[mCurrentDeadFrame];
+        else
+            currentImage = &mLeftDieAnimaion[mCurrentDeadFrame];
+    }
+    else if (mIsHit)
+    {
+        if (state == EnemyState::RIGHT)
+            currentImage = &mRightHitAnimation[mCurrentHitFrame];
+        else
+            currentImage = &mLeftHitAnimation[mCurrentHitFrame];
+    }
+    else if (mIsAttack)
+    {
+        if (state == EnemyState::RIGHT)
+            currentImage = &mRightAttackAnimation[mCurrenAttackFrame];
+        else
+            currentImage = &mLeftAttackAnimation[mCurrenAttackFrame];
+    }
+    else if (mIsMoving)
+    {
+        if (state == EnemyState::RIGHT)
+            currentImage = &mRightWalkAnimation[mCurrentWalkFrame];
+        else
+            currentImage = &mLeftWalkAnimation[mCurrentWalkFrame];
+    }
+    else
+    {
+        if (state == EnemyState::RIGHT)
+            currentImage = &mRightIdleAnimation;
+        else
+            currentImage = &mLeftIdleAnimation;
+    }
+
+    // 이미지 크기 가져오기
+    int imageWidth = 141 - 60;
+    int imageHeight = 145 - 60;
+
+    // 중심을 mX, mY에 맞추기 위해 왼쪽 상단 좌표 계산
+    int drawX = static_cast<int>(mX - imageWidth / 2.0f);
+    int drawY = static_cast<int>(mY - imageHeight / 2.0f);
+
+    // 캐릭터 이미지 그리기
+    currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
+
+    
 }
 
 void Archer::SetPosition(float x, float y)
 {
+    mX = x;
+    mY = y;
 }
