@@ -191,23 +191,12 @@ void Player::Update()
                 dieTimer = 0.0f;
             }
         }
-
-        mIsMoving = false;
-        mIsDashing = false;
-        mIsAttack = false;
-        mIsHit = false;
-        mIsDead = false;
-        mCurrentWalkFrame = 0;
-        mCurrentDashFrame = 0;
-        mCurrentAttackFrame = 0;
-        mCurrentHitFrame = 0;
-        mCurrentDieFrame = 0;
-        mDashTimer = 0.0f;
-        mAttackTimer = 0.0f;
-        mHitTimer = 0.0f;
-        mMouseClickFlag = false;
-        mHasEffectHitbox = false;
-        
+		mIsMoving = false;
+		mIsDashing = false;
+		mIsAttack = false;
+		mIsHit = false;
+		mMouseClickFlag = false;
+		rect = { 0, 0, 0, 0 };
         return;
     }
 
@@ -228,9 +217,9 @@ void Player::Update()
     // rect 업데이트
     int imageWidth = mFrontIdleAnimation.GetWidth();
     int imageHeight = mFrontIdleAnimation.GetHeight();
-    rect.left = static_cast<int>(mX - imageWidth / 2.0f) + 30;
-    rect.top = static_cast<int>(mY - imageHeight / 2.0f) + 10;
-    rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 18;
+    rect.left = static_cast<int>(mX - imageWidth / 2.0f) + 32;
+    rect.top = static_cast<int>(mY - imageHeight / 2.0f) + 20;
+    rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 22;
     rect.bottom = static_cast<int>(mY + imageHeight / 2.0f);
 
     // 피격 상태 처리

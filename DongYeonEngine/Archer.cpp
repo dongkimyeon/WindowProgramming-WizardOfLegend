@@ -111,16 +111,19 @@ void Archer::Update(Player& p, Stage1* stage)
     rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 54;
     rect.bottom = static_cast<int>(mY + imageHeight / 2.0f) - 33;
 
+
     // 죽음 상태 처리
     if (mIsDead) {
         static float dieTimer = 0.0f;
-        if (mCurrentDeadFrame < 5) { // 0~4까지 5프레임
+        if (mCurrentDeadFrame < 5) { // 0~5까지 6프레임
             dieTimer += Time::DeltaTime();
             if (dieTimer >= 0.1f) {
                 mCurrentDeadFrame++;
                 dieTimer = 0.0f;
             }
         }
+        rect = { 0,0,0,0 }; // 죽으면 rect를 비활성화
+
         return;
     }
 
@@ -297,6 +300,7 @@ void Archer::Render(HDC hdc, Player& p)
         int alpha = (mCurrenAttackFrame == 0) ? 64 :
             (mCurrenAttackFrame == 1) ? 128 :
             (mCurrenAttackFrame == 2) ? 192 : 255;
+
         Gdiplus::Pen pen(Gdiplus::Color(alpha, 255, 0, 0), 2.0f);
 
         float dx = p.GetPositionX() - mX;
@@ -306,7 +310,7 @@ void Archer::Render(HDC hdc, Player& p)
         float directionY = (distance > 0.0f) ? dy / distance : 0.0f;
         float angle = static_cast<float>(atan2(dy, dx) * 180.0 / 3.1415926535);
 
-        float bowOffset = 10.0f;
+        float bowOffset = 20.0f;
         Gdiplus::PointF startPoint(mX + directionX * bowOffset, mY + directionY * bowOffset);
         Gdiplus::PointF endPoint(mX + directionX * AttackRange * 2, mY + directionY * AttackRange * 2);
         graphics.DrawLine(&pen, startPoint, endPoint);
@@ -323,6 +327,7 @@ void Archer::Render(HDC hdc, Player& p)
         graphics.SetTransform(&matrix);
 
         Gdiplus::Bitmap bowBitmap((HBITMAP)*bowImage, nullptr);
+
         graphics.DrawImage(&bowBitmap,
             Gdiplus::Rect(bowDrawX, bowDrawY, bowWidth, bowHeight),
             0, 0, bowBitmap.GetWidth(), bowBitmap.GetHeight(),

@@ -119,6 +119,9 @@ void Wizard::Update(Player& p, Stage1* stage)
                 dieTimer = 0.0f;
             }
         }
+        rect = { 0,0,0,0 }; // 죽으면 rect를 비활성화
+
+
         return;
     }
 
