@@ -34,6 +34,12 @@
     <Filter Include="Object\Monster\Wizard">
       <UniqueIdentifier>{9231d814-482d-4566-9db2-8d06c07027f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Map">
+      <UniqueIdentifier>{7dbe1fe7-07f0-49dc-b1e0-1d4175eb5f02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Map\Tile">
+      <UniqueIdentifier>{a1696d17-6764-4305-868c-6570a0d8abba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -90,6 +96,12 @@
     <ClInclude Include="FireBall.h">
       <Filter>Object\Monster\Wizard</Filter>
     </ClInclude>
+    <ClInclude Include="MapManager.h">
+      <Filter>Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>Map\Tile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -145,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="FireBall.cpp">
       <Filter>Object\Monster\Wizard</Filter>
+    </ClCompile>
+    <ClCompile Include="MapManager.cpp">
+      <Filter>Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>Map\Tile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
