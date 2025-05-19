@@ -24,8 +24,8 @@ public:
 	void SetCameraX(int cameraX) { mCameraX = cameraX; }
 	void SetCameraY(int cameraY) { mCameraY = cameraY; }
 
-    bool GetEffectHitbox(POINT outPoints[4]); // SwordMan과 동일한 인터페이스 추가
-    bool CheckCollisionWithRect(RECT& otherRect); // 충돌 검사 함수 추가
+    bool GetEffectHitbox(POINT outPoints[4]); 
+    bool CheckCollisionWithRect(RECT& otherRect); 
 
 private:
     float mX;

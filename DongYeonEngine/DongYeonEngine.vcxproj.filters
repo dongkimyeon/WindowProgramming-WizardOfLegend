@@ -43,6 +43,12 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{c1ccf7f5-8d17-4527-80f7-1a17f451a2e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Player">
+      <UniqueIdentifier>{1e0680e5-89b0-4e98-ab57-a135d82d063c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Monster\SwordMan">
+      <UniqueIdentifier>{3207b0d9-2f8d-4507-a90d-ad9e3bf5e697}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -81,12 +87,6 @@
     <ClInclude Include="GameObject.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>Object</Filter>
-    </ClInclude>
-    <ClInclude Include="SwordMan.h">
-      <Filter>Object\Monster</Filter>
-    </ClInclude>
     <ClInclude Include="Archer.h">
       <Filter>Object\Monster\Archer</Filter>
     </ClInclude>
@@ -107,6 +107,18 @@
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="SwordMan.h">
+      <Filter>Object\Monster\SwordMan</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_Skill_FireBall.h">
+      <Filter>Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Player_Skill_FireDragon.h">
+      <Filter>Object\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -146,12 +158,6 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Object</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Object</Filter>
-    </ClCompile>
-    <ClCompile Include="SwordMan.cpp">
-      <Filter>Object\Monster</Filter>
-    </ClCompile>
     <ClCompile Include="Archer.cpp">
       <Filter>Object\Monster\Archer</Filter>
     </ClCompile>
@@ -172,6 +178,18 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="SwordMan.cpp">
+      <Filter>Object\Monster\SwordMan</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Player_Skill_FireBall.cpp">
+      <Filter>Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Player_Skill_FireDragon.cpp">
+      <Filter>Object\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

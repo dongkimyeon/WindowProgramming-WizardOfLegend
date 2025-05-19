@@ -141,6 +141,8 @@
     <ClInclude Include="MapManager.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Player_Skill_FireBall.h" />
+    <ClInclude Include="Player_Skill_FireDragon.h" />
     <ClInclude Include="Stage1.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
@@ -165,6 +167,8 @@
     <ClCompile Include="MapManager.cpp" />
     <ClCompile Include="Math.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Player_Skill_FireBall.cpp" />
+    <ClCompile Include="Player_Skill_FireDragon.cpp" />
     <ClCompile Include="Stage1.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />

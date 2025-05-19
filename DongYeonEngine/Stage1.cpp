@@ -231,44 +231,31 @@ void Stage1::Render(HDC hdc)
     wsprintf(playerPosText, L"플레이어 좌표: X = %d, Y = %d", static_cast<int>(player.GetPositionX()), static_cast<int>(player.GetPositionY()));
     TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
 
-    //// 디버깅 텍스트: 검사 좌표
-    //int swordmanIndex = 0;
-    //for (auto* swordman : swordmans)
-    //{
-    //    WCHAR swordmanPosText[100];
-    //    wsprintf(swordmanPosText, L"검사 %d 좌표: X = %d, Y = %d", swordmanIndex, static_cast<int>(swordman->GetPositionX()), static_cast<int>(swordman->GetPositionY()));
-    //    TextOut(hdc, 0, 80 + swordmanIndex * 20, swordmanPosText, lstrlen(swordmanPosText));
-    //    swordmanIndex++;
-    //}
-
-    //// 디버깅 텍스트: 마법사 좌표
-    //int wizardIndex = 0;
-    //for (auto* wizard : wizards)
-    //{
-    //    WCHAR wizardPosText[100];
-    //    wsprintf(wizardPosText, L"마법사 %d 좌표: X = %d, Y = %d", wizardIndex, static_cast<int>(wizard->GetPositionX()), static_cast<int>(wizard->GetPositionY()));
-    //    TextOut(hdc, 0, 100 + swordmanIndex * 20 + wizardIndex * 20, wizardPosText, lstrlen(wizardPosText));
-    //    wizardIndex++;
-    //}
-
-    //// 디버깅 텍스트: 궁수 좌표
-    //int archerIndex = 0;
-    //for (auto* archer : archers)
-    //{
-    //    WCHAR archerPosText[100];
-    //    wsprintf(archerPosText, L"궁수 %d 좌표: X = %d, Y = %d", archerIndex, static_cast<int>(archer->GetPositionX()), static_cast<int>(archer->GetPositionY()));
-    //    TextOut(hdc, 0, 120 + swordmanIndex * 20 + wizardIndex * 20 + archerIndex * 20, archerPosText, lstrlen(archerPosText));
-    //    archerIndex++;
-    //}
-
-    
+    // 디버깅 텍스트: 마우스 좌표
     WCHAR mousePosText[100];
     float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
     float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
     wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d", static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10, static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
-}
 
+    // 디버깅 텍스트: 화살 좌표
+    int arrowTextOffsetY = 80; // 플레이어 좌표 아래에 출력하기 위해 Y 오프셋 설정
+    int arrowIndex = 0;
+    for (const auto* arrow : arrows)
+    {
+        if (arrow->IsActive()) // 활성 상태의 화살만 출력
+        {
+            WCHAR arrowPosText[100];
+            wsprintf(arrowPosText, L"화살 %d 좌표: X = %d, Y = %d",
+                arrowIndex,
+                static_cast<int>(arrow->GetPositionX()),
+                static_cast<int>(arrow->GetPositionY()));
+            TextOut(hdc, 0, arrowTextOffsetY, arrowPosText, lstrlen(arrowPosText));
+            arrowTextOffsetY += 20; // 다음 화살 좌표를 아래에 출력
+            ++arrowIndex;
+        }
+    }
+}
 void Stage1::HandleCollision()
 {
     std::vector<GameObject*> allObjects;
