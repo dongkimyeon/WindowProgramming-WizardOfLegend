@@ -1,9 +1,7 @@
 #include "MapManager.h"
 #include <windows.h>
 
-// 정적 멤버 변수 정의
-Tile MapManager::floorTile[MAP_WIDTH / TILE_SIZE * MAP_HEIGHT / TILE_SIZE];
-Tile MapManager::wallTile[(MAP_WIDTH / TILE_SIZE + MAP_HEIGHT / TILE_SIZE) * 2];
+
 
 void MapManager::Initialize()
 {
