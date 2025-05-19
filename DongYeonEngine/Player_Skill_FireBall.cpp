@@ -58,7 +58,7 @@ void Player_Skill_FireBall::Update(GameObject& obj)
         return;
     }
 }
-
+//¤±¤¤¤·
 void Player_Skill_FireBall::Render(HDC hdc)
 {
     if (!mIsActive) return;
