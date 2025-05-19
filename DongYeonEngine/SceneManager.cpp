@@ -10,8 +10,7 @@ void SceneManager::Initialize()
 {
 	mMouseCursorImage.Load(L"resources/MouseCursor.png");
 	mSharedPlayer = new Player(); // 플레이어 객체 초기화
-	mSharedPlayer->SetPosition(2500, 2500); //스테이지 1 시작위치
-
+	
 
 }
 

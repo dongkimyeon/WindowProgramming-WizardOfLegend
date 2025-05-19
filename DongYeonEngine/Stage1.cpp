@@ -11,15 +11,16 @@ Stage1::Stage1()
     camera.SetTarget(SceneManager::GetSharedPlayer()); // 공유 플레이어 설정
     SceneManager::GetSharedPlayer()->SetCameraX(camera.GetPositionX());
     SceneManager::GetSharedPlayer()->SetCameraY(camera.GetPositionY());
+    SceneManager::GetSharedPlayer()->SetPosition(1200, 1200); //스테이지 1 시작위치
 
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(2700, 2300);
+    swordmans.back()->SetPosition(800, 800);
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(2800, 2400);
+    swordmans.back()->SetPosition(850, 800);
     wizards.push_back(new Wizard());
-    wizards.back()->SetPosition(2900, 2300);
+    wizards.back()->SetPosition(900, 800);
     archers.push_back(new Archer());
-    archers.back()->SetPosition(2300, 2300);
+    archers.back()->SetPosition(950, 800);
 }
 
 Stage1::~Stage1()
@@ -190,7 +191,7 @@ void Stage1::Update()
                 wizard->SetHitFlag(true);
             }
         }
-        for (auto* archer : archers)
+        for (auto* archer : archers) 
         {
             RECT enemyRect = archer->GetRect();
             if (player->CheckCollisionWithRect(enemyRect) && !archer->HasBeenHit())
@@ -207,6 +208,7 @@ void Stage1::Update()
         for (auto* archer : archers) archer->SetHitFlag(false);
     }
     HandleCollision();
+
 }
 
 void Stage1::LateUpdate()

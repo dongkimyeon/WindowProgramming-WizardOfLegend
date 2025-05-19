@@ -19,8 +19,8 @@ void Camera::Update()
         mX = mTarget->GetPositionX() - 640.0f; // 1280 / 2
         mY = mTarget->GetPositionY() - 360.0f; // 720 / 2
         // Clamp to map bounds (5000x5000)
-        mX = max(0.0f, min(mX, 5000.0f - 1280.0f));
-        mY = max(0.0f, min(mY, 5000.0f - 720.0f));
+        mX = max(0.0f, min(mX, 2000.0f - 1280.0f));
+        mY = max(0.0f, min(mY, 2000.0f - 720.0f));
     }
 }
 

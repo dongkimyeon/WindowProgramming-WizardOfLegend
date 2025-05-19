@@ -26,6 +26,7 @@ public:
 	void AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon) override { playerFireDragon.push_back(fireDragon); }
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
+	void ResolveCollisionMap(GameObject& obj1, GameObject& obj2);
 private:
     
     std::vector<Wizard*> wizards;

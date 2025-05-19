@@ -18,14 +18,10 @@ void Tile::Render(HDC hdc, RECT rect)
     if (tileImage && !tileImage->IsNull()) {
         if (rect.left == 0 && rect.right == 0 && rect.top == 0 && rect.bottom == 0) {
             tileImage->Draw(hdc, range);
-            OutputDebugString(L"Tile rendered with default rect\n");
         }
         else {
             tileImage->Draw(hdc, rect);
-            WCHAR debugStr[100];
-            wsprintf(debugStr, L"Tile rendered at (%d, %d, %d, %d)\n",
-                rect.left, rect.top, rect.right, rect.bottom);
-            OutputDebugString(debugStr);
+            
         }
     }
     else {
@@ -33,7 +29,6 @@ void Tile::Render(HDC hdc, RECT rect)
         HBRUSH brush = CreateSolidBrush(RGB(255, 0, 0));
         FillRect(hdc, rect.left == 0 ? &range : &rect, brush);
         DeleteObject(brush);
-        OutputDebugString(L"Tile image is null, drew red rectangle\n");
     }
 }
 
@@ -48,10 +43,4 @@ void Tile::SetPosition(float x, float y)
 void Tile::SetImage(CImage* image)
 {
     tileImage = image;
-    if (image && !image->IsNull()) {
-        OutputDebugString(L"Tile image set successfully\n");
-    }
-    else {
-        OutputDebugString(L"Tile image set failed\n");
-    }
 }

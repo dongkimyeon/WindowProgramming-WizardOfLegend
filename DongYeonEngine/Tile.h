@@ -16,7 +16,8 @@ public:
     void Update();
     void Render(HDC hdc, RECT rect = {});
     RECT GetRect() const { return range; }
-
+    
+	void SetRange(RECT rect) { range = rect; }
     void SetPosition(float x, float y);
     void SetImage(CImage* image);
 };
