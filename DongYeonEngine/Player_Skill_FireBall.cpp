@@ -1,4 +1,4 @@
-#include "Player_Skill_FireBall.h"
+ï»¿#include "Player_Skill_FireBall.h"
 #include "Stage1.h"
 #include "Time.h"
 #include <cmath>
@@ -28,12 +28,12 @@ void Player_Skill_FireBall::Update(GameObject& obj)
 {
     if (!mIsActive) return;
 
-    // À§Ä¡ ¾÷µ¥ÀÌÆ®
+    // ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     mX += mDirectionX * speed * Time::DeltaTime();
     mY += mDirectionY * speed * Time::DeltaTime();
     UpdateHitbox();
 
-    // ¾Ö´Ï¸ÞÀÌ¼Ç ¾÷µ¥ÀÌÆ®
+    // ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
     mAnimationTimer += Time::DeltaTime();
     if (mAnimationTimer >= mFrameDuration)
     {
@@ -41,7 +41,7 @@ void Player_Skill_FireBall::Update(GameObject& obj)
         mAnimationTimer -= mFrameDuration;
     }
 
-    // ¸Ê °æ°è Ã¼Å© (5000x5000 ¸Ê °¡Á¤)
+    // ï¿½ï¿½ ï¿½ï¿½ï¿½ Ã¼Å© (5000x5000 ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
     const float mapWidth = 5000.0f;
     const float mapHeight = 5000.0f;
     if (mX < 0 || mX > mapWidth || mY < 0 || mY > mapHeight)
@@ -50,7 +50,7 @@ void Player_Skill_FireBall::Update(GameObject& obj)
         return;
     }
 
-    // Ãæµ¹ Ã¼Å©
+    // ï¿½æµ¹ Ã¼Å©
     if (CheckCollisionWithRect(obj.GetRect()))
     {
         obj.TakeDamage(damage);
@@ -58,12 +58,12 @@ void Player_Skill_FireBall::Update(GameObject& obj)
         return;
     }
 }
-//¤±¤¤¤·¤·¤¤¤±¤¤¤·
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void Player_Skill_FireBall::Render(HDC hdc)
 {
     if (!mIsActive) return;
 
-    // È÷Æ®¹Ú½º ±×¸®±â
+    // ï¿½ï¿½Æ®ï¿½Ú½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
     HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
     HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
     HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
@@ -72,7 +72,7 @@ void Player_Skill_FireBall::Render(HDC hdc)
     SelectObject(hdc, oldBrush);
     DeleteObject(hitboxPen);
 
-    // ÆÄÀÌ¾îº¼ ÀÌ¹ÌÁö ·»´õ¸µ
+    // ï¿½ï¿½ï¿½Ì¾îº¼ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     int imageWidth = mFireBallAnimation[mCurrentFrame].GetWidth();
     int imageHeight = mFireBallAnimation[mCurrentFrame].GetHeight();
     float scale = 2.0f;
@@ -107,10 +107,10 @@ void Player_Skill_FireBall::UpdateHitbox()
     int imageHeight = static_cast<int>(mFireBallAnimation[0].GetHeight() * scale);
 
     POINT basePoints[4] = {
-        { -imageWidth / 2, -imageHeight / 2 }, // ÁÂ»ó
-        {  imageWidth / 2, -imageHeight / 2 }, // ¿ì»ó
-        {  imageWidth / 2,  imageHeight / 2 }, // ¿ìÇÏ
-        { -imageWidth / 2,  imageHeight / 2 }  // ÁÂÇÏ
+        { -imageWidth / 2, -imageHeight / 2 }, // ï¿½Â»ï¿½
+        {  imageWidth / 2, -imageHeight / 2 }, // ï¿½ï¿½ï¿½
+        {  imageWidth / 2,  imageHeight / 2 }, // ï¿½ï¿½ï¿½ï¿½
+        { -imageWidth / 2,  imageHeight / 2 }  // ï¿½ï¿½ï¿½ï¿½
     };
 
     float angle = static_cast<float>(atan2(mDirectionY, mDirectionX));
@@ -169,7 +169,7 @@ bool Player_Skill_FireBall::CheckCollisionWithRect(const RECT& rect)
 
 void Player_Skill_FireBall::Active(float mX, float mY, float angle, Scene* stage)
 {
-  
+
     float dirX = cos(angle);
     float dirY = sin(angle);
     stage->AddPlayerSkillFireBall(new Player_Skill_FireBall(mX, mY, dirX, dirY));

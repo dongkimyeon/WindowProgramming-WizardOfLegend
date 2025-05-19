@@ -27,9 +27,32 @@ public:
     float GetPositionX() const { return mX; }
     float GetPositionY() const { return mY; }
 
+    //파티클  관련 함수
+    void SpawnParticle();
+	void UpdateParticles();
+
 private:
+    //파티클 
+    struct Particle {
+        float x, y;           // 파티클 위치
+        float velX, velY;     // 파티클 속도
+        float lifetime;       // 파티클 수명
+        int frame;            // 애니메이션 프레임
+        float initialLifetime;
+    };
+
+    std::vector<Particle> mParticles; // 파티클 리스트
+    float mParticleTimer;             // 파티클 생성 타이머
+    float mParticleSpawnInterval;     // 파티클 생성 간격
+    CImage mFireParticleImage[20];    // 기존 파티클 이미지 배열
+
+
+
+
     CImage mFireDragonLeftImage;   // 왼쪽 방향 파이어 드래곤 이미지
     CImage mFireDragonRightImage;  // 오른쪽 방향 파이어 드래곤 이미지
+
+
     POINT hitboxPoints[4];         // 히트박스 좌표
     float mX;                      // 현재 x 위치
     float mY;                      // 현재 y 위치
@@ -46,7 +69,7 @@ private:
     float mAnimationTimer;         // 애니메이션 타이머
     const float mFrameDuration = 0.1f; // 프레임 지속 시간
 
-    bool mIsBalSa;
+   
     // 내부 함수
     void UpdateHitbox();           // 히트박스 업데이트
     bool CheckCollisionWithRect(const RECT& rect); // 충돌 체크

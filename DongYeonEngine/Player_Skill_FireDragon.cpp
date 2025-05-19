@@ -1,16 +1,30 @@
-#include "Player_Skill_FireDragon.h"
+癤�#include "Player_Skill_FireDragon.h"
 #include "Stage1.h"
 #include "Time.h"
 #include <cmath>
 #include <iostream>
+#include <random>
 
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(200.0f), mIsActive(true), damage(25),
     mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
-    mInstantDirX(0.0f), mInstantDirY(0.0f)
+    mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.1f),
+    mFrameDuration(0.1f)
 {
     mFireDragonLeftImage.Load(L"resources/Player/Player_Skill_FireDragonL/SKILL_FIREDRAGON_00.png");
     mFireDragonRightImage.Load(L"resources/Player/Player_Skill_FireDragonR/SKILL_FIREDRAGON_00.png");
+
+    for (int i = 0; i < 20; ++i)
+    {
+        wchar_t path[256];
+        swprintf_s(path, L"resources/Player/FireEffect/FIRE_PARTICLE_%02d.png", i);
+        if (mFireParticleImage[i].Load(path) != S_OK) {
+            std::cout << "Failed to load particle image: " << i << std::endl;
+        }
+        else {
+            std::cout << "Loaded particle image: " << i << std::endl;
+        }
+    }
 
     UpdateHitbox();
     std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
@@ -20,6 +34,9 @@ Player_Skill_FireDragon::~Player_Skill_FireDragon()
 {
     mFireDragonLeftImage.Destroy();
     mFireDragonRightImage.Destroy();
+    for (int i = 0; i < 20; ++i) {
+        mFireParticleImage[i].Destroy();
+    }
 }
 
 void Player_Skill_FireDragon::Update(GameObject& obj)
@@ -28,32 +45,26 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
 
     mWaveTime += Time::DeltaTime();
 
-    // 기본 이동 속도
     float baseVelX = mDirectionX * speed;
     float baseVelY = mDirectionY * speed;
 
-    // 사인파 파라미터
     float waveAmplitude = 60.0f;
     float waveFrequency = 2.0f;
 
-    // 이동 방향에 수직인 방향 (오른쪽 수직 벡터)
     float perpX = mDirectionY;
     float perpY = -mDirectionX;
 
-    // 사인파 속도 계산 (위상 오프셋 포함)
     float waveVel = waveAmplitude * waveFrequency * cos(waveFrequency * mWaveTime + phaseOffset);
 
-    // 순간적인 속도 벡터
     mInstantDirX = baseVelX + perpX * waveVel;
     mInstantDirY = baseVelY + perpY * waveVel;
 
-    // 위치 업데이트
     mX += mInstantDirX * Time::DeltaTime();
     mY += mInstantDirY * Time::DeltaTime();
 
     UpdateHitbox();
+    UpdateParticles();
 
-    // 애니메이션 업데이트
     mAnimationTimer += Time::DeltaTime();
     if (mAnimationTimer >= mFrameDuration)
     {
@@ -61,7 +72,6 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
         mAnimationTimer -= mFrameDuration;
     }
 
-    // 맵 경계 체크
     const float mapWidth = 5000.0f;
     const float mapHeight = 5000.0f;
     if (mX < 0 || mX > mapWidth || mY < 0 || mY > mapHeight)
@@ -70,7 +80,6 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
         return;
     }
 
-    // 충돌 체크
     if (CheckCollisionWithRect(obj.GetRect()))
     {
         obj.TakeDamage(damage);
@@ -102,11 +111,8 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     int drawY = static_cast<int>(mY - renderHeight / 2.0f);
 
     Gdiplus::Graphics graphics(hdc);
-    graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
     Gdiplus::ImageAttributes imageAttr;
-
-    imageAttr.SetColorKey(Gdiplus::Color(0, 0, 0), Gdiplus::Color(0, 0, 0), Gdiplus::ColorAdjustTypeBitmap);
-
+    //imageAttr.SetColorKey(Gdiplus::Color(0, 0, 0), Gdiplus::Color(0, 0, 0), Gdiplus::ColorAdjustTypeBitmap);
     float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX) * 180.0 / 3.1415926535);
 
     Gdiplus::Matrix matrix;
@@ -120,6 +126,26 @@ void Player_Skill_FireDragon::Render(HDC hdc)
         Gdiplus::UnitPixel, &imageAttr);
 
     graphics.ResetTransform();
+
+    std::cout << "Particle count: " << mParticles.size() << std::endl;
+    for (const auto& particle : mParticles) {
+        CImage& particleImage = mFireParticleImage[particle.frame];
+        int pWidth = particleImage.GetWidth();
+        int pHeight = particleImage.GetHeight();
+        float pScale = 0.7f;
+        int pRenderWidth = static_cast<int>(pWidth * pScale);
+        int pRenderHeight = static_cast<int>(pHeight * pScale);
+        int pDrawX = static_cast<int>(particle.x - pRenderWidth / 2.0f);
+        int pDrawY = static_cast<int>(particle.y - pRenderHeight / 2.0f);
+
+        std::cout << "Rendering particle at (" << pDrawX << ", " << pDrawY << ") with frame " << particle.frame << std::endl;
+
+        Gdiplus::Bitmap particleBitmap((HBITMAP)particleImage, nullptr);
+        graphics.DrawImage(&particleBitmap,
+            Gdiplus::Rect(pDrawX, pDrawY, pRenderWidth, pRenderHeight),
+            0, 0, pWidth, pHeight,
+            Gdiplus::UnitPixel, &imageAttr);
+    }
 }
 
 void Player_Skill_FireDragon::UpdateHitbox()
@@ -130,9 +156,9 @@ void Player_Skill_FireDragon::UpdateHitbox()
 
     POINT basePoints[4] = {
         { -imageWidth / 2, -imageHeight / 2 },
-        {  imageWidth / 2, -imageHeight / 2 },
-        {  imageWidth / 2,  imageHeight / 2 },
-        { -imageWidth / 2,  imageHeight / 2 }
+        { imageWidth / 2, -imageHeight / 2 },
+        { imageWidth / 2, imageHeight / 2 },
+        { -imageWidth / 2, imageHeight / 2 }
     };
 
     float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX));
@@ -198,7 +224,7 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
     static float savedMY = 0.0f;
     static float savedAngle = 0.0f;
     const int numDragons = 10;
-    const float spawnInterval = 0.05f;
+    const float spawnInterval = 0.07f;
 
     if (triggerFire && !isFiring)
     {
@@ -220,8 +246,6 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
         {
             float dirX = cos(savedAngle);
             float dirY = sin(savedAngle);
-
-            // 짝수: 위상 0, 홀수: 위상 π
             float phaseOffset = (dragonsSpawned % 2 == 0) ? 0.0f : 3.1415926535f;
 
             std::cout << "Spawning FireDragon #" << dragonsSpawned + 1 << " at (" << savedMX << ", " << savedMY << ") with phaseOffset = " << phaseOffset << std::endl;
@@ -243,5 +267,56 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
                 player->ResetFireDragonTriggered();
             }
         }
+    }
+}
+
+void Player_Skill_FireDragon::SpawnParticle()
+{
+   
+    float magnitude = std::sqrt(mInstantDirX * mInstantDirX + mInstantDirY * mInstantDirY);
+    float normDirX = (magnitude > 0) ? mInstantDirX / magnitude : 0.0f;
+    float normDirY = (magnitude > 0) ? mInstantDirY / magnitude : 0.0f;
+
+    float tailOffset = -30.0f;
+    float spawnX = mX + tailOffset * normDirX;
+    float spawnY = mY + tailOffset * normDirY;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> velDist(-5.0f, 5.0f); 
+    std::uniform_real_distribution<float> lifeDist(0.5f, 1.0f);
+
+    Particle particle;
+    particle.x = spawnX;
+    particle.y = spawnY;
+    particle.velX = mDirectionX * speed * 0.5f + velDist(gen); 
+    particle.velY = mDirectionY * speed * 0.5f + velDist(gen);
+    particle.lifetime = lifeDist(gen);
+    particle.initialLifetime = particle.lifetime;
+    particle.frame = 0;
+
+    mParticles.emplace_back(particle);
+    std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
+}
+
+void Player_Skill_FireDragon::UpdateParticles()
+{
+    mParticleTimer += Time::DeltaTime();
+    if (mParticleTimer >= mParticleSpawnInterval) {
+        SpawnParticle();
+        mParticleTimer = 0.0f;
+    }
+
+    for (auto it = mParticles.begin(); it != mParticles.end();) {
+        it->lifetime -= Time::DeltaTime();
+        if (it->lifetime <= 0) {
+            it = mParticles.erase(it);
+            continue;
+        }
+
+        it->x += it->velX * Time::DeltaTime();
+        it->y += it->velY * Time::DeltaTime();
+        it->frame = static_cast<int>(20 * (1.0f - it->lifetime / it->initialLifetime)) % 20;
+        ++it;
     }
 }
