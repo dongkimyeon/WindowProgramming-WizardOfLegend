@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "Player.h"
 
 class SceneManager
 {
@@ -32,9 +33,9 @@ public:
 	static void Update();
 	static void LateUpdate();
 	static void Render(HDC hdc);
-
+	static Player* GetSharedPlayer() { return mSharedPlayer; }
 private:
-	//static std::vector<Scene*> mScene;
+	static Player* mSharedPlayer;
 	static std::map<std::wstring, Scene*> mScene;
 	static Scene* mActiveScene;
 	static CImage mMouseCursorImage;

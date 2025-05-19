@@ -25,7 +25,7 @@ public:
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
 private:
-    Player player;
+    
     std::vector<Wizard*> wizards;
     std::vector<SwordMan*> swordmans;
     std::vector<Archer*> archers;

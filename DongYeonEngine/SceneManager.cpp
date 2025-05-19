@@ -4,10 +4,15 @@
 std::map<std::wstring, Scene*> SceneManager::mScene = {};
 Scene* SceneManager::mActiveScene = nullptr;
 CImage SceneManager::mMouseCursorImage;
+Player* SceneManager::mSharedPlayer = nullptr; 
 
 void SceneManager::Initialize()
 {
 	mMouseCursorImage.Load(L"resources/MouseCursor.png");
+	mSharedPlayer = new Player(); // 플레이어 객체 초기화
+	mSharedPlayer->SetPosition(2500, 2500); //스테이지 1 시작위치
+
+
 }
 
 void SceneManager::Update()

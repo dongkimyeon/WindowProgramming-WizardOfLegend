@@ -4,7 +4,7 @@
 #include <cmath>
 
 Player_Skill_FireBall::Player_Skill_FireBall(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(400.0f), mIsActive(true), damage(10),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(400.0f), mIsActive(true), damage(25),
     mCurrentFrame(0), mAnimationTimer(0.0f)
 {
     for (int i = 0; i < 5; ++i)
@@ -75,7 +75,7 @@ void Player_Skill_FireBall::Render(HDC hdc)
     // 파이어볼 이미지 렌더링
     int imageWidth = mFireBallAnimation[mCurrentFrame].GetWidth();
     int imageHeight = mFireBallAnimation[mCurrentFrame].GetHeight();
-    float scale = 1.5f;
+    float scale = 2.0f;
     int renderWidth = static_cast<int>(imageWidth * scale);
     int renderHeight = static_cast<int>(imageHeight * scale);
     int drawX = static_cast<int>(mX - renderWidth / 2.0f);
@@ -102,7 +102,7 @@ void Player_Skill_FireBall::Render(HDC hdc)
 
 void Player_Skill_FireBall::UpdateHitbox()
 {
-    float scale = 0.6f;
+    float scale = 1.5f;
     int imageWidth = static_cast<int>(mFireBallAnimation[0].GetWidth() * scale);
     int imageHeight = static_cast<int>(mFireBallAnimation[0].GetHeight() * scale);
 
@@ -169,18 +169,8 @@ bool Player_Skill_FireBall::CheckCollisionWithRect(const RECT& rect)
 
 void Player_Skill_FireBall::Active(float mX, float mY, float angle, Stage1* stage)
 {
-    const float totalAngle = 60.0f;
-    const int numFireBalls = 5;
-    const float angleIncrement = totalAngle / (numFireBalls - 1);
-    const float startAngle = -totalAngle / 2.0f;
-
-    float baseAngle = angle;
-
-    for (int i = 0; i < numFireBalls; ++i)
-    {
-        float currentAngle = baseAngle + (startAngle + i * angleIncrement) * 3.1415926535f / 180.0f;
-        float dirX = cos(currentAngle);
-        float dirY = sin(currentAngle);
-        stage->AddPlayerSkillFireBall(new Player_Skill_FireBall(mX, mY, dirX, dirY));
-    }
+    // 단일 파이어볼 발사
+    float dirX = cos(angle);
+    float dirY = sin(angle);
+    stage->AddPlayerSkillFireBall(new Player_Skill_FireBall(mX, mY, dirX, dirY));
 }
