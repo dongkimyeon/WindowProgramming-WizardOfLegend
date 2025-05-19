@@ -13,12 +13,12 @@ public:
     void Initialize();
     void Update();
     void LateUpdate();
-    void Render(HDC hdc);
+    void Render(HDC hdc, float cameraX, float cameraY);
 private:
-    static const int MAP_WIDTH = 1000;
-    static const int MAP_HEIGHT = 1000;
-    Tile floorTile[MAP_WIDTH / TILE_SIZE * MAP_HEIGHT / TILE_SIZE];
-    Tile wallTile[MAP_WIDTH / TILE_SIZE * 4];
+    static const int MAP_WIDTH = 5000;
+    static const int MAP_HEIGHT = 5000;
+    static Tile floorTile[MAP_WIDTH / TILE_SIZE * MAP_HEIGHT / TILE_SIZE];
+    static Tile wallTile[(MAP_WIDTH / TILE_SIZE + MAP_HEIGHT / TILE_SIZE) * 2];
     CImage floorImage;
     CImage wallImage;
     CImage buffer;

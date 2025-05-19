@@ -6,19 +6,16 @@
 
 Stage1::Stage1()
 {
-    player.SetPosition(1000, 500);
-
-    // 초기 적 객체 추가
+    player.SetPosition(2500, 2500);
+    camera.SetTarget(&player);
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(700, 100);
+    swordmans.back()->SetPosition(2700, 2300);
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(800, 200);
-
+    swordmans.back()->SetPosition(2800, 2400);
     wizards.push_back(new Wizard());
-    wizards.back()->SetPosition(900, 100);
-
+    wizards.back()->SetPosition(2900, 2300);
     archers.push_back(new Archer());
-    archers.back()->SetPosition(500, 100);
+    archers.back()->SetPosition(2300, 2300);
 }
 
 Stage1::~Stage1()
@@ -32,17 +29,17 @@ Stage1::~Stage1()
 
 void Stage1::Initialize()
 {
-    MapManager::GetInstance()->Initialize(); // MapManager 초기화
+    MapManager::GetInstance()->Initialize();
+    camera.Update();
 }
 
 void Stage1::Update()
 {
     player.Update();
-
+    camera.Update();
     for (auto* archer : archers) archer->Update(player, this);
     for (auto* wizard : wizards) wizard->Update(player, this);
     for (auto* swordman : swordmans) swordman->Update(player);
-
     for (auto it = arrows.begin(); it != arrows.end();)
     {
         if ((*it)->IsActive())
@@ -56,7 +53,6 @@ void Stage1::Update()
             it = arrows.erase(it);
         }
     }
-
     for (auto it = fireballs.begin(); it != fireballs.end();)
     {
         if ((*it)->IsActive())
@@ -70,10 +66,8 @@ void Stage1::Update()
             it = fireballs.erase(it);
         }
     }
-
     POINT effectHitboxPoints[4];
     bool hasEffectHitbox = player.GetEffectHitbox(effectHitboxPoints);
-
     if (hasEffectHitbox)
     {
         for (auto* swordman : swordmans)
@@ -110,7 +104,6 @@ void Stage1::Update()
         for (auto* wizard : wizards) wizard->SetHitFlag(false);
         for (auto* archer : archers) archer->SetHitFlag(false);
     }
-
     HandleCollision();
 }
 
@@ -121,19 +114,92 @@ void Stage1::LateUpdate()
 
 void Stage1::Render(HDC hdc)
 {
-    // MapManager로 타일 렌더링
-    MapManager::GetInstance()->Render(hdc);
+    int savedDC = SaveDC(hdc);
+    float cameraX = camera.GetPositionX();
+    float cameraY = camera.GetPositionY();
+    int viewWidth = 1280;
+    int viewHeight = 720;
 
-    // 적과 플레이어 렌더링
-    for (auto* wizard : wizards) wizard->Render(hdc, player);
-    for (auto* archer : archers) archer->Render(hdc, player);
-    for (auto* swordman : swordmans) swordman->Render(hdc, player);
-    player.Render(hdc);
+    // Render map
+    MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
-    for (auto* arrow : arrows) arrow->Render(hdc);
-    for (auto* fireball : fireballs) fireball->Render(hdc);
+    // Apply camera offset for objects
+    for (auto* wizard : wizards)
+    {
+        RECT rect = wizard->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            // Adjust rendering position
+            HDC wizardDC = hdc;
+            int savedWizardDC = SaveDC(wizardDC);
+            OffsetViewportOrgEx(wizardDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            wizard->Render(wizardDC, player);
+            RestoreDC(wizardDC, savedWizardDC);
+        }
+    }
+    for (auto* archer : archers)
+    {
+        RECT rect = archer->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC archerDC = hdc;
+            int savedArcherDC = SaveDC(archerDC);
+            OffsetViewportOrgEx(archerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            archer->Render(archerDC, player);
+            RestoreDC(archerDC, savedArcherDC);
+        }
+    }
+    for (auto* swordman : swordmans)
+    {
+        RECT rect = swordman->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC swordmanDC = hdc;
+            int savedSwordmanDC = SaveDC(swordmanDC);
+            OffsetViewportOrgEx(swordmanDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            swordman->Render(swordmanDC, player);
+            RestoreDC(swordmanDC, savedSwordmanDC);
+        }
+    }
+    // Render player
+    {
+        HDC playerDC = hdc;
+        int savedPlayerDC = SaveDC(playerDC);
+        OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        player.Render(playerDC);
+        RestoreDC(playerDC, savedPlayerDC);
+    }
+    /*for (auto* arrow : arrows)
+    {
+        RECT rect = arrow->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC arrowDC = hdc;
+            int savedArrowDC = SaveDC(arrowDC);
+            OffsetViewportOrgEx(arrowDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            arrow->Render(arrowDC);
+            RestoreDC(arrowDC, savedArrowDC);
+        }
+    }
+    for (auto* fireball : fireballs)
+    {
+        RECT rect = fireball->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC fireballDC = hdc;
+            int savedFireballDC = SaveDC(fireballDC);
+            OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            fireball->Render(fireballDC);
+            RestoreDC(fireballDC, savedFireballDC);
+        }
+    }*/
 
-    // UI 텍스트 출력
+    RestoreDC(hdc, savedDC);
     if (!swordmans.empty())
     {
         WCHAR swordManHpText[100];
@@ -143,7 +209,6 @@ void Stage1::Render(HDC hdc)
     WCHAR PlayerHpText[100];
     wsprintf(PlayerHpText, L"player Hp : %d", player.GetHp());
     TextOut(hdc, 0, 40, PlayerHpText, lstrlen(PlayerHpText));
-
     WCHAR Text[100];
     wsprintf(Text, L"X : %d Y : %d", static_cast<int>(Input::GetMousePosition().x), static_cast<int>(Input::GetMousePosition().y));
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10, static_cast<int>(Input::GetMousePosition().y), Text, lstrlen(Text));
@@ -156,7 +221,6 @@ void Stage1::HandleCollision()
     for (auto* swordman : swordmans) allObjects.push_back(swordman);
     for (auto* wizard : wizards) allObjects.push_back(wizard);
     for (auto* archer : archers) allObjects.push_back(archer);
-
     for (size_t i = 0; i < allObjects.size(); ++i)
     {
         for (size_t j = i + 1; j < allObjects.size(); ++j)
@@ -174,12 +238,10 @@ void Stage1::ResolveCollision(GameObject& obj1, GameObject& obj2)
     RECT rect1 = obj1.GetRect();
     RECT rect2 = obj2.GetRect();
     RECT intersect;
-
     if (IntersectRect(&intersect, &rect1, &rect2))
     {
         int overlapX = min(rect1.right, rect2.right) - max(rect1.left, rect2.left);
         int overlapY = min(rect1.bottom, rect2.bottom) - max(rect1.top, rect2.top);
-
         if (overlapX < overlapY)
         {
             if (rect1.left < rect2.left)

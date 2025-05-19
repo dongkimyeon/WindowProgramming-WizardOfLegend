@@ -6,7 +6,7 @@
 class Tile
 {
 private:
-    CImage* tileImage; // 포인터로 변경
+    CImage* tileImage;
     RECT range;
 
 public:
@@ -14,8 +14,9 @@ public:
     ~Tile();
 
     void Update();
-    void Render(HDC hdc);
+    void Render(HDC hdc, RECT rect = {});
+    RECT GetRect() const { return range; }
 
     void SetPosition(float x, float y);
-    void SetImage(CImage* image); // 포10 포인터 매개변수 수정
+    void SetImage(CImage* image);
 };

@@ -6,7 +6,8 @@
 #include "Archer.h"
 #include "Arrow.h"
 #include "FireBall.h"
-#include "MapManager.h" // MapManager Çì´õ Ãß°¡
+#include "MapManager.h"
+#include "Camera.h"
 #include <vector>
 
 class Stage1 : public Scene {
@@ -25,9 +26,10 @@ public:
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
 private:
     Player player;
-    std::vector<Wizard*> wizards;               // ¸¶¹ý»ç °´Ã¼ º¤ÅÍ
-    std::vector<SwordMan*> swordmans;           // ¼Òµå¸Ç °´Ã¼ º¤ÅÍ
-    std::vector<Archer*> archers;               // ±Ã¼ö °´Ã¼ º¤ÅÍ
-    std::vector<Arrow*> arrows;                 // È­»ì °´Ã¼ º¤ÅÍ
-    std::vector<FireBall*> fireballs;           // ÆÄÀÌ¾îº¼ °´Ã¼ º¤ÅÍ
+    std::vector<Wizard*> wizards;
+    std::vector<SwordMan*> swordmans;
+    std::vector<Archer*> archers;
+    std::vector<Arrow*> arrows;
+    std::vector<FireBall*> fireballs;
+    Camera camera; // Add camera
 };
