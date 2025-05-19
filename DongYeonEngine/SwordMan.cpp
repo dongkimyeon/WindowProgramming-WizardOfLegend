@@ -131,7 +131,7 @@ void SwordMan::Update(Player& p)
                 dieTimer = 0.0f;
             }
         }
-		rect = { 0,0,0,0 }; // 죽으면 rect를 비활성화
+        rect = { (int)mX,(int)mY,(int)mX,(int)mY };  // 죽으면 rect를 비활성화
 
         return;
     }
