@@ -2,18 +2,18 @@
 #include "Stage1.h"
 #include "Time.h"
 #include <cmath>
-#include <iostream> // 디버깅용 출력
+#include <iostream>
 
-Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, bool useSineWave)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(300.0f), mIsActive(true), damage(25),
-    mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), useSineWave(useSineWave), mInstantDirX(0.0f), mInstantDirY(0.0f)
+Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(200.0f), mIsActive(true), damage(25),
+    mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
+    mInstantDirX(0.0f), mInstantDirY(0.0f)
 {
-    // 파이어 드래곤 이미지 로드
     mFireDragonLeftImage.Load(L"resources/Player/Player_Skill_FireDragonL/SKILL_FIREDRAGON_00.png");
     mFireDragonRightImage.Load(L"resources/Player/Player_Skill_FireDragonR/SKILL_FIREDRAGON_00.png");
 
     UpdateHitbox();
-    std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl; // 디버깅 출력
+    std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
 }
 
 Player_Skill_FireDragon::~Player_Skill_FireDragon()
@@ -26,29 +26,26 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
 {
     if (!mIsActive) return;
 
-    // 시간에 따라 물결 효과 업데이트
     mWaveTime += Time::DeltaTime();
 
-    // 기본 이동
+    // 기본 이동 속도
     float baseVelX = mDirectionX * speed;
     float baseVelY = mDirectionY * speed;
 
-    // 물결 효과에 따른 y축 속도 변화
-    float waveAmplitude = 100.0f; // 진폭
-    float waveFrequency = 2.0f;  // 주파수
-    float waveVelY;
-    if (useSineWave)
-    {
-        waveVelY = waveAmplitude * waveFrequency * cos(mWaveTime * waveFrequency); // 사인파의 미분
-    }
-    else
-    {
-        waveVelY = -waveAmplitude * waveFrequency * sin(mWaveTime * waveFrequency); // 코사인파의 미분
-    }
+    // 사인파 파라미터
+    float waveAmplitude = 60.0f;
+    float waveFrequency = 2.0f;
 
-    // 순간적인 속도 벡터 계산
-    mInstantDirX = baseVelX;
-    mInstantDirY = baseVelY + waveVelY;
+    // 이동 방향에 수직인 방향 (오른쪽 수직 벡터)
+    float perpX = mDirectionY;
+    float perpY = -mDirectionX;
+
+    // 사인파 속도 계산 (위상 오프셋 포함)
+    float waveVel = waveAmplitude * waveFrequency * cos(waveFrequency * mWaveTime + phaseOffset);
+
+    // 순간적인 속도 벡터
+    mInstantDirX = baseVelX + perpX * waveVel;
+    mInstantDirY = baseVelY + perpY * waveVel;
 
     // 위치 업데이트
     mX += mInstantDirX * Time::DeltaTime();
@@ -56,15 +53,15 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
 
     UpdateHitbox();
 
-    // 애니메이션 업데이트 (단일 이미지를 사용하므로 프레임은 가상으로 관리)
+    // 애니메이션 업데이트
     mAnimationTimer += Time::DeltaTime();
     if (mAnimationTimer >= mFrameDuration)
     {
-        mCurrentFrame = (mCurrentFrame + 1) % 5; // 프레임 수는 임의로 5로 유지
+        mCurrentFrame = (mCurrentFrame + 1) % 5;
         mAnimationTimer -= mFrameDuration;
     }
 
-    // 맵 경계 체크 (5000x5000 맵)
+    // 맵 경계 체크
     const float mapWidth = 5000.0f;
     const float mapHeight = 5000.0f;
     if (mX < 0 || mX > mapWidth || mY < 0 || mY > mapHeight)
@@ -86,7 +83,6 @@ void Player_Skill_FireDragon::Render(HDC hdc)
 {
     if (!mIsActive) return;
 
-    // 히트박스 그리기
     HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
     HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
     HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
@@ -95,7 +91,6 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     SelectObject(hdc, oldBrush);
     DeleteObject(hitboxPen);
 
-    // 파이어 드래곤 이미지 렌더링 (방향에 따라 선택)
     CImage& currentImage = (mInstantDirX >= 0) ? mFireDragonRightImage : mFireDragonLeftImage;
 
     int imageWidth = currentImage.GetWidth();
@@ -110,10 +105,8 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
     Gdiplus::ImageAttributes imageAttr;
 
-    // 흰색 배경을 투명하게 처리 (RGB 245-255 범위)
-    imageAttr.SetColorKey(Gdiplus::Color(245, 245, 245), Gdiplus::Color(0, 0, 0), Gdiplus::ColorAdjustTypeBitmap);
+    imageAttr.SetColorKey(Gdiplus::Color(0, 0, 0), Gdiplus::Color(0, 0, 0), Gdiplus::ColorAdjustTypeBitmap);
 
-    // 순간적인 속도 벡터를 기반으로 회전 각도 계산
     float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX) * 180.0 / 3.1415926535);
 
     Gdiplus::Matrix matrix;
@@ -131,15 +124,15 @@ void Player_Skill_FireDragon::Render(HDC hdc)
 
 void Player_Skill_FireDragon::UpdateHitbox()
 {
-    float scale = 1.0f;
+    float scale = 0.5f;
     int imageWidth = static_cast<int>(mFireDragonLeftImage.GetWidth() * scale);
     int imageHeight = static_cast<int>(mFireDragonLeftImage.GetHeight() * scale);
 
     POINT basePoints[4] = {
-        { -imageWidth / 2, -imageHeight / 2 }, // 좌상
-        {  imageWidth / 2, -imageHeight / 2 }, // 우상
-        {  imageWidth / 2,  imageHeight / 2 }, // 우하
-        { -imageWidth / 2,  imageHeight / 2 }  // 좌하
+        { -imageWidth / 2, -imageHeight / 2 },
+        {  imageWidth / 2, -imageHeight / 2 },
+        {  imageWidth / 2,  imageHeight / 2 },
+        { -imageWidth / 2,  imageHeight / 2 }
     };
 
     float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX));
@@ -177,7 +170,6 @@ bool Player_Skill_FireDragon::CheckCollisionWithRect(const RECT& rect)
         return (crossings % 2) == 1;
         };
 
-    // 사각형 점이 드래곤 히트박스 안에 있는지 확인
     for (const auto& p : rectPoints)
     {
         if (PointInPolygon(p, hitboxPoints))
@@ -186,7 +178,6 @@ bool Player_Skill_FireDragon::CheckCollisionWithRect(const RECT& rect)
         }
     }
 
-    // 드래곤 히트박스 점이 사각형 안에 있는지 확인
     for (const auto& p : hitboxPoints)
     {
         if (p.x >= rect.left && p.x <= rect.right && p.y >= rect.top && p.y <= rect.bottom)
@@ -198,7 +189,7 @@ bool Player_Skill_FireDragon::CheckCollisionWithRect(const RECT& rect)
     return false;
 }
 
-void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* stage, bool triggerFire)
+void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* stage, Player* player, bool triggerFire)
 {
     static bool isFiring = false;
     static float accumulatedTime = 0.0f;
@@ -209,7 +200,6 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
     const int numDragons = 10;
     const float spawnInterval = 0.05f;
 
-    // 발사 시작
     if (triggerFire && !isFiring)
     {
         isFiring = true;
@@ -221,7 +211,6 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
         std::cout << "Firing started at (" << savedMX << ", " << savedMY << ") with angle " << savedAngle << std::endl;
     }
 
-    // 발사 중일 때 시간 누적 및 드래곤 생성
     if (isFiring)
     {
         accumulatedTime += Time::DeltaTime();
@@ -232,25 +221,27 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
             float dirX = cos(savedAngle);
             float dirY = sin(savedAngle);
 
-            // 사인파와 코사 drills 용 번갈아 사용
-            bool useSine = (dragonsSpawned % 2 == 0); // 짝수: 사인, 홀수: 코사인
+            // 짝수: 위상 0, 홀수: 위상 π
+            float phaseOffset = (dragonsSpawned % 2 == 0) ? 0.0f : 3.1415926535f;
 
-            std::cout << "Spawning FireDragon #" << dragonsSpawned + 1 << " at (" << savedMX << ", " << savedMY << ") with useSine = " << useSine << std::endl;
+            std::cout << "Spawning FireDragon #" << dragonsSpawned + 1 << " at (" << savedMX << ", " << savedMY << ") with phaseOffset = " << phaseOffset << std::endl;
 
-            stage->AddPlayerSkillFireDragon(new Player_Skill_FireDragon(savedMX, savedMY, dirX, dirY, useSine));
+            stage->AddPlayerSkillFireDragon(new Player_Skill_FireDragon(savedMX, savedMY, dirX, dirY, phaseOffset));
 
             dragonsSpawned++;
             accumulatedTime = 0.0f;
         }
 
-        // 모든 드래곤 발사 완료
         if (dragonsSpawned >= numDragons)
         {
             std::cout << "All " << numDragons << " FireDragons spawned, stopping firing." << std::endl;
             isFiring = false;
             dragonsSpawned = 0;
             accumulatedTime = 0.0f;
-
+            if (player != nullptr)
+            {
+                player->ResetFireDragonTriggered();
+            }
         }
     }
 }

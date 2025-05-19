@@ -30,7 +30,7 @@ public:
 
     bool GetEffectHitbox(POINT outPoints[4]); 
     bool CheckCollisionWithRect(RECT& otherRect); 
-
+    void ResetFireDragonTriggered() { fireDragonTriggered = false; } // 플래그 초기화 함수
 private:
     float mX;
     float mY;
@@ -42,6 +42,8 @@ private:
     int mCameraX;
     int mCameraY;
     
+    bool fireDragonTriggered; // 파이어드래곤 발사 상태 플래그
+
 
     // Front 애니메이션
     CImage mFrontIdleAnimation;
