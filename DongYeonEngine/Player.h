@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "Player_Skill_FireBall.h"  
+#include "Player_Skill_FireDragon.h"
 
 class Scene;
 

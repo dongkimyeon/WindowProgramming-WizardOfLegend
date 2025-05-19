@@ -316,6 +316,28 @@ void Player::Update(Scene* stage)
 
         Player_Skill_FireBall::Active(mX,mY, attackAngle, stage);
     }
+
+    // FireDragon 스킬
+    static bool fireDragonTriggered = false;
+    if (!mIsAttack && Input::GetKeyDown(eKeyCode::E) && !fireDragonTriggered)
+    {
+        Vector2 mousePos = Input::GetMousePosition();
+        float worldMouseX = mousePos.x + mCameraX;
+        float worldMouseY = mousePos.y + mCameraY;
+        float dx = worldMouseX - mX;
+        float dy = worldMouseY - mY;
+        attackAngle = atan2f(dy, dx);
+
+        Player_Skill_FireDragon::Active(mX, mY, attackAngle, stage, true);
+        fireDragonTriggered = true; // 발사 시작 플래그 설정
+    }
+
+    // 매 프레임 FireDragon Active 호출 (발사 상태 유지)
+    if (fireDragonTriggered)
+    {
+        Player_Skill_FireDragon::Active(mX, mY, attackAngle, stage, false);
+    }
+
     // 이동 방향 벡터 계산
     Vector2 moveDirection(0.0f, 0.0f);
     if (Input::GetKey(eKeyCode::W)) moveDirection.y -= 1.0f;

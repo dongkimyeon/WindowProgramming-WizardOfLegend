@@ -121,7 +121,53 @@ void Stage1::Update()
         if (!(*it)->IsActive()) continue;
         ++it;
     }
+    //파이어 드래곤
+    for (auto it = playerFireDragon.begin(); it != playerFireDragon.end();)
+    {
+        if (!(*it)->IsActive())
+        {
+            delete* it;
+            it = playerFireDragon.erase(it);
+            continue;
+        }
 
+        bool collided = false;
+        for (auto* swordman : swordmans)
+        {
+            (*it)->Update(*swordman);
+            if (!(*it)->IsActive())
+            {
+                collided = true;
+                break;
+            }
+        }
+        if (!collided)
+        {
+            for (auto* wizard : wizards)
+            {
+                (*it)->Update(*wizard);
+                if (!(*it)->IsActive())
+                {
+                    collided = true;
+                    break;
+                }
+            }
+        }
+        if (!collided)
+        {
+            for (auto* archer : archers)
+            {
+                (*it)->Update(*archer);
+                if (!(*it)->IsActive())
+                {
+                    collided = true;
+                    break;
+                }
+            }
+        }
+        if (!(*it)->IsActive()) continue;
+        ++it;
+    }
     POINT effectHitboxPoints[4];
     bool hasEffectHitbox = player->GetEffectHitbox(effectHitboxPoints);
     if (hasEffectHitbox)
@@ -269,6 +315,7 @@ void Stage1::Render(HDC hdc)
             RestoreDC(fireballDC, savedFireballDC);
         }
     }
+    //플레이어 파이어볼
     for (auto* playerFireBall : playerFireballs)
     {
         POINT* points = playerFireBall->GetHitboxPoints();
@@ -291,6 +338,30 @@ void Stage1::Render(HDC hdc)
             RestoreDC(fireballDC, savedFireballDC);
         }
     }
+	//플레이어 파이어 드래곤
+    for (auto* FireDragon : playerFireDragon)
+    {
+        POINT* points = FireDragon->GetHitboxPoints();
+        bool inView = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            {
+                inView = true;
+                break;
+            }
+        }
+        if (inView)
+        {
+            HDC FireDragonDC = hdc;
+            int saveFireDragonDC = SaveDC(FireDragonDC);
+            OffsetViewportOrgEx(FireDragonDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            FireDragon->Render(FireDragonDC);
+            RestoreDC(FireDragonDC, saveFireDragonDC);
+        }
+    }
+
 
     RestoreDC(hdc, savedDC);
 
