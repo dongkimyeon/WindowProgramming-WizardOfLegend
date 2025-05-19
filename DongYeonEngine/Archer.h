@@ -28,6 +28,8 @@ public:
     bool HasBeenHit() const { return mHasBeenHit; }
     void SetHitFlag(bool hit) { mHasBeenHit = hit; }
 
+	
+
 
 private:
     float mX;

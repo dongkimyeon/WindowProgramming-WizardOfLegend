@@ -17,6 +17,16 @@ public:
 
     bool IsActive() const { return mIsActive; }
 
+	POINT* GetHitboxPoints() { return hitboxPoints; } // 히트박스 포인터 반환
+
+
+	float GetPositionX() const { return mX; }
+	float GetPositionY() const { return mY; }
+	
+	float GetDirectionX() const { return mDirectionX; }
+	float GetDirectionY() const { return mDirectionY; }
+    
+
 private:
     CImage mArrowImage;
     POINT hitboxPoints[4]; // 회전된 충돌 박스
@@ -27,6 +37,8 @@ private:
     float speed;
     bool mIsActive;
     int damage;
+
+
 
     void UpdateHitbox();
     bool CheckCollisionWithRect(const RECT& rect);

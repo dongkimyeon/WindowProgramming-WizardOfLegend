@@ -17,6 +17,13 @@ public:
 
     bool IsActive() const { return mIsActive; }
 
+    POINT* GetHitboxPoints() { return hitboxPoints; } // 히트박스 포인터 반환
+
+    float GetPositionX() const { return mX; }
+    float GetPositionY() const { return mY; }
+
+
+
 private:
     CImage mFireBallAnimation[6];
     POINT hitboxPoints[4]; // 회전된 충돌 박스

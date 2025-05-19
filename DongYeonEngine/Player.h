@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
+
 class Player : public GameObject
 {
 public:
@@ -19,6 +20,9 @@ public:
     float GetSpeed() override;
     RECT GetRect() override; // GetHitbox 대신 GetRect 사용 (기존 코드 기반)
     bool GetIsDead() { return mIsDead; }
+	
+	void SetCameraX(int cameraX) { mCameraX = cameraX; }
+	void SetCameraY(int cameraY) { mCameraY = cameraY; }
 
     bool GetEffectHitbox(POINT outPoints[4]); // SwordMan과 동일한 인터페이스 추가
     bool CheckCollisionWithRect(RECT& otherRect); // 충돌 검사 함수 추가
@@ -29,6 +33,12 @@ private:
     Vector2 position;
     int hp;
     int damage;
+    
+
+    int mCameraX;
+    int mCameraY;
+    
+
     // Front 애니메이션
     CImage mFrontIdleAnimation;
     CImage mFrontAttackAnimation[16];

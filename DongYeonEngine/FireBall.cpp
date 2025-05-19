@@ -5,15 +5,14 @@
 
 FireBall::FireBall(float x, float y, float dirX, float dirY)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(400.0f), mIsActive(true), damage(10),
-    mCurrentFrame(0), mAnimationTimer(0.0f)
+	mCurrentFrame(0), mAnimationTimer(0.0f)
 {
     for (int i = 0; i < 6; ++i)
     {
         wchar_t path[256];
         swprintf_s(path, L"resources/Monster/WIZARD/WizardFire/Attack/WIZARD_FIRE_%02d.png", i);
         mFireBallAnimation[i].Load(path);
-
-        
+  
     }
     UpdateHitbox();
 }
@@ -51,12 +50,7 @@ void FireBall::Update(Player& player)
         return;
     }
 
-    // 화면 밖으로 나가면 비활성화
-    if (mX < 0 || mX > 1920 || mY < 0 || mY > 1080)
-    {
-        mIsActive = false;
-        return;
-    }
+	
 }
 
 void FireBall::Render(HDC hdc)

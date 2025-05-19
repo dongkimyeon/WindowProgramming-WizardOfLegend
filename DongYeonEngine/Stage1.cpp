@@ -8,6 +8,9 @@ Stage1::Stage1()
 {
     player.SetPosition(2500, 2500);
     camera.SetTarget(&player);
+	player.SetCameraX(camera.GetPositionX());
+	player.SetCameraY(camera.GetPositionY());
+
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(2700, 2300);
     swordmans.push_back(new SwordMan());
@@ -37,6 +40,8 @@ void Stage1::Update()
 {
     player.Update();
     camera.Update();
+    player.SetCameraX(camera.GetPositionX());
+    player.SetCameraY(camera.GetPositionY());
     for (auto* archer : archers) archer->Update(player, this);
     for (auto* wizard : wizards) wizard->Update(player, this);
     for (auto* swordman : swordmans) swordman->Update(player);
@@ -45,6 +50,8 @@ void Stage1::Update()
         if ((*it)->IsActive())
         {
             (*it)->Update(player);
+			
+
             ++it;
         }
         else
@@ -58,6 +65,7 @@ void Stage1::Update()
         if ((*it)->IsActive())
         {
             (*it)->Update(player);
+		
             ++it;
         }
         else
@@ -172,11 +180,20 @@ void Stage1::Render(HDC hdc)
         player.Render(playerDC);
         RestoreDC(playerDC, savedPlayerDC);
     }
-    /*for (auto* arrow : arrows)
+    for (auto* arrow : arrows)
     {
-        RECT rect = arrow->GetRect();
-        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
-            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        POINT* points = arrow->GetHitboxPoints();
+        bool inView = false;
+        for (int i = 0; i < 4; ++i) // Assuming 4 points for hitbox
+        {
+            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            {
+                inView = true;
+                break;
+            }
+        }
+        if (inView)
         {
             HDC arrowDC = hdc;
             int savedArrowDC = SaveDC(arrowDC);
@@ -187,9 +204,18 @@ void Stage1::Render(HDC hdc)
     }
     for (auto* fireball : fireballs)
     {
-        RECT rect = fireball->GetRect();
-        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
-            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        POINT* points = fireball->GetHitboxPoints();
+        bool inView = false;
+        for (int i = 0; i < 4; ++i) // Assuming 4 points for hitbox
+        {
+            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            {
+                inView = true;
+                break;
+            }
+        }
+        if (inView)
         {
             HDC fireballDC = hdc;
             int savedFireballDC = SaveDC(fireballDC);
@@ -197,21 +223,50 @@ void Stage1::Render(HDC hdc)
             fireball->Render(fireballDC);
             RestoreDC(fireballDC, savedFireballDC);
         }
-    }*/
+    }
 
     RestoreDC(hdc, savedDC);
-    if (!swordmans.empty())
-    {
-        WCHAR swordManHpText[100];
-        wsprintf(swordManHpText, L"enemy Hp : %d", swordmans[0]->GetHp());
-        TextOut(hdc, 0, 20, swordManHpText, lstrlen(swordManHpText));
-    }
-    WCHAR PlayerHpText[100];
-    wsprintf(PlayerHpText, L"player Hp : %d", player.GetHp());
-    TextOut(hdc, 0, 40, PlayerHpText, lstrlen(PlayerHpText));
-    WCHAR Text[100];
-    wsprintf(Text, L"X : %d Y : %d", static_cast<int>(Input::GetMousePosition().x), static_cast<int>(Input::GetMousePosition().y));
-    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10, static_cast<int>(Input::GetMousePosition().y), Text, lstrlen(Text));
+    // µð¹ö±ë ÅØ½ºÆ®: ÇÃ·¹ÀÌ¾î ÁÂÇ¥
+    WCHAR playerPosText[100];
+    wsprintf(playerPosText, L"ÇÃ·¹ÀÌ¾î ÁÂÇ¥: X = %d, Y = %d", static_cast<int>(player.GetPositionX()), static_cast<int>(player.GetPositionY()));
+    TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
+
+    //// µð¹ö±ë ÅØ½ºÆ®: °Ë»ç ÁÂÇ¥
+    //int swordmanIndex = 0;
+    //for (auto* swordman : swordmans)
+    //{
+    //    WCHAR swordmanPosText[100];
+    //    wsprintf(swordmanPosText, L"°Ë»ç %d ÁÂÇ¥: X = %d, Y = %d", swordmanIndex, static_cast<int>(swordman->GetPositionX()), static_cast<int>(swordman->GetPositionY()));
+    //    TextOut(hdc, 0, 80 + swordmanIndex * 20, swordmanPosText, lstrlen(swordmanPosText));
+    //    swordmanIndex++;
+    //}
+
+    //// µð¹ö±ë ÅØ½ºÆ®: ¸¶¹ý»ç ÁÂÇ¥
+    //int wizardIndex = 0;
+    //for (auto* wizard : wizards)
+    //{
+    //    WCHAR wizardPosText[100];
+    //    wsprintf(wizardPosText, L"¸¶¹ý»ç %d ÁÂÇ¥: X = %d, Y = %d", wizardIndex, static_cast<int>(wizard->GetPositionX()), static_cast<int>(wizard->GetPositionY()));
+    //    TextOut(hdc, 0, 100 + swordmanIndex * 20 + wizardIndex * 20, wizardPosText, lstrlen(wizardPosText));
+    //    wizardIndex++;
+    //}
+
+    //// µð¹ö±ë ÅØ½ºÆ®: ±Ã¼ö ÁÂÇ¥
+    //int archerIndex = 0;
+    //for (auto* archer : archers)
+    //{
+    //    WCHAR archerPosText[100];
+    //    wsprintf(archerPosText, L"±Ã¼ö %d ÁÂÇ¥: X = %d, Y = %d", archerIndex, static_cast<int>(archer->GetPositionX()), static_cast<int>(archer->GetPositionY()));
+    //    TextOut(hdc, 0, 120 + swordmanIndex * 20 + wizardIndex * 20 + archerIndex * 20, archerPosText, lstrlen(archerPosText));
+    //    archerIndex++;
+    //}
+
+    
+    WCHAR mousePosText[100];
+    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
+    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
+    wsprintf(mousePosText, L"¸¶¿ì½º ÁÂÇ¥: X = %d, Y = %d", static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
+    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10, static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
 }
 
 void Stage1::HandleCollision()

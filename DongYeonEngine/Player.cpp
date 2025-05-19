@@ -243,8 +243,10 @@ void Player::Update()
         mMouseClickFlag = !mMouseClickFlag;
 
         Vector2 mousePos = Input::GetMousePosition();
-        float dx = mousePos.x - mX;
-        float dy = mousePos.y - mY;
+		float worldMouseX = mousePos.x + mCameraX;
+        float worldMouseY = mousePos.y + mCameraY;  
+        float dx = worldMouseX - mX;
+        float dy = worldMouseY - mY;
         attackAngle = atan2f(dy, dx);
 
         float angle = attackAngle * 180.0f / 3.14159f;
