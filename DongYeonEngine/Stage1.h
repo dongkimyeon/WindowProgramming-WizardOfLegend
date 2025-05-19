@@ -9,6 +9,7 @@
 #include "MapManager.h"
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
+#include "Player_Skill_FireDragon.h"
 
 class Stage1 : public Scene {
 public:
@@ -22,6 +23,7 @@ public:
     void AddArrow(Arrow* arrow) override  { arrows.push_back(arrow); }
     void AddFireBall(FireBall* fireball) override { fireballs.push_back(fireball); }
 	void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball) override { playerFireballs.push_back(fireball); }
+	void AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon) override { playerFireDragon.push_back(fireDragon); }
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
 private:
@@ -32,5 +34,6 @@ private:
     std::vector<Arrow*> arrows;
     std::vector<FireBall*> fireballs;
 	std::vector<Player_Skill_FireBall*> playerFireballs;
+	std::vector<Player_Skill_FireDragon*> playerFireDragon;
     Camera camera; // Add camera
 };

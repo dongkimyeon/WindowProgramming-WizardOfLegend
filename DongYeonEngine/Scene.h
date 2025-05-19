@@ -4,10 +4,11 @@
 #include "Player_Skill_FireBall.h"	
 #include "Arrow.h"
 #include "FireBall.h"
-
+#include "Player_Skill_FireDragon.h"
 class Player_Skill_FireBall;
 class Arrow;
 class FireBall;
+class Player_Skill_FireDragon;
 
 class Scene : public Entity
 {
@@ -25,7 +26,7 @@ public:
 	virtual void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball);
 	virtual void AddArrow(Arrow* arrow);
 	virtual void AddFireBall(FireBall* fireball);
-
+	virtual void AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon);
 private:
 	
 };

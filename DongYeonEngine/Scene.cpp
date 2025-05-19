@@ -38,3 +38,7 @@ void Scene::AddFireBall(FireBall* fireball)
 {
 }
 
+void Scene::AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon)
+{
+}
+
