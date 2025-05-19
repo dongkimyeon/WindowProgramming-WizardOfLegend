@@ -19,8 +19,8 @@ public:
     void LateUpdate();
     void Render(HDC hdc);
 
-    void AddArrow(Arrow* arrow)  { arrows.push_back(arrow); }
-    void AddFireBall(FireBall* fireball) { fireballs.push_back(fireball); }
+    void AddArrow(Arrow* arrow) override  { arrows.push_back(arrow); }
+    void AddFireBall(FireBall* fireball) override { fireballs.push_back(fireball); }
 	void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball) override { playerFireballs.push_back(fireball); }
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);

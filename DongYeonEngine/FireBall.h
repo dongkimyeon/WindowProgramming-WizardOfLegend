@@ -2,7 +2,7 @@
 #include "CommonInclude.h"
 #include "Player.h"
 
-class Stage1;
+class Scene;
 
 class FireBall
 {
@@ -13,7 +13,7 @@ public:
     void Update(Player& player);
     void Render(HDC hdc);
 
-    static void ThrowFireBall(Player& player, float mX, float mY, Stage1* stage);
+    static void ThrowFireBall(Player& player, float mX, float mY, Scene* stage);
 
     bool IsActive() const { return mIsActive; }
 

@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "FireBall.h"
 
+class Scene;
+
 class Wizard: public GameObject
 {
 public:
@@ -11,7 +13,7 @@ public:
 	~Wizard();
 	enum EnemyState { LEFT, RIGHT };
 
-	void Update(Player& p, Stage1* stage);
+	void Update(Player& p, Scene* stage);
 	void LateUpdate() override;
 	void Render(HDC hdc, Player& p);
 

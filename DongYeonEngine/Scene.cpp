@@ -30,3 +30,11 @@ void Scene::AddPlayerSkillFireBall(Player_Skill_FireBall* fireball)
 
 }
 
+void Scene::AddArrow(Arrow* arrow)
+{
+}
+
+void Scene::AddFireBall(FireBall* fireball)
+{
+}
+

@@ -99,7 +99,7 @@ Wizard::~Wizard()
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
-void Wizard::Update(Player& p, Stage1* stage)
+void Wizard::Update(Player& p, Scene* stage)
 {
     int imageWidth = mRightIdleAnimation.GetWidth();
     int imageHeight = mRightIdleAnimation.GetHeight();

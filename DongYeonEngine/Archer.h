@@ -2,7 +2,7 @@
 #include "GameObject.h"
 #include "Player.h"
 
-class Stage1;
+class Scene;
 
 class Archer : public GameObject
 {
@@ -10,7 +10,7 @@ public:
     Archer();
     ~Archer();
     enum EnemyState { LEFT, RIGHT };
-    void Update(Player& p, Stage1* stage);
+    void Update(Player& p, Scene* stage);
     void LateUpdate() override;
     void Render(HDC hdc, Player& p);
     void SetPosition(float x, float y) override;

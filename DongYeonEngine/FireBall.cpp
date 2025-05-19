@@ -161,7 +161,7 @@ bool FireBall::CheckCollisionWithRect(const RECT& rect)
     return false;
 }
 
-void FireBall::ThrowFireBall(Player& player, float mX, float mY, Stage1* stage)
+void FireBall::ThrowFireBall(Player& player, float mX, float mY, Scene* stage)
 {
     float playerX = player.GetPositionX();
     float playerY = player.GetPositionY();
