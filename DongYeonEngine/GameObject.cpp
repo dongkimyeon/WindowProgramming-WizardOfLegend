@@ -27,3 +27,4 @@ void GameObject::Render(HDC hdc)
 {
 	
 }
+

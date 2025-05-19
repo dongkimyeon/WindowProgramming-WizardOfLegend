@@ -33,6 +33,7 @@ public:
 	 virtual float GetSpeed() { return speed; }
 	 virtual COLORREF GetColor() { return color; }
 	 virtual float GetRadius() { return radius; }
+	 virtual void TakeDamage(int damage) = 0; // 순수 가상 함수로 선언
 	 virtual RECT GetRect() 
 	 {
 		 return rect;
@@ -49,6 +50,7 @@ public:
 protected:
 	float mX;
 	float mY;
+	float hp;
 	float radius;
 	float speed;
 	RECT rect;

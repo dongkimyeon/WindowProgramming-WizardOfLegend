@@ -364,3 +364,4 @@ void Archer::TakeDamage(int d)
         mIsMoving = false;
     }
 }
+

@@ -8,7 +8,7 @@
 #include "FireBall.h"
 #include "MapManager.h"
 #include "Camera.h"
-#include <vector>
+#include "Player_Skill_FireBall.h"
 
 class Stage1 : public Scene {
 public:
@@ -21,7 +21,7 @@ public:
 
     void AddArrow(Arrow* arrow) { arrows.push_back(arrow); }
     void AddFireBall(FireBall* fireball) { fireballs.push_back(fireball); }
-
+	void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball) { playerFireballs.push_back(fireball); }
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
 private:
@@ -31,5 +31,6 @@ private:
     std::vector<Archer*> archers;
     std::vector<Arrow*> arrows;
     std::vector<FireBall*> fireballs;
+	std::vector<Player_Skill_FireBall*> playerFireballs;
     Camera camera; // Add camera
 };

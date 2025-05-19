@@ -180,7 +180,7 @@ Player::Player()
     }
 }
 
-void Player::Update()
+void Player::Update(Stage1* stage)
 {
     if (mIsDead) {
         static float dieTimer = 0.0f;
@@ -305,6 +305,17 @@ void Player::Update()
         return;
     }
 
+    if (!mIsAttack && Input::GetKeyDown(eKeyCode::Q))
+    {
+        Vector2 mousePos = Input::GetMousePosition();
+        float worldMouseX = mousePos.x + mCameraX;
+        float worldMouseY = mousePos.y + mCameraY;
+        float dx = worldMouseX - mX;
+        float dy = worldMouseY - mY;
+        attackAngle = atan2f(dy, dx);
+
+        Player_Skill_FireBall::Active(mX,mY, attackAngle, stage);
+    }
     // 이동 방향 벡터 계산
     Vector2 moveDirection(0.0f, 0.0f);
     if (Input::GetKey(eKeyCode::W)) moveDirection.y -= 1.0f;

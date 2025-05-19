@@ -38,7 +38,8 @@ void Stage1::Initialize()
 
 void Stage1::Update()
 {
-    player.Update();
+    
+    player.Update(this);
     camera.Update();
     player.SetCameraX(camera.GetPositionX());
     player.SetCameraY(camera.GetPositionY());
@@ -74,6 +75,54 @@ void Stage1::Update()
             it = fireballs.erase(it);
         }
     }
+    //플레이어가 쏘는 파이어볼
+    for (auto it = playerFireballs.begin(); it != playerFireballs.end();)
+    {
+        if (!(*it)->IsActive())
+        {
+            delete* it;
+            it = playerFireballs.erase(it);
+            continue;
+        }
+
+        bool collided = false;
+        for (auto* swordman : swordmans)
+        {
+            (*it)->Update(*swordman);
+            if (!(*it)->IsActive())
+            {
+                collided = true;
+                break;
+            }
+        }
+        if (!collided)
+        {
+            for (auto* wizard : wizards)
+            {
+                (*it)->Update(*wizard);
+                if (!(*it)->IsActive())
+                {
+                    collided = true;
+                    break;
+                }
+            }
+        }
+        if (!collided)
+        {
+            for (auto* archer : archers)
+            {
+                (*it)->Update(*archer);
+                if (!(*it)->IsActive())
+                {
+                    collided = true;
+                    break;
+                }
+            }
+        }
+        if (!(*it)->IsActive()) continue;
+        ++it;
+    }
+
     POINT effectHitboxPoints[4];
     bool hasEffectHitbox = player.GetEffectHitbox(effectHitboxPoints);
     if (hasEffectHitbox)
@@ -221,6 +270,29 @@ void Stage1::Render(HDC hdc)
             int savedFireballDC = SaveDC(fireballDC);
             OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
             fireball->Render(fireballDC);
+            RestoreDC(fireballDC, savedFireballDC);
+        }
+    }
+    //플레이어 스킬 렌더링
+    for (auto* playerFireBall : playerFireballs)
+    {
+        POINT* points = playerFireBall->GetHitboxPoints();
+        bool inView = false;
+        for (int i = 0; i < 4; ++i) // Assuming 4 points for hitbox
+        {
+            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            {
+                inView = true;
+                break;
+            }
+        }
+        if (inView)
+        {
+            HDC fireballDC = hdc;
+            int savedFireballDC = SaveDC(fireballDC);
+            OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            playerFireBall->Render(fireballDC);
             RestoreDC(fireballDC, savedFireballDC);
         }
     }
