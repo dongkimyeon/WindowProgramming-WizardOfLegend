@@ -2,13 +2,14 @@
 #include "GameObject.h"
 #include "Player_Skill_FireBall.h"  
 
-class Stage1; // 전방 선언
+class Scene;
+
 
 class Player : public GameObject
 {
 public:
     Player();
-    void Update(Stage1* stage) ;
+    void Update(Scene* stage) ;
     void LateUpdate() override;
     void Render(HDC hdc) override;
 

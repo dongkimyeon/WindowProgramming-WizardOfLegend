@@ -180,7 +180,7 @@ Player::Player()
     }
 }
 
-void Player::Update(Stage1* stage)
+void Player::Update(Scene* stage)
 {
     if (mIsDead) {
         static float dieTimer = 0.0f;

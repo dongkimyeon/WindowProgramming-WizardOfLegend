@@ -25,3 +25,8 @@ void Scene::Render(HDC hdc)
 	
 }
 
+void Scene::AddPlayerSkillFireBall(Player_Skill_FireBall* fireball)
+{
+
+}
+

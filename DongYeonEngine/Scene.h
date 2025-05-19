@@ -1,6 +1,9 @@
 #pragma once
 #include "Entity.h"
 #include "GameObject.h"	
+#include "Player_Skill_FireBall.h"	
+
+class Player_Skill_FireBall;
 
 class Scene : public Entity
 {
@@ -15,6 +18,7 @@ public:
 
 	
 
+	virtual void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball);
 private:
 	
 };

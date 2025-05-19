@@ -167,9 +167,9 @@ bool Player_Skill_FireBall::CheckCollisionWithRect(const RECT& rect)
     return false;
 }
 
-void Player_Skill_FireBall::Active(float mX, float mY, float angle, Stage1* stage)
+void Player_Skill_FireBall::Active(float mX, float mY, float angle, Scene* stage)
 {
-    // 단일 파이어볼 발사
+  
     float dirX = cos(angle);
     float dirY = sin(angle);
     stage->AddPlayerSkillFireBall(new Player_Skill_FireBall(mX, mY, dirX, dirY));

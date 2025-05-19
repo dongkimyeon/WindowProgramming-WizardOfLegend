@@ -34,6 +34,7 @@ public:
 	static void LateUpdate();
 	static void Render(HDC hdc);
 	static Player* GetSharedPlayer() { return mSharedPlayer; }
+	static Scene* GetActiveScene() { return mActiveScene; }
 private:
 	static Player* mSharedPlayer;
 	static std::map<std::wstring, Scene*> mScene;
