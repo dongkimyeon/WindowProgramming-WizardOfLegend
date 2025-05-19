@@ -14,10 +14,10 @@ class Stage1 : public Scene {
 public:
     Stage1();
     ~Stage1();
-    void Initialize();
-    void Update();
-    void LateUpdate();
-    void Render(HDC hdc);
+    void Initialize() override;
+    void Update() override;
+    void LateUpdate() override;
+    void Render(HDC hdc) override;
 
     void AddArrow(Arrow* arrow) override  { arrows.push_back(arrow); }
     void AddFireBall(FireBall* fireball) override { fireballs.push_back(fireball); }

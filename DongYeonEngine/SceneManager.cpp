@@ -18,6 +18,10 @@ void SceneManager::Initialize()
 void SceneManager::Update()
 {
 	mActiveScene->Update();
+	if (Input::GetKeyDown(eKeyCode::ESC))
+	{
+		PostQuitMessage(0);	
+	}
 }
 
 void SceneManager::LateUpdate()
