@@ -25,11 +25,16 @@ Player::Player()
     mAttackTimer = 0.0f;
     mHitTimer = 0.0f;
     mMouseClickFlag = false;
-    fireDragonTriggered = false; // 초기화
+    fireDragonTriggered = false;
     mHasEffectHitbox = false;
-    for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 }; // 히트박스 초기화
+    fireBallCooldown = 0.0f;
+    fireDragonCooldown = 0.0f;
+    fireBallReady = true;
+    fireDragonReady = true;
+    isUsingSkill = false;
+    for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
 
-    // Front 애니메이션 로드
+    // 애니메이션 로드 (기존 코드 유지)
     mFrontIdleAnimation.Load(L"resources/Player/Front/Idle/FRONT_COMPLETE_00.png");
     if (mFrontIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Player/Front/Idle/FRONT_COMPLETE_00.png\n");
     for (int i = 0; i < 16; ++i)
@@ -68,7 +73,6 @@ Player::Player()
         if (mFrontWalkAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
 
-    // Back 애니메이션 로드
     mBackIdleAnimation.Load(L"resources/Player/Back/Idle/BACK_COMPLETE_00.png");
     if (mBackIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Player/Back/Idle/BACK_COMPLETE_00.png\n");
     for (int i = 0; i < 16; ++i)
@@ -100,7 +104,6 @@ Player::Player()
         if (mBackWalkAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
 
-    // Right 애니메이션 로드
     mRightIdleAnimation.Load(L"resources/Player/Right/Idle/RIGHT_COMPLETE_00.png");
     if (mRightIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Player/Right/Idle/RIGHT_COMPLETE_00.png\n");
     for (int i = 0; i < 16; ++i)
@@ -132,7 +135,6 @@ Player::Player()
         if (mRightWalkAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
 
-    // Left 애니메이션 로드
     mLeftIdleAnimation.Load(L"resources/Player/Left/Idle/LEFT_COMPLETE_00.png");
     if (mLeftIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Player/Left/Idle/LEFT_COMPLETE_00.png\n");
     for (int i = 0; i < 16; ++i)
@@ -163,7 +165,7 @@ Player::Player()
         mLeftWalkAnimation[i].Load(path);
         if (mLeftWalkAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
-    //공격 이펙트 애니메이션 로드
+
     for (int i = 0; i < 6; ++i)
     {
         wchar_t path[256];
@@ -191,12 +193,12 @@ void Player::Update(Scene* stage)
                 dieTimer = 0.0f;
             }
         }
-		mIsMoving = false;
-		mIsDashing = false;
-		mIsAttack = false;
-		mIsHit = false;
-		mMouseClickFlag = false;
-		rect = { 0, 0, 0, 0 };
+        mIsMoving = false;
+        mIsDashing = false;
+        mIsAttack = false;
+        mIsHit = false;
+        mMouseClickFlag = false;
+        rect = { 0, 0, 0, 0 };
         return;
     }
 
@@ -204,8 +206,8 @@ void Player::Update(Scene* stage)
     float deltaTime = Time::DeltaTime();
     static float animationTimer = 0.0f;
     const float walkFrameDuration = 0.1f;
-    const float dashDistance = 150.0f; // 대쉬 거리
-    const float dashSpeed = 600.0f;    // 대쉬 속도
+    const float dashDistance = 150.0f;
+    const float dashSpeed = 600.0f;
     const float attackDuration = 0.6f;
     const float attackFrameDuration = attackDuration / 16.0f;
     const float hitDuration = 0.2f;
@@ -213,6 +215,21 @@ void Player::Update(Scene* stage)
     float currentSpeed = speed;
     static int clickCounter = 0;
     static int attackEndFrame = mMouseClickFlag ? 16 : 8;
+    const float skillCooldown = 5.0f; // 스킬 쿨타임 5초
+
+    // 쿨타임 업데이트
+    if (!fireBallReady) {
+        fireBallCooldown -= deltaTime;
+        if (fireBallCooldown <= 0.0f) {
+            fireBallReady = true;
+        }
+    }
+    if (!fireDragonReady) {
+        fireDragonCooldown -= deltaTime;
+        if (fireDragonCooldown <= 0.0f) {
+            fireDragonReady = true;
+        }
+    }
 
     // rect 업데이트
     int imageWidth = mFrontIdleAnimation.GetWidth();
@@ -241,10 +258,11 @@ void Player::Update(Scene* stage)
         attackEndFrame = mMouseClickFlag ? 16 : 8;
         mCurrentAttackFrame = mMouseClickFlag ? 8 : 0;
         mMouseClickFlag = !mMouseClickFlag;
+        isUsingSkill = false; // 기본 공격
 
         Vector2 mousePos = Input::GetMousePosition();
-		float worldMouseX = mousePos.x + mCameraX;
-        float worldMouseY = mousePos.y + mCameraY;  
+        float worldMouseX = mousePos.x + mCameraX;
+        float worldMouseY = mousePos.y + mCameraY;
         float dx = worldMouseX - mX;
         float dy = worldMouseY - mY;
         attackAngle = atan2f(dy, dx);
@@ -256,6 +274,68 @@ void Player::Update(Scene* stage)
         else state = PlayerState::BACK;
 
         animationTimer = 0.0f;
+    }
+
+    // FireBall 스킬 (Q)
+    if (!mIsAttack && Input::GetKeyDown(eKeyCode::Q) && fireBallReady) {
+        mIsAttack = true;
+        mAttackTimer = attackDuration;
+        attackEndFrame = mMouseClickFlag ? 16 : 8;
+        mCurrentAttackFrame = mMouseClickFlag ? 8 : 0;
+        mMouseClickFlag = !mMouseClickFlag;
+        isUsingSkill = true; // 스킬 사용
+
+        Vector2 mousePos = Input::GetMousePosition();
+        float worldMouseX = mousePos.x + mCameraX;
+        float worldMouseY = mousePos.y + mCameraY;
+        float dx = worldMouseX - mX;
+        float dy = worldMouseY - mY;
+        attackAngle = atan2f(dy, dx);
+
+        float angle = attackAngle * 180.0f / 3.14159f;
+        if (angle >= -45.0f && angle < 45.0f) state = PlayerState::RIGHT;
+        else if (angle >= 45.0f && angle < 135.0f) state = PlayerState::FRONT;
+        else if (angle >= 135.0f || angle < -135.0f) state = PlayerState::LEFT;
+        else state = PlayerState::BACK;
+
+        Player_Skill_FireBall::Active(mX, mY, attackAngle, stage);
+        fireBallReady = false;
+        fireBallCooldown = skillCooldown;
+        animationTimer = 0.0f;
+    }
+
+    // FireDragon 스킬 (E)
+    if (!mIsAttack && Input::GetKeyDown(eKeyCode::E) && !fireDragonTriggered && fireDragonReady) {
+        mIsAttack = true;
+        mAttackTimer = attackDuration;
+        attackEndFrame = mMouseClickFlag ? 16 : 8;
+        mCurrentAttackFrame = mMouseClickFlag ? 8 : 0;
+        mMouseClickFlag = !mMouseClickFlag;
+        isUsingSkill = true; // 스킬 사용
+
+        Vector2 mousePos = Input::GetMousePosition();
+        float worldMouseX = mousePos.x + mCameraX;
+        float worldMouseY = mousePos.y + mCameraY;
+        float dx = worldMouseX - mX;
+        float dy = worldMouseY - mY;
+        attackAngle = atan2f(dy, dx);
+
+        float angle = attackAngle * 180.0f / 3.14159f;
+        if (angle >= -45.0f && angle < 45.0f) state = PlayerState::RIGHT;
+        else if (angle >= 45.0f && angle < 135.0f) state = PlayerState::FRONT;
+        else if (angle >= 135.0f || angle < -135.0f) state = PlayerState::LEFT;
+        else state = PlayerState::BACK;
+
+        Player_Skill_FireDragon::Active(mX, mY, attackAngle, stage, this, true);
+        fireDragonTriggered = true;
+        fireDragonReady = false;
+        fireDragonCooldown = skillCooldown;
+        animationTimer = 0.0f;
+    }
+
+    // FireDragon 연속 발사
+    if (fireDragonTriggered) {
+        Player_Skill_FireDragon::Active(mX, mY, attackAngle, stage, this, false);
     }
 
     if (mIsAttack) {
@@ -271,12 +351,12 @@ void Player::Update(Scene* stage)
             mIsAttack = false;
             mCurrentAttackFrame = 0;
             mHasEffectHitbox = false;
+            isUsingSkill = false; // 공격 종료 시 플래그 초기화
             for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
             animationTimer = 0.0f;
         }
 
-        // 히트박스 업데이트
-        if ((mCurrentAttackFrame >= 4 && mCurrentAttackFrame < 8) || (mCurrentAttackFrame >= 12 && mCurrentAttackFrame < 16)) {
+        if (!isUsingSkill && ((mCurrentAttackFrame >= 4 && mCurrentAttackFrame < 8) || (mCurrentAttackFrame >= 12 && mCurrentAttackFrame < 16))) {
             int hitboxWidth = 65;
             int hitboxHeight = 70;
             float effectOffset = 27.0f;
@@ -305,38 +385,6 @@ void Player::Update(Scene* stage)
         return;
     }
 
-    if (!mIsAttack && Input::GetKeyDown(eKeyCode::Q))
-    {
-        Vector2 mousePos = Input::GetMousePosition();
-        float worldMouseX = mousePos.x + mCameraX;
-        float worldMouseY = mousePos.y + mCameraY;
-        float dx = worldMouseX - mX;
-        float dy = worldMouseY - mY;
-        attackAngle = atan2f(dy, dx);
-
-        Player_Skill_FireBall::Active(mX,mY, attackAngle, stage);
-    }
-
-    // FireDragon 스킬
-    if (!mIsAttack && Input::GetKeyDown(eKeyCode::E) && !fireDragonTriggered)
-    {
-        Vector2 mousePos = Input::GetMousePosition();
-        float worldMouseX = mousePos.x + mCameraX;
-        float worldMouseY = mousePos.y + mCameraY;
-        float dx = worldMouseX - mX;
-        float dy = worldMouseY - mY;
-        attackAngle = atan2f(dy, dx);
-
-        Player_Skill_FireDragon::Active(mX, mY, attackAngle, stage, this, true);
-        fireDragonTriggered = true; // 발사 시작 플래그 설정
-    }
-
-    // 매 프레임 FireDragon Active 호출 (발사 상태 유지)
-    if (fireDragonTriggered)
-    {
-        Player_Skill_FireDragon::Active(mX, mY, attackAngle, stage, this, false);
-    }
-
     // 이동 방향 벡터 계산
     Vector2 moveDirection(0.0f, 0.0f);
     if (Input::GetKey(eKeyCode::W)) moveDirection.y -= 1.0f;
@@ -346,7 +394,7 @@ void Player::Update(Scene* stage)
 
     // 대쉬 처리
     static Vector2 dashDirection(0.0f, 0.0f);
-    static float dashProgress = 0.0f; // 대쉬 진행 거리
+    static float dashProgress = 0.0f;
     if (!mIsDashing && Input::GetKeyDown(eKeyCode::SPACE) && moveDirection.Length() > 0.0f) {
         mIsDashing = true;
         dashDirection = moveDirection.Normalize();
@@ -354,7 +402,6 @@ void Player::Update(Scene* stage)
         mCurrentDashFrame = 0;
         animationTimer = 0.0f;
 
-        // 대쉬 방향에 따라 state 설정
         if (abs(dashDirection.x) > abs(dashDirection.y)) {
             state = (dashDirection.x > 0) ? PlayerState::RIGHT : PlayerState::LEFT;
         }
@@ -367,7 +414,7 @@ void Player::Update(Scene* stage)
         float moveDistance = dashSpeed * deltaTime;
         dashProgress += moveDistance;
         if (dashProgress >= dashDistance) {
-            moveDistance -= (dashProgress - dashDistance); // 초과분 조정
+            moveDistance -= (dashProgress - dashDistance);
             mIsDashing = false;
             dashProgress = 0.0f;
         }
@@ -376,13 +423,10 @@ void Player::Update(Scene* stage)
         mY += move.y;
         isMoving = true;
 
-        // 애니메이션 프레임 설정
         if (dashProgress < dashDistance * 0.8f) {
-            // 대쉬 중: 00~03 프레임
             mCurrentDashFrame = static_cast<int>((dashProgress / (dashDistance * 0.8f)) * 4) % 4;
         }
         else {
-            // 대쉬 종료 직전: 04~07 프레임
             mCurrentDashFrame = 4 + static_cast<int>(((dashProgress - dashDistance * 0.8f) / (dashDistance * 0.2f)) * 4) % 4;
         }
     }
@@ -393,7 +437,6 @@ void Player::Update(Scene* stage)
         mY += move.y;
         isMoving = true;
 
-        // 일반 이동 시 state 설정
         if (abs(moveDirection.x) > abs(moveDirection.y)) {
             state = (moveDirection.x > 0) ? PlayerState::RIGHT : PlayerState::LEFT;
         }
@@ -402,7 +445,6 @@ void Player::Update(Scene* stage)
         }
     }
 
-    // 이동 애니메이션
     if (isMoving && !mIsDashing && !mIsAttack && !mIsHit) {
         animationTimer += deltaTime;
         if (animationTimer >= walkFrameDuration) {
@@ -425,7 +467,6 @@ void Player::LateUpdate()
 void Player::Render(HDC hdc)
 {
     Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
-    // 디버그 히트박스 렌더링
     if (mHasEffectHitbox) {
         HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
         HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
@@ -440,7 +481,6 @@ void Player::Render(HDC hdc)
     int imageWidth = 0;
     int imageHeight = 0;
 
-    // 상태에 따라 이미지 선택 (기존 로직 유지)
     if (mIsDead) {
         currentImage = &mFrontDieAnimation[mCurrentDieFrame];
     }
@@ -487,7 +527,6 @@ void Player::Render(HDC hdc)
         }
     }
 
-    // 플레이어 이미지 렌더링
     if (currentImage != nullptr) {
         imageWidth = currentImage->GetWidth();
         imageHeight = currentImage->GetHeight();
@@ -496,19 +535,16 @@ void Player::Render(HDC hdc)
         currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
     }
 
-    // 공격 이펙트 렌더링
-    if (mIsAttack && mCurrentAttackFrame >= 4) { // 4프레임부터 이펙트 출력
+    // 공격 이펙트 렌더링 (스킬 사용 시 제외)
+    if (mIsAttack && !isUsingSkill && mCurrentAttackFrame >= 4) {
         CImage* effectImage = nullptr;
         int effectFrame = 0;
-        if (mCurrentAttackFrame < 8)
-        {
-            // 레프트 이펙트: 4~7프레임 -> 0~3
-            effectFrame = (mCurrentAttackFrame - 4) * 6 / 4; // 4프레임을 6프레임으로 확장
+        if (mCurrentAttackFrame < 8) {
+            effectFrame = (mCurrentAttackFrame - 4) * 6 / 4;
             effectImage = &mLeftAttackEffectAnimation[effectFrame % 6];
         }
         else {
-            // 라이트 이펙트: 8~15프레임 -> 0~5
-            effectFrame = (mCurrentAttackFrame - 8) * 6 / 8; // 8프레임을 6프레임으로 매핑
+            effectFrame = (mCurrentAttackFrame - 8) * 6 / 8;
             effectImage = &mRightAttackEffectAnimation[effectFrame % 6];
         }
 
@@ -516,26 +552,38 @@ void Player::Render(HDC hdc)
             int effectWidth = effectImage->GetWidth() + 50;
             int effectHeight = effectImage->GetHeight() + 30;
             float effectOffset = 20.0f;
-            int effectDrawX = static_cast<int>(mX + cos(attackAngle) * effectOffset - effectWidth / 2.0f);
-            int effectDrawY = static_cast<int>(mY + sin(attackAngle) * effectOffset - effectHeight / 2.0f);
 
-            Gdiplus::Graphics graphics(hdc);
-            graphics.SetSmoothingMode(Gdiplus::SmoothingModeAntiAlias);
-            Gdiplus::ImageAttributes imageAttr;
-            imageAttr.SetColorKey(Gdiplus::Color(0, 0, 0), Gdiplus::Color(0, 0, 0));
+            // 회전 각도 계산
+            float angle = attackAngle;
 
-            float angle = attackAngle * 180.0f / 3.1415926535f;
-            Gdiplus::Matrix matrix;
-            matrix.RotateAt(angle, Gdiplus::PointF(mX + cos(attackAngle) * effectOffset, mY + sin(attackAngle) * effectOffset));
-            graphics.SetTransform(&matrix);
+            // 변환 행렬 설정
+            XFORM xForm = { 0 };
+            xForm.eM11 = cos(angle); // X 스케일 및 회전
+            xForm.eM12 = sin(angle); // X에 대한 Y의 기울기
+            xForm.eM21 = -sin(angle); // Y에 대한 X의 기울기
+            xForm.eM22 = cos(angle); // Y 스케일 및 회전
+            xForm.eDx = mX + cos(attackAngle) * effectOffset; // 중심점 X로 이동
+            xForm.eDy = mY + sin(attackAngle) * effectOffset; // 중심점 Y로 이동
 
-            Gdiplus::Bitmap effectBitmap((HBITMAP)*effectImage, nullptr);
-            graphics.DrawImage(&effectBitmap,
-                Gdiplus::Rect(effectDrawX, effectDrawY, effectWidth, effectHeight),
-                0, 0, effectBitmap.GetWidth(), effectBitmap.GetHeight(),
-                Gdiplus::UnitPixel, &imageAttr);
+            // 그래픽 모드 및 변환 적용
+            SetGraphicsMode(hdc, GM_ADVANCED);
+            SetWorldTransform(hdc, &xForm);
 
-            graphics.ResetTransform();
+            // 이펙트 렌더링
+            HDC srcDC = effectImage->GetDC();
+            TransparentBlt(
+                hdc,
+                -effectWidth / 2, -effectHeight / 2, effectWidth, effectHeight,
+                srcDC,
+                0, 0, effectImage->GetWidth(), effectImage->GetHeight(),
+                RGB(0, 0, 0) // 투명색
+            );
+            effectImage->ReleaseDC();
+
+            // 변환 행렬 초기화
+            XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+            SetWorldTransform(hdc, &identity);
+            SetGraphicsMode(hdc, GM_COMPATIBLE);
         }
     }
 }
@@ -563,7 +611,7 @@ void Player::TakeDamage(int d)
     }
     else {
         mIsHit = true;
-        mHitTimer = 0.2f; // 피격 애니메이션 0.2초
+        mHitTimer = 0.2f;
         mCurrentHitFrame = 0;
         mIsAttack = false;
         mIsDashing = false;
@@ -614,7 +662,6 @@ bool Player::CheckCollisionWithRect(RECT& otherRect)
 {
     if (!mHasEffectHitbox) return false;
 
-    // 플레이어 사각형 꼭짓점
     POINT rectPoints[4] = {
         { otherRect.left, otherRect.top },
         { otherRect.right, otherRect.top },
@@ -622,14 +669,12 @@ bool Player::CheckCollisionWithRect(RECT& otherRect)
         { otherRect.left, otherRect.bottom }
     };
 
-    // 1. 플레이어 꼭짓점이 이펙트 사각형 내부에 있는지
     for (auto& p : rectPoints) {
         if (CheckPointInPolygon(p, mEffectHitboxPoints)) {
             return true;
         }
     }
 
-    // 2. 이펙트 사각형 꼭짓점이 플레이어 사각형 내부에 있는지
     for (auto& p : mEffectHitboxPoints) {
         if (p.x >= otherRect.left && p.x <= otherRect.right &&
             p.y >= otherRect.top && p.y <= otherRect.bottom) {

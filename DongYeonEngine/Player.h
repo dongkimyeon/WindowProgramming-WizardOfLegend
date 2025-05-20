@@ -5,12 +5,11 @@
 
 class Scene;
 
-
 class Player : public GameObject
 {
 public:
     Player();
-    void Update(Scene* stage) ;
+    void Update(Scene* stage);
     void LateUpdate() override;
     void Render(HDC hdc) override;
 
@@ -22,30 +21,34 @@ public:
     float GetPositionX() override;
     float GetPositionY() override;
     float GetSpeed() override;
-    RECT GetRect() override; // GetHitbox 대신 GetRect 사용 (기존 코드 기반)
+    RECT GetRect() override;
     bool GetIsDead() { return mIsDead; }
-	
-	void SetCameraX(int cameraX) { mCameraX = cameraX; }
-	void SetCameraY(int cameraY) { mCameraY = cameraY; }
 
-    bool GetEffectHitbox(POINT outPoints[4]); 
-    bool CheckCollisionWithRect(RECT& otherRect); 
-    void ResetFireDragonTriggered() { fireDragonTriggered = false; } // 플래그 초기화 함수
+    void SetCameraX(int cameraX) { mCameraX = cameraX; }
+    void SetCameraY(int cameraY) { mCameraY = cameraY; }
+
+    bool GetEffectHitbox(POINT outPoints[4]);
+    bool CheckCollisionWithRect(RECT& otherRect);
+    void ResetFireDragonTriggered() { fireDragonTriggered = false; }
+
 private:
     float mX;
     float mY;
     Vector2 position;
     int hp;
     int damage;
-    
 
     int mCameraX;
     int mCameraY;
-    
+
     bool fireDragonTriggered; // 파이어드래곤 발사 상태 플래그
+    float fireBallCooldown;   // 파이어볼 쿨타임 타이머
+    float fireDragonCooldown; // 파이어드래곤 쿨타임 타이머
+    bool fireBallReady;       // 파이어볼 쿨타임 준비 여부
+    bool fireDragonReady;     // 파이어드래곤 쿨타임 준비 여부
+    bool isUsingSkill;        // 스킬 사용 여부 플래그
 
-
-    // Front 애니메이션
+    // 애니메이션 이미지들
     CImage mFrontIdleAnimation;
     CImage mFrontAttackAnimation[16];
     CImage mFrontDashAnimation[8];
@@ -53,33 +56,28 @@ private:
     CImage mFrontHitAnimation[2];
     CImage mFrontWalkAnimation[10];
 
-    // Right 애니메이션
     CImage mRightIdleAnimation;
     CImage mRightAttackAnimation[16];
     CImage mRightDashAnimation[8];
     CImage mRightHitAnimation[2];
     CImage mRightWalkAnimation[10];
- 
-    // Left 애니메이션
+
     CImage mLeftIdleAnimation;
     CImage mLeftAttackAnimation[16];
     CImage mLeftDashAnimation[8];
     CImage mLeftHitAnimation[2];
     CImage mLeftWalkAnimation[10];
-  
-    // Back 애니메이션
+
     CImage mBackIdleAnimation;
     CImage mBackAttackAnimation[16];
     CImage mBackDashAnimation[8];
     CImage mBackHitAnimation[2];
     CImage mBackWalkAnimation[10];
 
-    // 이펙트 애니메이션 왼쪽 오른쪽 어택애니메이션 8프레임까지는 라이트이펙트애니메이션 이후에는 래프트 이펙트 애니메이션
     CImage mRightAttackEffectAnimation[6];
     CImage mLeftAttackEffectAnimation[6];
 
-    //플레이어 피격시 애니메이션
-    
+
     PlayerState state = PlayerState::FRONT;
 
     // 상태 변수
@@ -88,7 +86,6 @@ private:
     bool mIsAttack;
     bool mIsHit;
     bool mIsDead;
-
     bool mMouseClickFlag;
 
     // 애니메이션 프레임
@@ -105,13 +102,9 @@ private:
     float speed;
     RECT rect;
 
-    POINT mEffectHitboxPoints[4]; // 공격 이펙트 히트박스 꼭짓점
-    bool mHasEffectHitbox; // 히트박스 활성화 여부
-    float attackAngle; // 마우스 방향 각도
-
-    
+    POINT mEffectHitboxPoints[4];
+    bool mHasEffectHitbox;
+    float attackAngle;
 
     bool CheckPointInPolygon(POINT& point, POINT polygon[4]);
-    
-
 };
