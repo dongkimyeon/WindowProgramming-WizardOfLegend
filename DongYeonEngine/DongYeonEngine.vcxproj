@@ -182,6 +182,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="DongYeonEngine.ico" />
+    <Image Include="resources\Player\Skill_FireBall\Fireball_00.png" />
+    <Image Include="resources\Player\Skill_FireBall\Fireball_01.png" />
+    <Image Include="resources\Player\Skill_FireBall\Fireball_02.png" />
+    <Image Include="resources\Player\Skill_FireBall\Fireball_03.png" />
+    <Image Include="resources\Player\Skill_FireBall\Fireball_04.png" />
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>

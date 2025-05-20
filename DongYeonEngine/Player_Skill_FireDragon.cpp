@@ -11,6 +11,11 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
     mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f),
     mFrameDuration(0.1f)
 {
+    
+    float offsetDistance = 35.0f; 
+    mX += dirX * offsetDistance;  
+    mY += dirY * offsetDistance;  
+
     mFireDragonLeftImage.Load(L"resources/Player/Player_Skill_FireDragonL/SKILL_FIREDRAGON_00.png");
     mFireDragonRightImage.Load(L"resources/Player/Player_Skill_FireDragonR/SKILL_FIREDRAGON_00.png");
 
@@ -25,7 +30,7 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
             std::cout << "Loaded particle image: " << i << std::endl;
         }
     }
-   
+
     UpdateHitbox();
     std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
 }
@@ -92,58 +97,41 @@ void Player_Skill_FireDragon::Render(HDC hdc)
 {
     if (!mIsActive) return;
 
-    // 히트박스 디버그 렌더링
-    HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0)); // 빨간색 펜, 두께 2
-    HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
-    MoveToEx(hdc, hitboxPoints[0].x, hitboxPoints[0].y, nullptr);
-    for (int i = 1; i < 4; ++i) {
-        LineTo(hdc, hitboxPoints[i].x, hitboxPoints[i].y);
-    }
-    LineTo(hdc, hitboxPoints[0].x, hitboxPoints[0].y); // 다각형 닫기
-    SelectObject(hdc, hOldPen);
-    DeleteObject(hPen);
-
     CImage& currentImage = (mInstantDirX >= 0) ? mFireDragonRightImage : mFireDragonLeftImage;
 
-    int imageWidth = currentImage.GetWidth();
-    int imageHeight = currentImage.GetHeight();
+    const int imageWidth = 179;  // 원본 가로
+    const int imageHeight = 117; // 원본 세로
     float scale = 0.75f;
     int renderWidth = static_cast<int>(imageWidth * scale);
     int renderHeight = static_cast<int>(imageHeight * scale);
 
-    // 회전 각도 계산 (라디안)
     float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX));
 
-    // 변환 행렬 설정
     XFORM xForm = { 0 };
-    xForm.eM11 = cos(angle) * scale; // X 스케일 및 회전
-    xForm.eM12 = sin(angle);         // X에 대한 Y의 기울기
-    xForm.eM21 = -sin(angle);        // Y에 대한 X의 기울기
-    xForm.eM22 = cos(angle) * scale; // Y 스케일 및 회전
-    xForm.eDx = mX;                  // 중심점 X로 이동
-    xForm.eDy = mY;                  // 중심점 Y로 이동
+    xForm.eM11 = cos(angle);         // 회전만 적용
+    xForm.eM12 = sin(angle);
+    xForm.eM21 = -sin(angle);
+    xForm.eM22 = cos(angle);
+    xForm.eDx = mX;                  // 중심점 X
+    xForm.eDy = mY;                  // 중심점 Y
 
-    // 그래픽 모드 및 변환 적용
     SetGraphicsMode(hdc, GM_ADVANCED);
     SetWorldTransform(hdc, &xForm);
 
-    // 이미지 렌더링
     HDC srcDC = currentImage.GetDC();
     TransparentBlt(
         hdc,
         -renderWidth / 2, -renderHeight / 2, renderWidth, renderHeight,
         srcDC,
         0, 0, imageWidth, imageHeight,
-        RGB(0, 0, 0) // 투명색
+        RGB(0, 0, 0)
     );
     currentImage.ReleaseDC();
 
-    // 변환 행렬 초기화 (원래 상태로 복구)
     XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
     SetWorldTransform(hdc, &identity);
     SetGraphicsMode(hdc, GM_COMPATIBLE);
 
-    // 파티클 렌더링
     for (const auto& particle : mParticles)
     {
         CImage& particleImage = mFireParticleImage[particle.frame];
@@ -161,16 +149,26 @@ void Player_Skill_FireDragon::Render(HDC hdc)
             pDrawX, pDrawY, pRenderWidth, pRenderHeight,
             particleDC,
             0, 0, pWidth, pHeight,
-            RGB(0, 0, 0) // 투명색
+            RGB(0, 0, 0)
         );
         particleImage.ReleaseDC();
     }
+
+    HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
+    HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
+    MoveToEx(hdc, hitboxPoints[0].x, hitboxPoints[0].y, nullptr);
+    for (int i = 1; i < 4; ++i) {
+        LineTo(hdc, hitboxPoints[i].x, hitboxPoints[i].y);
+    }
+    LineTo(hdc, hitboxPoints[0].x, hitboxPoints[0].y);
+    SelectObject(hdc, hOldPen);
+    DeleteObject(hPen);
 }
 
 void Player_Skill_FireDragon::UpdateHitbox()
 {
     float scale = 0.5f;
-    int imageWidth = static_cast<int>(mFireDragonLeftImage.GetWidth() * scale);
+    int imageWidth = static_cast<int>(mFireDragonLeftImage.GetWidth() * scale) - 50;
     int imageHeight = static_cast<int>(mFireDragonLeftImage.GetHeight() * scale);
 
     POINT basePoints[4] = {
@@ -291,7 +289,6 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
 
 void Player_Skill_FireDragon::SpawnParticle()
 {
-   
     float magnitude = std::sqrt(mInstantDirX * mInstantDirX + mInstantDirY * mInstantDirY);
     float normDirX = (magnitude > 0) ? mInstantDirX / magnitude : 0.0f;
     float normDirY = (magnitude > 0) ? mInstantDirY / magnitude : 0.0f;
@@ -302,13 +299,13 @@ void Player_Skill_FireDragon::SpawnParticle()
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> velDist(-5.0f, 5.0f); 
+    std::uniform_real_distribution<float> velDist(-5.0f, 5.0f);
     std::uniform_real_distribution<float> lifeDist(0.5f, 1.0f);
 
     Particle particle;
     particle.x = spawnX;
     particle.y = spawnY;
-    particle.velX = mDirectionX * speed * 0.5f + velDist(gen); 
+    particle.velX = mDirectionX * speed * 0.5f + velDist(gen);
     particle.velY = mDirectionY * speed * 0.5f + velDist(gen);
     particle.lifetime = lifeDist(gen);
     particle.initialLifetime = particle.lifetime;

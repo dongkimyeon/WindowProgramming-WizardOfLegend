@@ -208,6 +208,21 @@
     <Image Include="small.ico">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="resources\Player\Skill_FireBall\Fireball_00.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="resources\Player\Skill_FireBall\Fireball_01.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="resources\Player\Skill_FireBall\Fireball_02.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="resources\Player\Skill_FireBall\Fireball_03.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="resources\Player\Skill_FireBall\Fireball_04.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DongYeonEngine.rc">

@@ -6,9 +6,17 @@
 #include <iostream>
 
 Player_Skill_FireBall::Player_Skill_FireBall(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(300.0f), mIsActive(true), damage(25),
-    mCurrentFrame(0), mAnimationTimer(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f)
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(200.0f), mIsActive(true), damage(25),
+    mCurrentFrame(0), mAnimationTimer(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f),
+    mFrameDuration(0.1f) // mFrameDuration 초기화 추가
 {
+
+    // 마우스 방향(진행 방향)으로 오프셋 적용
+    float offsetDistance = 50.0f; 
+    mX += dirX * offsetDistance;  
+    mY += dirY * offsetDistance;  
+
+
     for (int i = 0; i < 5; ++i)
     {
         wchar_t path[256];
@@ -79,56 +87,40 @@ void Player_Skill_FireBall::Render(HDC hdc)
 {
     if (!mIsActive) return;
 
-    // 히트박스 디버그 렌더링
-    HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-    HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-    Polygon(hdc, hitboxPoints, 4);
-    SelectObject(hdc, oldPen);
-    SelectObject(hdc, oldBrush);
-    DeleteObject(hitboxPen);
-
-    // 이미지 설정
     CImage& currentImage = mFireBallAnimation[mCurrentFrame];
-    int imageWidth = currentImage.GetWidth();
-    int imageHeight = currentImage.GetHeight();
-    float scale = 1.7f;
+    const int imageWidth = 64;  // 원본 가로
+    const int imageHeight = 48; // 원본 세로
+    float scale = 2.5f;
     int renderWidth = static_cast<int>(imageWidth * scale);
     int renderHeight = static_cast<int>(imageHeight * scale);
 
-    // 회전 각도 계산 (라디안)
     float angle = static_cast<float>(atan2(mDirectionY, mDirectionX));
 
-    // 변환 행렬 설정
     XFORM xForm = { 0 };
-    xForm.eM11 = cos(angle) * scale; // X 스케일 및 회전
-    xForm.eM12 = sin(angle);         // X에 대한 Y의 기울기
-    xForm.eM21 = -sin(angle);        // Y에 대한 X의 기울기
-    xForm.eM22 = cos(angle) * scale; // Y 스케일 및 회전
-    xForm.eDx = mX;                  // 중심점 X로 이동
-    xForm.eDy = mY;                  // 중심점 Y로 이동
+    xForm.eM11 = cos(angle);         // 회전만 적용
+    xForm.eM12 = sin(angle);
+    xForm.eM21 = -sin(angle);
+    xForm.eM22 = cos(angle);
+    xForm.eDx = mX;                  // 중심점 X
+    xForm.eDy = mY;                  // 중심점 Y
 
-    // 그래픽 모드 및 변환 적용
     SetGraphicsMode(hdc, GM_ADVANCED);
     SetWorldTransform(hdc, &xForm);
 
-    // 이미지 렌더링
     HDC srcDC = currentImage.GetDC();
     TransparentBlt(
         hdc,
         -renderWidth / 2, -renderHeight / 2, renderWidth, renderHeight,
         srcDC,
         0, 0, imageWidth, imageHeight,
-        RGB(0, 0, 0) // 투명색
+        RGB(0, 0, 0)
     );
     currentImage.ReleaseDC();
 
-    // 변환 행렬 초기화 (원래 상태로 복구)
     XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
     SetWorldTransform(hdc, &identity);
     SetGraphicsMode(hdc, GM_COMPATIBLE);
 
-    // 파티클 렌더링
     for (const auto& particle : mParticles)
     {
         CImage& particleImage = mFireParticleImage[particle.frame];
@@ -146,10 +138,18 @@ void Player_Skill_FireBall::Render(HDC hdc)
             pDrawX, pDrawY, pRenderWidth, pRenderHeight,
             particleDC,
             0, 0, pWidth, pHeight,
-            RGB(0, 0, 0) // 투명색
+            RGB(0, 0, 0)
         );
         particleImage.ReleaseDC();
     }
+
+    HPEN hitboxPen = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
+    HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
+    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
+    Polygon(hdc, hitboxPoints, 4);
+    SelectObject(hdc, oldPen);
+    SelectObject(hdc, oldBrush);
+    DeleteObject(hitboxPen);
 }
 
 void Player_Skill_FireBall::SpawnParticle()
@@ -205,8 +205,8 @@ void Player_Skill_FireBall::UpdateParticles()
 void Player_Skill_FireBall::UpdateHitbox()
 {
     float scale = 1.5f;
-    int imageWidth = static_cast<int>(mFireBallAnimation[0].GetWidth() * scale);
-    int imageHeight = static_cast<int>(mFireBallAnimation[0].GetHeight() * scale);
+    int imageWidth = static_cast<int>(mFireBallAnimation[0].GetWidth() * scale)- 40;
+    int imageHeight = static_cast<int>(mFireBallAnimation[0].GetHeight() * scale) - 10;
 
     POINT basePoints[4] = {
         { -imageWidth / 2, -imageHeight / 2 },
