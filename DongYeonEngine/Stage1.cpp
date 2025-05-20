@@ -5,6 +5,7 @@
 #include "Arrow.h"
 #include "SceneManager.h"
 #include "MapManager.h"
+#include "UI.h"
 #include <stdio.h>
 
 #define MAP_COLS 40
@@ -41,6 +42,7 @@ Stage1::~Stage1()
 
 void Stage1::Initialize()
 {
+	UI::Initialize();
     MapManager::GetInstance()->Initialize();
     camera.Update();
 }
@@ -371,13 +373,12 @@ void Stage1::Render(HDC hdc)
             RestoreDC(FireDragonDC, saveFireDragonDC);
         }
     }
-
-    
-    
-
     RestoreDC(hdc, savedDC);
 
-    WCHAR playerPosText[100];
+	UI::Render(hdc);
+
+
+   /* WCHAR playerPosText[100];
     wsprintf(playerPosText, L"플레이어 좌표: X = %d, Y = %d",
         static_cast<int>(player->GetPositionX()), static_cast<int>(player->GetPositionY()));
     TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
@@ -404,7 +405,7 @@ void Stage1::Render(HDC hdc)
             arrowTextOffsetY += 20;
             ++arrowIndex;
         }
-    }
+    }*/
 }
 
 void Stage1::HandleCollision()

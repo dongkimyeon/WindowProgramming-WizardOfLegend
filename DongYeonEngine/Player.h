@@ -31,6 +31,9 @@ public:
     bool CheckCollisionWithRect(RECT& otherRect);
     void ResetFireDragonTriggered() { fireDragonTriggered = false; }
 
+	float GetFireBallCooldown() { return fireBallCooldown; }    
+	float GetFireDragonCooldown() { return fireDragonCooldown; }
+
 private:
     float mX;
     float mY;

@@ -2,6 +2,7 @@
 #include "Editor_Window.h"
 #include "Game.h"
 #include "LoadScenes.h"
+
 #define MAX_LOADSTRING 100
 
 #pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")

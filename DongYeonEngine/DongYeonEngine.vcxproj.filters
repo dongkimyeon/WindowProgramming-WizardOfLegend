@@ -49,6 +49,9 @@
     <Filter Include="Object\Monster\SwordMan">
       <UniqueIdentifier>{3207b0d9-2f8d-4507-a90d-ad9e3bf5e697}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{aa218598-78d9-41d7-9c06-8711f1961489}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -120,6 +123,9 @@
     <ClInclude Include="Player_Skill_FireDragon.h">
       <Filter>Object\Player</Filter>
     </ClInclude>
+    <ClInclude Include="UI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -190,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="Player_Skill_FireDragon.cpp">
       <Filter>Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="UI.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
