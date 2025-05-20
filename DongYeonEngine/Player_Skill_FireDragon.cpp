@@ -8,7 +8,7 @@
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(200.0f), mIsActive(true), damage(25),
     mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
-    mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.1f),
+    mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f),
     mFrameDuration(0.1f)
 {
     mFireDragonLeftImage.Load(L"resources/Player/Player_Skill_FireDragonL/SKILL_FIREDRAGON_00.png");
@@ -25,7 +25,7 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
             std::cout << "Loaded particle image: " << i << std::endl;
         }
     }
-
+   
     UpdateHitbox();
     std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
 }
@@ -92,43 +92,60 @@ void Player_Skill_FireDragon::Render(HDC hdc)
 {
     if (!mIsActive) return;
 
-    HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-    HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-    Polygon(hdc, hitboxPoints, 4);
-    SelectObject(hdc, oldPen);
-    SelectObject(hdc, oldBrush);
-    DeleteObject(hitboxPen);
+    // 히트박스 디버그 렌더링
+    HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0)); // 빨간색 펜, 두께 2
+    HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
+    MoveToEx(hdc, hitboxPoints[0].x, hitboxPoints[0].y, nullptr);
+    for (int i = 1; i < 4; ++i) {
+        LineTo(hdc, hitboxPoints[i].x, hitboxPoints[i].y);
+    }
+    LineTo(hdc, hitboxPoints[0].x, hitboxPoints[0].y); // 다각형 닫기
+    SelectObject(hdc, hOldPen);
+    DeleteObject(hPen);
 
     CImage& currentImage = (mInstantDirX >= 0) ? mFireDragonRightImage : mFireDragonLeftImage;
 
     int imageWidth = currentImage.GetWidth();
     int imageHeight = currentImage.GetHeight();
-    float scale = 0.6f;
+    float scale = 0.75f;
     int renderWidth = static_cast<int>(imageWidth * scale);
     int renderHeight = static_cast<int>(imageHeight * scale);
-    int drawX = static_cast<int>(mX - renderWidth / 2.0f);
-    int drawY = static_cast<int>(mY - renderHeight / 2.0f);
 
-    Gdiplus::Graphics graphics(hdc);
-    Gdiplus::ImageAttributes imageAttr;
-    //imageAttr.SetColorKey(Gdiplus::Color(0, 0, 0), Gdiplus::Color(0, 0, 0), Gdiplus::ColorAdjustTypeBitmap);
-    float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX) * 180.0 / 3.1415926535);
+    // 회전 각도 계산 (라디안)
+    float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX));
 
-    Gdiplus::Matrix matrix;
-    matrix.RotateAt(angle, Gdiplus::PointF(mX, mY));
-    graphics.SetTransform(&matrix);
+    // 변환 행렬 설정
+    XFORM xForm = { 0 };
+    xForm.eM11 = cos(angle) * scale; // X 스케일 및 회전
+    xForm.eM12 = sin(angle);         // X에 대한 Y의 기울기
+    xForm.eM21 = -sin(angle);        // Y에 대한 X의 기울기
+    xForm.eM22 = cos(angle) * scale; // Y 스케일 및 회전
+    xForm.eDx = mX;                  // 중심점 X로 이동
+    xForm.eDy = mY;                  // 중심점 Y로 이동
 
-    Gdiplus::Bitmap dragonBitmap((HBITMAP)currentImage, nullptr);
-    graphics.DrawImage(&dragonBitmap,
-        Gdiplus::Rect(drawX, drawY, renderWidth, renderHeight),
+    // 그래픽 모드 및 변환 적용
+    SetGraphicsMode(hdc, GM_ADVANCED);
+    SetWorldTransform(hdc, &xForm);
+
+    // 이미지 렌더링
+    HDC srcDC = currentImage.GetDC();
+    TransparentBlt(
+        hdc,
+        -renderWidth / 2, -renderHeight / 2, renderWidth, renderHeight,
+        srcDC,
         0, 0, imageWidth, imageHeight,
-        Gdiplus::UnitPixel, &imageAttr);
+        RGB(0, 0, 0) // 투명색
+    );
+    currentImage.ReleaseDC();
 
-    graphics.ResetTransform();
+    // 변환 행렬 초기화 (원래 상태로 복구)
+    XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+    SetWorldTransform(hdc, &identity);
+    SetGraphicsMode(hdc, GM_COMPATIBLE);
 
-    std::cout << "Particle count: " << mParticles.size() << std::endl;
-    for (const auto& particle : mParticles) {
+    // 파티클 렌더링
+    for (const auto& particle : mParticles)
+    {
         CImage& particleImage = mFireParticleImage[particle.frame];
         int pWidth = particleImage.GetWidth();
         int pHeight = particleImage.GetHeight();
@@ -138,13 +155,15 @@ void Player_Skill_FireDragon::Render(HDC hdc)
         int pDrawX = static_cast<int>(particle.x - pRenderWidth / 2.0f);
         int pDrawY = static_cast<int>(particle.y - pRenderHeight / 2.0f);
 
-        std::cout << "Rendering particle at (" << pDrawX << ", " << pDrawY << ") with frame " << particle.frame << std::endl;
-
-        Gdiplus::Bitmap particleBitmap((HBITMAP)particleImage, nullptr);
-        graphics.DrawImage(&particleBitmap,
-            Gdiplus::Rect(pDrawX, pDrawY, pRenderWidth, pRenderHeight),
+        HDC particleDC = particleImage.GetDC();
+        TransparentBlt(
+            hdc,
+            pDrawX, pDrawY, pRenderWidth, pRenderHeight,
+            particleDC,
             0, 0, pWidth, pHeight,
-            Gdiplus::UnitPixel, &imageAttr);
+            RGB(0, 0, 0) // 투명색
+        );
+        particleImage.ReleaseDC();
     }
 }
 
