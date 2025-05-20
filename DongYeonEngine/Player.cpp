@@ -216,7 +216,7 @@ void Player::Update(Scene* stage)
     float currentSpeed = speed;
     static int clickCounter = 0;
     static int attackEndFrame = mMouseClickFlag ? 16 : 8;
-    const float skillCooldown = 5.0f; // 스킬 쿨타임 5초
+    const float skillCooldown = 3.0f; // 스킬 쿨타임 5초
 
     // 쿨타임 업데이트
     if (!fireBallReady) {

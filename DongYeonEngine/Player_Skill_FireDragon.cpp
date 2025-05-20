@@ -12,7 +12,7 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
     mFrameDuration(0.1f)
 {
     
-    float offsetDistance = 35.0f; 
+    float offsetDistance = 30.0f; 
     mX += dirX * offsetDistance;  
     mY += dirY * offsetDistance;  
 
