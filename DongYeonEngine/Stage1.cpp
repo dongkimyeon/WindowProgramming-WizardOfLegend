@@ -4,14 +4,19 @@
 #include "Archer.h"
 #include "Arrow.h"
 #include "SceneManager.h"
+#include "MapManager.h"
+#include <stdio.h>
+
+#define MAP_COLS 40
+#define MAP_ROWS 40
+#define TILE_SIZE 50
 
 Stage1::Stage1()
 {
-    // 플레이어는 SceneManager에서 관리하므로 여기서 초기화하지 않음
-    camera.SetTarget(SceneManager::GetSharedPlayer()); // 공유 플레이어 설정
+    camera.SetTarget(SceneManager::GetSharedPlayer());
     SceneManager::GetSharedPlayer()->SetCameraX(camera.GetPositionX());
     SceneManager::GetSharedPlayer()->SetCameraY(camera.GetPositionY());
-    SceneManager::GetSharedPlayer()->SetPosition(1200, 1200); //스테이지 1 시작위치
+    SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
 
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(800, 800);
@@ -31,6 +36,7 @@ Stage1::~Stage1()
     for (auto* arrow : arrows) delete arrow;
     for (auto* fireball : fireballs) delete fireball;
     for (auto* playerFireball : playerFireballs) delete playerFireball;
+    for (auto* fireDragon : playerFireDragon) delete fireDragon;
 }
 
 void Stage1::Initialize()
@@ -122,7 +128,6 @@ void Stage1::Update()
         if (!(*it)->IsActive()) continue;
         ++it;
     }
-    //파이어 드래곤
     for (auto it = playerFireDragon.begin(); it != playerFireDragon.end();)
     {
         if (!(*it)->IsActive())
@@ -191,7 +196,7 @@ void Stage1::Update()
                 wizard->SetHitFlag(true);
             }
         }
-        for (auto* archer : archers) 
+        for (auto* archer : archers)
         {
             RECT enemyRect = archer->GetRect();
             if (player->CheckCollisionWithRect(enemyRect) && !archer->HasBeenHit())
@@ -208,7 +213,12 @@ void Stage1::Update()
         for (auto* archer : archers) archer->SetHitFlag(false);
     }
     HandleCollision();
-
+    // 맵 충돌 처리
+    auto map = MapManager::GetInstance()->GetMap();
+    if (map)
+    {
+        HandleCollisionMap(map, *player);
+    }
 }
 
 void Stage1::LateUpdate()
@@ -317,7 +327,6 @@ void Stage1::Render(HDC hdc)
             RestoreDC(fireballDC, savedFireballDC);
         }
     }
-    //플레이어 파이어볼
     for (auto* playerFireBall : playerFireballs)
     {
         POINT* points = playerFireBall->GetHitboxPoints();
@@ -340,7 +349,6 @@ void Stage1::Render(HDC hdc)
             RestoreDC(fireballDC, savedFireballDC);
         }
     }
-	//플레이어 파이어 드래곤
     for (auto* FireDragon : playerFireDragon)
     {
         POINT* points = FireDragon->GetHitboxPoints();
@@ -364,6 +372,8 @@ void Stage1::Render(HDC hdc)
         }
     }
 
+    
+    
 
     RestoreDC(hdc, savedDC);
 
@@ -423,8 +433,8 @@ void Stage1::ResolveCollision(GameObject& obj1, GameObject& obj2)
     RECT intersect;
     if (IntersectRect(&intersect, &rect1, &rect2))
     {
-        int overlapX = min(rect1.right, rect2.right) - max(rect1.left, rect2.left);
-        int overlapY = min(rect1.bottom, rect2.bottom) - max(rect1.top, rect2.top);
+        float overlapX = static_cast<float>(min(rect1.right, rect2.right) - max(rect1.left, rect2.left));
+        float overlapY = static_cast<float>(min(rect1.bottom, rect2.bottom) - max(rect1.top, rect2.top));
         if (overlapX < overlapY)
         {
             if (rect1.left < rect2.left)
@@ -449,6 +459,73 @@ void Stage1::ResolveCollision(GameObject& obj1, GameObject& obj2)
             {
                 obj1.SetPosition(obj1.GetPositionX(), obj1.GetPositionY() + overlapY);
                 obj2.SetPosition(obj2.GetPositionX(), obj2.GetPositionY() - overlapY);
+            }
+        }
+    }
+}
+
+void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
+{
+    Player* player = SceneManager::GetSharedPlayer();
+    if (&obj != player) return;
+
+    for (int i = 0; i < MAP_ROWS; ++i)
+    {
+        for (int j = 0; j < MAP_COLS; ++j)
+        {
+            if (map[i][j] == 1) // 벽 타일
+            {
+                RECT wallRect = {
+                    j * TILE_SIZE,
+                    i * TILE_SIZE,
+                    (j + 1) * TILE_SIZE,
+                    (i + 1) * TILE_SIZE
+                };
+                RECT playerRect = player->GetRect();
+                RECT intersect;
+                if (IntersectRect(&intersect, &wallRect, &playerRect))
+                {
+                    printf("Collision with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Player RECT: (%ld, %ld, %ld, %ld)\n",
+                        i, j,
+                        wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                        playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);
+                    ResolveCollisionMap(wallRect, *player);
+                }
+            }
+        }
+    }
+}
+
+void Stage1::ResolveCollisionMap(RECT wallRect, GameObject& obj)
+{
+    RECT objRect = obj.GetRect();
+    RECT intersect;
+
+    if (IntersectRect(&intersect, &wallRect, &objRect))
+    {
+        float overlapX = static_cast<float>(min(wallRect.right, objRect.right) - max(wallRect.left, objRect.left));
+        float overlapY = static_cast<float>(min(wallRect.bottom, objRect.bottom) - max(wallRect.top, objRect.top));
+
+        if (overlapX < overlapY)
+        {
+            if (objRect.left < wallRect.left)
+            {
+                obj.SetPosition(obj.GetPositionX() - overlapX, obj.GetPositionY());
+            }
+            else
+            {
+                obj.SetPosition(obj.GetPositionX() + overlapX, obj.GetPositionY());
+            }
+        }
+        else
+        {
+            if (objRect.top < wallRect.top)
+            {
+                obj.SetPosition(obj.GetPositionX(), obj.GetPositionY() - overlapY);
+            }
+            else
+            {
+                obj.SetPosition(obj.GetPositionX(), obj.GetPositionY() + overlapY);
             }
         }
     }

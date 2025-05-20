@@ -1,7 +1,7 @@
 #include "Tile.h"
 #include <windows.h>
 
-Tile::Tile() : tileImage(nullptr)
+Tile::Tile() : tileImage(nullptr), tileType(TileType::Floor)
 {
 }
 
@@ -21,11 +21,10 @@ void Tile::Render(HDC hdc, RECT rect)
         }
         else {
             tileImage->Draw(hdc, rect);
-            
         }
     }
     else {
-        // Fallback: Draw red rectangle
+        // Range Red Rectangle
         HBRUSH brush = CreateSolidBrush(RGB(255, 0, 0));
         FillRect(hdc, rect.left == 0 ? &range : &rect, brush);
         DeleteObject(brush);
