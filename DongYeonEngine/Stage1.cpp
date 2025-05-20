@@ -58,124 +58,329 @@ void Stage1::Update()
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);
     for (auto* swordman : swordmans) swordman->Update(*player);
-    for (auto it = arrows.begin(); it != arrows.end();)
+
+    // 발사체 벽 충돌 체크
+    auto map = MapManager::GetInstance()->GetMap();
+    if (map)
     {
-        if ((*it)->IsActive())
+        // Arrows
+        for (auto it = arrows.begin(); it != arrows.end();)
         {
-            (*it)->Update(*player);
-            ++it;
-        }
-        else
-        {
-            delete* it;
-            it = arrows.erase(it);
-        }
-    }
-    for (auto it = fireballs.begin(); it != fireballs.end();)
-    {
-        if ((*it)->IsActive())
-        {
-            (*it)->Update(*player);
-            ++it;
-        }
-        else
-        {
-            delete* it;
-            it = fireballs.erase(it);
-        }
-    }
-    for (auto it = playerFireballs.begin(); it != playerFireballs.end();)
-    {
-        if (!(*it)->IsActive())
-        {
-            delete* it;
-            it = playerFireballs.erase(it);
-            continue;
+            if ((*it)->IsActive())
+            {
+                POINT* points = (*it)->GetHitboxPoints();
+                // POINT[4]에서 RECT 생성
+                LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
+                for (int k = 1; k < 4; ++k)
+                {
+                    minX = min(minX, points[k].x);
+                    maxX = max(maxX, points[k].x);
+                    minY = min(minY, points[k].y);
+                    maxY = max(maxY, points[k].y);
+                }
+                RECT projectileRect = { minX, minY, maxX, maxY };
+                bool collided = false;
+                for (int i = 0; i < MAP_ROWS && !collided; ++i)
+                {
+                    for (int j = 0; j < MAP_COLS && !collided; ++j)
+                    {
+                        if (map[i][j] == 1)
+                        {
+                            RECT wallRect = {
+                                j * TILE_SIZE,
+                                i * TILE_SIZE,
+                                (j + 1) * TILE_SIZE,
+                                (i + 1) * TILE_SIZE
+                            };
+                            RECT intersect;
+                            if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
+                                    i, j,
+                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                                    points[0].x, points[0].y, points[1].x, points[1].y,
+                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    (*it)->Update(*player);
+                    ++it;
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            else
+            {
+                delete* it;
+                it = arrows.erase(it);
+            }
         }
 
-        bool collided = false;
-        for (auto* swordman : swordmans)
+        // Fireballs
+        for (auto it = fireballs.begin(); it != fireballs.end();)
         {
-            (*it)->Update(*swordman);
-            if (!(*it)->IsActive())
+            if ((*it)->IsActive())
             {
-                collided = true;
-                break;
-            }
-        }
-        if (!collided)
-        {
-            for (auto* wizard : wizards)
-            {
-                (*it)->Update(*wizard);
-                if (!(*it)->IsActive())
+                POINT* points = (*it)->GetHitboxPoints();
+                LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
+                for (int k = 1; k < 4; ++k)
                 {
-                    collided = true;
-                    break;
+                    minX = min(minX, points[k].x);
+                    maxX = max(maxX, points[k].x);
+                    minY = min(minY, points[k].y);
+                    maxY = max(maxY, points[k].y);
+                }
+                RECT projectileRect = { minX, minY, maxX, maxY };
+                bool collided = false;
+                for (int i = 0; i < MAP_ROWS && !collided; ++i)
+                {
+                    for (int j = 0; j < MAP_COLS && !collided; ++j)
+                    {
+                        if (map[i][j] == 1)
+                        {
+                            RECT wallRect = {
+                                j * TILE_SIZE,
+                                i * TILE_SIZE,
+                                (j + 1) * TILE_SIZE,
+                                (i + 1) * TILE_SIZE
+                            };
+                            RECT intersect;
+                            if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                printf("Fireball collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Fireball Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
+                                    i, j,
+                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                                    points[0].x, points[0].y, points[1].x, points[1].y,
+                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    (*it)->Update(*player);
+                    ++it;
+                }
+                else
+                {
+                    ++it;
                 }
             }
-        }
-        if (!collided)
-        {
-            for (auto* archer : archers)
+            else
             {
-                (*it)->Update(*archer);
-                if (!(*it)->IsActive())
-                {
-                    collided = true;
-                    break;
-                }
+                delete* it;
+                it = fireballs.erase(it);
             }
-        }
-        if (!(*it)->IsActive()) continue;
-        ++it;
-    }
-    for (auto it = playerFireDragon.begin(); it != playerFireDragon.end();)
-    {
-        if (!(*it)->IsActive())
-        {
-            delete* it;
-            it = playerFireDragon.erase(it);
-            continue;
         }
 
-        bool collided = false;
-        for (auto* swordman : swordmans)
+        // Player Fireballs
+        for (auto it = playerFireballs.begin(); it != playerFireballs.end();)
         {
-            (*it)->Update(*swordman);
-            if (!(*it)->IsActive())
+            if ((*it)->IsActive())
             {
-                collided = true;
-                break;
-            }
-        }
-        if (!collided)
-        {
-            for (auto* wizard : wizards)
-            {
-                (*it)->Update(*wizard);
-                if (!(*it)->IsActive())
+                POINT* points = (*it)->GetHitboxPoints();
+                LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
+                for (int k = 1; k < 4; ++k)
                 {
-                    collided = true;
-                    break;
+                    minX = min(minX, points[k].x);
+                    maxX = max(maxX, points[k].x);
+                    minY = min(minY, points[k].y);
+                    maxY = max(maxY, points[k].y);
+                }
+                RECT projectileRect = { minX, minY, maxX, maxY };
+                bool collided = false;
+                for (int i = 0; i < MAP_ROWS && !collided; ++i)
+                {
+                    for (int j = 0; j < MAP_COLS && !collided; ++j)
+                    {
+                        if (map[i][j] == 1)
+                        {
+                            RECT wallRect = {
+                                j * TILE_SIZE,
+                                i * TILE_SIZE,
+                                (j + 1) * TILE_SIZE,
+                                (i + 1) * TILE_SIZE
+                            };
+                            RECT intersect;
+                            if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                printf("PlayerFireball collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), PlayerFireball Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
+                                    i, j,
+                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                                    points[0].x, points[0].y, points[1].x, points[1].y,
+                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    bool enemyCollided = false;
+                    for (auto* swordman : swordmans)
+                    {
+                        (*it)->Update(*swordman);
+                        if (!(*it)->IsActive())
+                        {
+                            enemyCollided = true;
+                            break;
+                        }
+                    }
+                    if (!enemyCollided)
+                    {
+                        for (auto* wizard : wizards)
+                        {
+                            (*it)->Update(*wizard);
+                            if (!(*it)->IsActive())
+                            {
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!enemyCollided)
+                    {
+                        for (auto* archer : archers)
+                        {
+                            (*it)->Update(*archer);
+                            if (!(*it)->IsActive())
+                            {
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!(*it)->IsActive())
+                    {
+                        ++it;
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                else
+                {
+                    ++it;
                 }
             }
-        }
-        if (!collided)
-        {
-            for (auto* archer : archers)
+            else
             {
-                (*it)->Update(*archer);
-                if (!(*it)->IsActive())
-                {
-                    collided = true;
-                    break;
-                }
+                delete* it;
+                it = playerFireballs.erase(it);
             }
         }
-        if (!(*it)->IsActive()) continue;
-        ++it;
+
+        // Player FireDragons
+        for (auto it = playerFireDragon.begin(); it != playerFireDragon.end();)
+        {
+            if ((*it)->IsActive())
+            {
+                POINT* points = (*it)->GetHitboxPoints();
+                LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
+                for (int k = 1; k < 4; ++k)
+                {
+                    minX = min(minX, points[k].x);
+                    maxX = max(maxX, points[k].x);
+                    minY = min(minY, points[k].y);
+                    maxY = max(maxY, points[k].y);
+                }
+                RECT projectileRect = { minX, minY, maxX, maxY };
+                bool collided = false;
+                for (int i = 0; i < MAP_ROWS && !collided; ++i)
+                {
+                    for (int j = 0; j < MAP_COLS && !collided; ++j)
+                    {
+                        if (map[i][j] == 1)
+                        {
+                            RECT wallRect = {
+                                j * TILE_SIZE,
+                                i * TILE_SIZE,
+                                (j + 1) * TILE_SIZE,
+                                (i + 1) * TILE_SIZE
+                            };
+                            RECT intersect;
+                            if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                printf("FireDragon collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), FireDragon Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
+                                    i, j,
+                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                                    points[0].x, points[0].y, points[1].x, points[1].y,
+                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    bool enemyCollided = false;
+                    for (auto* swordman : swordmans)
+                    {
+                        (*it)->Update(*swordman);
+                        if (!(*it)->IsActive())
+                        {
+                            enemyCollided = true;
+                            break;
+                        }
+                    }
+                    if (!enemyCollided)
+                    {
+                        for (auto* wizard : wizards)
+                        {
+                            (*it)->Update(*wizard);
+                            if (!(*it)->IsActive())
+                            {
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!enemyCollided)
+                    {
+                        for (auto* archer : archers)
+                        {
+                            (*it)->Update(*archer);
+                            if (!(*it)->IsActive())
+                            {
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!(*it)->IsActive())
+                    {
+                        ++it;
+                    }
+                    else
+                    {
+                        ++it;
+                    }
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            else
+            {
+                delete* it;
+                it = playerFireDragon.erase(it);
+            }
+        }
     }
+
     POINT effectHitboxPoints[4];
     bool hasEffectHitbox = player->GetEffectHitbox(effectHitboxPoints);
     if (hasEffectHitbox)
@@ -214,15 +419,13 @@ void Stage1::Update()
         for (auto* wizard : wizards) wizard->SetHitFlag(false);
         for (auto* archer : archers) archer->SetHitFlag(false);
     }
-    HandleCollision();
-    // 맵 충돌 처리
-    auto map = MapManager::GetInstance()->GetMap();
+
+    // 플레이어 벽 충돌 처리
     if (map)
     {
         HandleCollisionMap(map, *player);
     }
 }
-
 void Stage1::LateUpdate()
 {
     Scene::LateUpdate();
@@ -474,7 +677,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
     {
         for (int j = 0; j < MAP_COLS; ++j)
         {
-            if (map[i][j] == 1) // 벽 타일
+            if (map[i][j] == 1)
             {
                 RECT wallRect = {
                     j * TILE_SIZE,
@@ -486,7 +689,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 RECT intersect;
                 if (IntersectRect(&intersect, &wallRect, &playerRect))
                 {
-                    printf("Collision with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Player RECT: (%ld, %ld, %ld, %ld)\n",
+                    printf("Player collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Player RECT: (%ld, %ld, %ld, %ld)\n",
                         i, j,
                         wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
                         playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);

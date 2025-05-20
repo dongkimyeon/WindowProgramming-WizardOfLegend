@@ -18,6 +18,8 @@ public:
 
     bool IsActive() const { return mIsActive; }
 
+	//상태 변경
+	void SetActive(bool active) { mIsActive = active; }
 
     POINT* GetHitboxPoints() { return hitboxPoints; }
 

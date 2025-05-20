@@ -22,6 +22,9 @@ public:
     // 상태 확인
     bool IsActive() const { return mIsActive; }
 
+	// 상태 변경
+	void SetActive(bool active) { mIsActive = active; }
+
     // 히트박스 및 위치 정보 반환
     POINT* GetHitboxPoints() { return hitboxPoints; }
     float GetPositionX() const { return mX; }
