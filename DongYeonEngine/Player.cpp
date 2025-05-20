@@ -10,6 +10,7 @@ Player::Player()
     speed = 200.0f;
     state = PlayerState::FRONT;
     hp = 100;
+	mp = 100;
     damage = 20;
     mIsMoving = false;
     mIsDashing = false;

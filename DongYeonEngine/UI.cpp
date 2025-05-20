@@ -47,7 +47,21 @@ void UI::Render(HDC hdc)
     Player* player = SceneManager::GetSharedPlayer();
 
     UI_PLAYERBAR.Draw(hdc, 0, 0);
+    // HP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
+    float hpRatio = static_cast<float>(player->GetHp()) / 100;
+    int hpBarWidth = static_cast<int>(UI_HPBAR.GetWidth() * hpRatio);
+    if (hpBarWidth > 0) {
+        int srcX = UI_HPBAR.GetWidth() - hpBarWidth; // 오른쪽에서 시작
+        UI_HPBAR.Draw(hdc, 75, 13, hpBarWidth, UI_HPBAR.GetHeight(), srcX, 0, hpBarWidth, UI_HPBAR.GetHeight());
+    }
 
+    // MP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
+    float mpRatio = static_cast<float>(player->GetMp()) / 100;
+    int mpBarWidth = static_cast<int>(UI_MPBAR.GetWidth() * mpRatio);
+    if (mpBarWidth > 0) {
+        int srcX = UI_MPBAR.GetWidth() - mpBarWidth; // 오른쪽에서 시작
+        UI_MPBAR.Draw(hdc, 75, 53, mpBarWidth, UI_MPBAR.GetHeight(), srcX, 0, mpBarWidth, UI_MPBAR.GetHeight());
+    }
     int originalWidth = UI_SKILLBAR.GetWidth();
     int originalHeight = UI_SKILLBAR.GetHeight();
     int scaledWidth = static_cast<int>(originalWidth * 0.2f);

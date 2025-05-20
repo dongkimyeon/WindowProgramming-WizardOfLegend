@@ -16,6 +16,7 @@ public:
     void SetPosition(float x, float y) override;
     void TakeDamage(int d);
     int GetHp() { return hp; }
+	int GetMp() { return mp; }
     int GetDamage() { return damage; }
     PlayerState GetState() { return state; }
     float GetPositionX() override;
@@ -39,6 +40,7 @@ private:
     float mY;
     Vector2 position;
     int hp;
+    int mp;
     int damage;
 
     int mCameraX;

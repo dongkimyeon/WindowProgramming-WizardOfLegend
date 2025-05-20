@@ -18,6 +18,7 @@ public:
 
     bool IsActive() const { return mIsActive; }
 
+
     POINT* GetHitboxPoints() { return hitboxPoints; }
 
     float GetPositionX() const { return mX; }
