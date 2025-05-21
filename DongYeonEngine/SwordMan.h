@@ -9,7 +9,7 @@ public:
     ~SwordMan(); // GDI+ 종료를 위한 소멸자
     enum EnemyState { LEFT, RIGHT };
     void Update(Player& p);
-    void LateUpdate() override;
+    void LateUpdate();
     void Render(HDC hdc, Player& p);
     void SetPosition(float x, float y) override;
 
@@ -21,6 +21,7 @@ public:
     float GetPositionX() override { return mX; }
     float GetPositionY() override { return mY; }
     float GetSpeed() override { return speed; }
+    bool GetIsDead() override  { return mIsDead; }
 
     bool GetEffectHitbox(POINT outPoints[4]);
     bool CheckCollisionWithRect(RECT& otherRect); // 충돌 감지 메서드
@@ -87,6 +88,13 @@ private:
 
 
     bool mHasBeenHit = false; // 피격 플래그 추가
+
+
+    // 데미지 표시 변수
+    int mDamageTaken;           // 받은 데미지 양
+    float mDamageTextY;         // 데미지 텍스트의 Y 위치
+    float mDamageTextSpeed;     // 텍스트의 상승 속도
+    bool mShowDamage;           // 데미지 텍스트 표시 플래그
 
     // GDI+ 관련
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;

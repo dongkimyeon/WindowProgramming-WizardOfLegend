@@ -28,3 +28,8 @@ void GameObject::Render(HDC hdc)
 	
 }
 
+bool GameObject::GetIsDead()
+{
+	return false;
+}
+

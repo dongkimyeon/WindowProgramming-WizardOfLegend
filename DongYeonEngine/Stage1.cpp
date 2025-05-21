@@ -443,6 +443,9 @@ void Stage1::Render(HDC hdc)
 
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
+
+  
+
     for (auto* wizard : wizards)
     {
         RECT rect = wizard->GetRect();
@@ -482,13 +485,7 @@ void Stage1::Render(HDC hdc)
             RestoreDC(swordmanDC, savedSwordmanDC);
         }
     }
-    {
-        HDC playerDC = hdc;
-        int savedPlayerDC = SaveDC(playerDC);
-        OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        player->Render(playerDC);
-        RestoreDC(playerDC, savedPlayerDC);
-    }
+    
     for (auto* arrow : arrows)
     {
         POINT* points = arrow->GetHitboxPoints();
@@ -577,12 +574,19 @@ void Stage1::Render(HDC hdc)
             RestoreDC(FireDragonDC, saveFireDragonDC);
         }
     }
+
+    HDC playerDC = hdc;
+    int savedPlayerDC = SaveDC(playerDC);
+    OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+    player->Render(playerDC);
+    RestoreDC(playerDC, savedPlayerDC);
+
     RestoreDC(hdc, savedDC);
 
 	UI::Render(hdc);
 
 
-   /* WCHAR playerPosText[100];
+   WCHAR playerPosText[100];
     wsprintf(playerPosText, L"플레이어 좌표: X = %d, Y = %d",
         static_cast<int>(player->GetPositionX()), static_cast<int>(player->GetPositionY()));
     TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
@@ -595,7 +599,7 @@ void Stage1::Render(HDC hdc)
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
         static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
 
-    int arrowTextOffsetY = 80;
+    /*int arrowTextOffsetY = 80;
     int arrowIndex = 0;
     for (const auto* arrow : arrows)
     {

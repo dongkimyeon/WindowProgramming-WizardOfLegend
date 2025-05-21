@@ -111,6 +111,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
     {
         ShowCursor(false);
+        // 폰트 로드
+        AddFontResourceEx(L"resources/Font/8bitWonder.ttf", FR_PRIVATE, nullptr);
+
         break;
     }
     case WM_PAINT:

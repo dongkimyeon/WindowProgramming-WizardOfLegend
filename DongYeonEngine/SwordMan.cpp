@@ -4,7 +4,6 @@
 
 SwordMan::SwordMan()
 {
-    // GDI+ 초기화
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
 
     mX = 1920 / 2;
@@ -27,10 +26,16 @@ SwordMan::SwordMan()
     mAttackDirectionX = 0.0f;
     mAttackDirectionY = 0.0f;
     mHasEffectHitbox = false;
-    mHasAttackedPlayer = false; // 공격 플래그 초기화
+    mHasAttackedPlayer = false;
     hp = 100;
     damage = 20;
     for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
+
+    // 데미지 표시 변수 초기화
+    mDamageTaken = 0;
+    mDamageTextY = 0.0f;
+    mDamageTextSpeed = 50.0f; // 텍스트 상승 속도 (초당 픽셀)
+    mShowDamage = false;
 
     rect = { (int)(mX - 20), (int)(mY - 20), (int)(mX + 20), (int)(mY + 20) };
 
@@ -131,8 +136,8 @@ void SwordMan::Update(Player& p)
                 dieTimer = 0.0f;
             }
         }
-        rect = { (int)mX,(int)mY,(int)mX,(int)mY };  // 죽으면 rect를 비활성화
-
+        rect = { (int)mX,(int)mY,(int)mX,(int)mY };
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
         return;
     }
 
@@ -144,11 +149,16 @@ void SwordMan::Update(Player& p)
         mHitTimer -= deltaTime;
         if (mHitTimer <= 0.0f) {
             mIsHit = false;
+            mShowDamage = false; // 피격 애니메이션 종료 시 데미지 텍스트 비활성화
         }
         animationTimer += deltaTime;
         if (animationTimer >= hitFrameDuration) {
             mCurrentHitFrame = (mCurrentHitFrame + 1) % 2;
             animationTimer = 0.0f;
+        }
+        // 데미지 텍스트 위로 이동
+        if (mShowDamage) {
+            mDamageTextY -= mDamageTextSpeed * deltaTime;
         }
         return;
     }
@@ -188,7 +198,7 @@ void SwordMan::Update(Player& p)
                 mCurrenAttackFrame = 0;
                 mAttackCooldown = 3.0f;
                 mHasEffectHitbox = false;
-                mHasAttackedPlayer = false; // 공격 종료 시 플래그 리셋
+                mHasAttackedPlayer = false;
             }
             mAttackFrameTime = 0.0f;
         }
@@ -200,7 +210,7 @@ void SwordMan::Update(Player& p)
             if (CheckCollisionWithRect(playerRect))
             {
                 p.TakeDamage(damage);
-                mHasAttackedPlayer = true; // 한 번만 데미지 입힘
+                mHasAttackedPlayer = true;
             }
         }
     }
@@ -222,7 +232,7 @@ void SwordMan::Update(Player& p)
                 mAttackDirectionX = (state == EnemyState::RIGHT) ? 1.0f : -1.0f;
                 mAttackDirectionY = 0.0f;
             }
-            mHasAttackedPlayer = false; // 공격 시작 시 플래그 리셋
+            mHasAttackedPlayer = false;
         }
         else if (distance <= PlayerDetectRange)
         {
@@ -241,7 +251,7 @@ void SwordMan::Update(Player& p)
         }
     }
 
-    // 히트박스 업데이트 (기존 코드 유지)
+    // 히트박스 업데이트
     if (mIsAttack && mCurrenAttackFrame >= 1)
     {
         int hitboxWidth = 64;
@@ -273,7 +283,7 @@ void SwordMan::Update(Player& p)
         mHasEffectHitbox = false;
     }
 
-    // 이동 애니메이션 프레임 업데이트 (기존 코드 유지)
+    // 이동 애니메이션 프레임 업데이트
     if (!mIsDead && !mIsHit && !mIsAttack && mIsMoving)
     {
         static float frameTime = 0.0f;
@@ -292,7 +302,7 @@ void SwordMan::LateUpdate()
 
 void SwordMan::Render(HDC hdc, Player& p)
 {
-    // 디버그 범위 그리기 (기존 코드 유지)
+    // 디버그 범위 그리기
     HPEN attackPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
     HPEN detectPen = CreatePen(PS_DOT, 1, RGB(0, 255, 0));
     HBRUSH nullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -319,7 +329,7 @@ void SwordMan::Render(HDC hdc, Player& p)
 
     Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
 
-    // 히트박스 디버그 그리기 (기존 코드 유지)
+    // 히트박스 디버그 그리기
     if (mHasEffectHitbox)
     {
         HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
@@ -359,6 +369,22 @@ void SwordMan::Render(HDC hdc, Player& p)
     int drawY = static_cast<int>(mY - imageHeight / 2.0f);
 
     currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
+
+    // 데미지 텍스트 렌더링
+    if (mShowDamage && mIsHit)
+    {
+        SetTextColor(hdc, RGB(255, 255, 255));
+        HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+        wchar_t damageText[32];
+        swprintf_s(damageText, L"%d", mDamageTaken);
+
+        TextOut(hdc, static_cast<int>(mX) - 50, static_cast<int>(mDamageTextY), damageText, wcslen(damageText));
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
+    }
 
     if (mIsAttack && mCurrenAttackFrame >= 1)
     {
@@ -404,8 +430,6 @@ void SwordMan::Render(HDC hdc, Player& p)
             Gdiplus::UnitPixel, &imageAttr);
 
         graphics.ResetTransform();
-
-
     }
 }
 
@@ -419,6 +443,10 @@ void SwordMan::TakeDamage(int d)
 {
     if (mIsDead) return;
     hp -= d;
+    mDamageTaken = d; // 데미지 값 저장
+    mShowDamage = true; // 데미지 텍스트 표시 활성화
+    mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
+
     if (hp <= 0) {
         hp = 0;
         mIsDead = true;
@@ -426,6 +454,7 @@ void SwordMan::TakeDamage(int d)
         mIsAttack = false;
         mIsMoving = false;
         mCurrentDeadFrame = 0;
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
     }
     else {
         mIsHit = true;

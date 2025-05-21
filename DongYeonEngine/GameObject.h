@@ -38,7 +38,7 @@ public:
 	 {
 		 return rect;
 	 }
-
+	 virtual bool GetIsDead();
 	 virtual bool IsCollidingWith(GameObject* other)  
 	 {
 		 RECT rect1 = GetRect();

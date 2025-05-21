@@ -27,6 +27,11 @@ Archer::Archer()
     mAttackFrameTime = 0.0f;
     mAttackCooldown = 0.0f;
 
+    mDamageTaken = 0;
+    mDamageTextY = 0.0f;
+    mDamageTextSpeed = 50.0f; // Speed of upward movement (pixels per second)
+    mShowDamage = false;
+
     mRightIdleAnimation.Load(L"resources/Monster/ARCHER/ArcherRight/ArcherIdle/ARCHER_RIGHT_00.png");
     if (mRightIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Monster/ARCHER/ArcherRight/ArcherIdle/ARCHER_RIGHT_00.png\n");
     for (int i = 0; i < 4; ++i)
@@ -111,7 +116,6 @@ void Archer::Update(Player& p, Scene* stage)
     rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 54;
     rect.bottom = static_cast<int>(mY + imageHeight / 2.0f) - 33;
 
-
     // 죽음 상태 처리
     if (mIsDead) {
         static float dieTimer = 0.0f;
@@ -123,7 +127,7 @@ void Archer::Update(Player& p, Scene* stage)
             }
         }
         rect = { (int)mX,(int)mY,(int)mX,(int)mY }; // 죽으면 rect를 비활성화
-
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
         return;
     }
 
@@ -135,11 +139,16 @@ void Archer::Update(Player& p, Scene* stage)
         mHitTimer -= deltaTime;
         if (mHitTimer <= 0.0f) {
             mIsHit = false;
+            mShowDamage = false; // 피격 애니메이션 종료 시 데미지 텍스트 비활성화
         }
         animationTimer += deltaTime;
         if (animationTimer >= hitFrameDuration) {
             mCurrentHitFrame = (mCurrentHitFrame + 1) % 2;
             animationTimer = 0.0f;
+        }
+        // 데미지 텍스트 위로 이동
+        if (mShowDamage) {
+            mDamageTextY -= mDamageTextSpeed * deltaTime;
         }
         return;
     }
@@ -290,6 +299,22 @@ void Archer::Render(HDC hdc, Player& p)
 
     currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
 
+    // 데미지 텍스트 렌더링
+    if (mShowDamage && mIsHit)
+    {
+		SetTextColor(hdc, RGB(255, 255, 255));
+        HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+        wchar_t damageText[32];
+        swprintf_s(damageText, L"%d", mDamageTaken);
+        
+		TextOut(hdc, static_cast<int>(mX) - 50, static_cast<int>(mDamageTextY), damageText, wcslen(damageText));
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
+    }
+
     if (mIsAttack)
     {
         Gdiplus::Graphics graphics(hdc);
@@ -348,6 +373,10 @@ void Archer::TakeDamage(int d)
     if (mIsDead) return;
 
     hp -= d;
+    mDamageTaken = d; // 데미지 값 저장
+    mShowDamage = true; // 데미지 텍스트 표시 활성화
+    mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
+
     if (hp <= 0) {
         hp = 0;
         mIsDead = true;
@@ -355,6 +384,7 @@ void Archer::TakeDamage(int d)
         mIsAttack = false;
         mIsMoving = false;
         mCurrentDeadFrame = 0;
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
     }
     else {
         mIsHit = true;
@@ -364,4 +394,3 @@ void Archer::TakeDamage(int d)
         mIsMoving = false;
     }
 }
-

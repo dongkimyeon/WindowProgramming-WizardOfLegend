@@ -33,8 +33,7 @@ void UI::Initialize()
 	UI_PLAYERBAR.Load(L"resources/Ui/UI_PLAYERBAR.png");
 	UI_SKILLBAR.Load(L"resources/Ui/UI_SKILLBAR.png");
 
-    // 폰트 로드
-    AddFontResourceEx(L"resources/Font/8bitWonder.ttf", FR_PRIVATE, nullptr);
+  
 }
 
 void UI::Update()

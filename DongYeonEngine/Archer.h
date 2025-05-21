@@ -22,14 +22,10 @@ public:
     float GetPositionY() override { return mY; }
     float GetSpeed() override { return speed; }
     RECT GetRect() override { return rect; }
-
-
+    bool GetIsDead() override { return mIsDead; }
 
     bool HasBeenHit() const { return mHasBeenHit; }
     void SetHitFlag(bool hit) { mHasBeenHit = hit; }
-
-	
-
 
 private:
     float mX;
@@ -62,8 +58,6 @@ private:
     bool mIsHit;
     int mCurrentHitFrame;
 
-    
-
     float PlayerDetectRange = 300.0f;
     float AttackRange = 250.0f;
 
@@ -75,8 +69,13 @@ private:
     float mAttackFrameTime;
     float mAttackCooldown;
 
+    bool mHasBeenHit = false; // 피격 플래그
 
-    bool mHasBeenHit = false; // 피격 플래그 추가
+    // 데미지 표시 변수
+    int mDamageTaken;           // 받은 데미지 양
+    float mDamageTextY;         // 데미지 텍스트의 Y 위치
+    float mDamageTextSpeed;     // 텍스트의 상승 속도
+    bool mShowDamage;           // 데미지 텍스트 표시 플래그
 
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     ULONG_PTR gdiplusToken;

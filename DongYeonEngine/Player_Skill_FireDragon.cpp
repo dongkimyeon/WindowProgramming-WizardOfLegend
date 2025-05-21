@@ -85,7 +85,7 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
         return;
     }
 
-    if (CheckCollisionWithRect(obj.GetRect()))
+    if (CheckCollisionWithRect(obj.GetRect()) && !obj.GetIsDead())
     {
         obj.TakeDamage(damage);
         mIsActive = false;

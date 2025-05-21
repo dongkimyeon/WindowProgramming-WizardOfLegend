@@ -29,6 +29,12 @@ Wizard::Wizard()
     PlayerDetectRange = 300.0f;
     AttackRange = 250.0f;
 
+    // 데미지 표시 변수 초기화
+    mDamageTaken = 0;
+    mDamageTextY = 0.0f;
+    mDamageTextSpeed = 50.0f; // 텍스트 상승 속도 (초당 픽셀)
+    mShowDamage = false;
+
     // Right 애니메이션 로드
     mRightIdleAnimation.Load(L"resources/Monster/WIZARD/WizardRight/WizardIdle/WIZARD_RIGHT_00.png");
     if (mRightIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Monster/WIZARD/WizardRight/WizardIdle/WIZARD_RIGHT_00.png\n");
@@ -119,8 +125,30 @@ void Wizard::Update(Player& p, Scene* stage)
                 dieTimer = 0.0f;
             }
         }
-       rect = { (int)mX,(int)mY,(int)mX,(int)mY }; // 죽으면 rect를 비활성화
+        rect = { (int)mX, (int)mY, (int)mX, (int)mY }; // 죽으면 rect를 비활성화
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
+        return;
+    }
 
+    // 피격 상태 처리
+    float deltaTime = Time::DeltaTime();
+    static float animationTimer = 0.0f;
+    const float hitFrameDuration = 0.1f;
+    if (mIsHit) {
+        mHitTimer -= deltaTime;
+        if (mHitTimer <= 0.0f) {
+            mIsHit = false;
+            mShowDamage = false; // 피격 애니메이션 종료 시 데미지 텍스트 비활성화
+        }
+        animationTimer += deltaTime;
+        if (animationTimer >= hitFrameDuration) {
+            mCurrentHitFrame = (mCurrentHitFrame + 1) % 2;
+            animationTimer = 0.0f;
+        }
+        // 데미지 텍스트 위로 이동
+        if (mShowDamage) {
+            mDamageTextY -= mDamageTextSpeed * deltaTime;
+        }
         return;
     }
 
@@ -133,70 +161,61 @@ void Wizard::Update(Player& p, Scene* stage)
         mAttackCooldown -= Time::DeltaTime();
     }
 
-    if (mIsHit)
+    if (playerX > mX)
     {
-        mIsMoving = false;
-        mIsAttack = false;
-        mCurrentWalkFrame = 0;
+        state = EnemyState::RIGHT;
+    }
+    else if (playerX < mX)
+    {
+        state = EnemyState::LEFT;
+    }
+
+    if (mIsAttack)
+    {
+        mAttackFrameTime += Time::DeltaTime();
+        float frameDuration = 0.5f;
+        if (mAttackFrameTime >= frameDuration)
+        {
+            mCurrenAttackFrame++;
+            if (mCurrenAttackFrame >= 4)
+            {
+                mIsAttack = false;
+                mCurrenAttackFrame = 0;
+                mAttackCooldown = 3.0f;
+                FireBall::ThrowFireBall(p, mX, mY, stage);
+            }
+            mAttackFrameTime = 0.0f;
+        }
     }
     else
     {
-        if (playerX > mX)
+        if (distance <= AttackRange && mAttackCooldown <= 0.0f)
         {
-            state = EnemyState::RIGHT;
+            mIsAttack = true;
+            mIsMoving = false;
+            mCurrenAttackFrame = 0;
+            mAttackFrameTime = 0.0f;
+            mCurrentWalkFrame = 0;
         }
-        else if (playerX < mX)
+        else if (distance <= PlayerDetectRange)
         {
-            state = EnemyState::LEFT;
-        }
-
-        if (mIsAttack)
-        {
-            mAttackFrameTime += Time::DeltaTime();
-            float frameDuration = 0.5f;
-            if (mAttackFrameTime >= frameDuration)
+            if (!mIsMoving)
             {
-                mCurrenAttackFrame++;
-                if (mCurrenAttackFrame >= 4)
-                {
-                    mIsAttack = false;
-                    mCurrenAttackFrame = 0;
-                    mAttackCooldown = 3.0f;
-                    FireBall::ThrowFireBall(p, mX, mY, stage);
-                }
-                mAttackFrameTime = 0.0f;
+                mCurrentWalkFrame = 0;
             }
+            mIsAttack = false;
+            mIsMoving = true;
+            float directionX = (playerX - mX) / distance;
+            float directionY = (playerY - mY) / distance;
+            mX += directionX * speed * Time::DeltaTime();
+            mY += directionY * speed * Time::DeltaTime();
         }
         else
         {
-            if (distance <= AttackRange && mAttackCooldown <= 0.0f)
-            {
-                mIsAttack = true;
-                mIsMoving = false;
-                mCurrenAttackFrame = 0;
-                mAttackFrameTime = 0.0f;
-                mCurrentWalkFrame = 0;
-            }
-            else if (distance <= PlayerDetectRange)
-            {
-                if (!mIsMoving)
-                {
-                    mCurrentWalkFrame = 0;
-                }
-                mIsAttack = false;
-                mIsMoving = true;
-                float directionX = (playerX - mX) / distance;
-                float directionY = (playerY - mY) / distance;
-                mX += directionX * speed * Time::DeltaTime();
-                mY += directionY * speed * Time::DeltaTime();
-            }
-            else
-            {
-                mIsAttack = false;
-                mIsMoving = false;
-                mCurrenAttackFrame = 0;
-                mCurrentWalkFrame = 0;
-            }
+            mIsAttack = false;
+            mIsMoving = false;
+            mCurrenAttackFrame = 0;
+            mCurrentWalkFrame = 0;
         }
     }
 
@@ -213,22 +232,6 @@ void Wizard::Update(Player& p, Scene* stage)
     else
     {
         walkFrameTime = 0.0f;
-    }
-
-    // 피격 상태 처리
-    float deltaTime = Time::DeltaTime();
-    static float animationTimer = 0.0f;
-    const float hitFrameDuration = 0.1f;
-    if (mIsHit) {
-        mHitTimer -= deltaTime;
-        if (mHitTimer <= 0.0f) {
-            mIsHit = false;
-        }
-        animationTimer += deltaTime;
-        if (animationTimer >= hitFrameDuration) {
-            mCurrentHitFrame = (mCurrentHitFrame + 1) % 2;
-            animationTimer = 0.0f;
-        }
     }
 }
 
@@ -294,6 +297,22 @@ void Wizard::Render(HDC hdc, Player& p)
 
     currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
 
+    // 데미지 텍스트 렌더링
+    if (mShowDamage && mIsHit)
+    {
+        SetTextColor(hdc, RGB(255, 255, 255));
+        HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+        wchar_t damageText[32];
+        swprintf_s(damageText, L"%d", mDamageTaken);
+
+        TextOut(hdc, static_cast<int>(mX) - 50, static_cast<int>(mDamageTextY), damageText, wcslen(damageText));
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
+    }
+
     if (mIsAttack)
     {
         Gdiplus::Graphics graphics(hdc);
@@ -312,9 +331,9 @@ void Wizard::Render(HDC hdc, Player& p)
         float angle = static_cast<float>(atan2(dy, dx) * 180.0 / 3.1415926535);
 
         float wandOffset = 10.0f;
-        //Gdiplus::PointF startPoint(mX + directionX * wandOffset, mY + directionY * wandOffset);
-        //Gdiplus::PointF endPoint(mX + directionX * AttackRange * 2, mY + directionY * AttackRange * 2);
-        //graphics.DrawLine(&pen, startPoint, endPoint);
+        // Gdiplus::PointF startPoint(mX + directionX * wandOffset, mY + directionY * wandOffset);
+        // Gdiplus::PointF endPoint(mX + directionX * AttackRange * 2, mY + directionY * AttackRange * 2);
+        // graphics.DrawLine(&pen, startPoint, endPoint);
     }
 }
 
@@ -322,6 +341,10 @@ void Wizard::TakeDamage(int d)
 {
     if (mIsDead) return;
     hp -= d;
+    mDamageTaken = d; // 데미지 값 저장
+    mShowDamage = true; // 데미지 텍스트 표시 활성화
+    mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
+
     if (hp <= 0) {
         hp = 0;
         mIsDead = true;
@@ -329,6 +352,7 @@ void Wizard::TakeDamage(int d)
         mIsAttack = false;
         mIsMoving = false;
         mCurrentDeadFrame = 0;
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
     }
     else {
         mIsHit = true;
