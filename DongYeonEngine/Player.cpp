@@ -494,6 +494,8 @@ void Player::Update(Scene* stage)
     mIsMoving = isMoving;
 }
 
+
+
 void Player::LateUpdate()
 {
 }

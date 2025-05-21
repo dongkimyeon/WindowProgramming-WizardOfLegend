@@ -6,7 +6,7 @@
 #include "SceneManager.h"
 #include "MapManager.h"
 #include "UI.h"
-#include <stdio.h>
+
 
 #define MAP_COLS 40
 #define MAP_ROWS 40
@@ -428,6 +428,7 @@ void Stage1::Update()
     if(IntersectRect(&temp, &playerRect, &portalRect))
     {
 		SceneManager::LoadScene(L"Stage2");
+		SceneManager::GetSharedPlayer()->SetPosition(100, 100);
 	}
     //객체간에 충돌처리 밀어내는거
 	HandleCollision();
@@ -630,6 +631,8 @@ void Stage1::Render(HDC hdc)
         }
     }*/
 }
+
+
 
 void Stage1::HandleCollision()
 {
