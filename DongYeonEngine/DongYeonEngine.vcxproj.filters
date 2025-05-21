@@ -52,6 +52,9 @@
     <Filter Include="UI">
       <UniqueIdentifier>{aa218598-78d9-41d7-9c06-8711f1961489}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scenes\Stage">
+      <UniqueIdentifier>{66b14d5c-59ff-4dc8-a739-6c6497a5ef4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -59,9 +62,6 @@
     </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Stage1.h">
-      <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Scene</Filter>
@@ -126,13 +126,25 @@
     <ClInclude Include="UI.h">
       <Filter>UI</Filter>
     </ClInclude>
+    <ClInclude Include="EndScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="BossStage.h">
+      <Filter>Scenes\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Stage1.h">
+      <Filter>Scenes\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Stage2.h">
+      <Filter>Scenes\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="TutorialStage.h">
+      <Filter>Scenes\Stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Stage1.cpp">
-      <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Scene</Filter>
@@ -199,6 +211,21 @@
     </ClCompile>
     <ClCompile Include="UI.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="EndScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="BossStage.cpp">
+      <Filter>Scenes\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Stage1.cpp">
+      <Filter>Scenes\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="Stage2.cpp">
+      <Filter>Scenes\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="TutorialStage.cpp">
+      <Filter>Scenes\Stage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

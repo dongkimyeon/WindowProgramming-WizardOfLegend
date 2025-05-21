@@ -46,7 +46,7 @@ void Game::Render()
 {
 	clearRenderTarget();
 
-	Time::Render(mBackHdc);
+	//Time::Render(mBackHdc);
 	SceneManager::Render(mBackHdc);
 
 	copyRenderTarget(mBackHdc, mHdc);

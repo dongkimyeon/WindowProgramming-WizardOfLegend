@@ -374,14 +374,14 @@ void SwordMan::Render(HDC hdc, Player& p)
     if (mShowDamage && mIsHit)
     {
         SetTextColor(hdc, RGB(255, 255, 255));
-        HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        HFONT hFont = CreateFont(30, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+            DEFAULT_PITCH | FF_DONTCARE, L"EXO 2");
         HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
         wchar_t damageText[32];
         swprintf_s(damageText, L"%d", mDamageTaken);
 
-        TextOut(hdc, static_cast<int>(mX) - 50, static_cast<int>(mDamageTextY), damageText, wcslen(damageText));
+        TextOut(hdc, static_cast<int>(mX) - 40, static_cast<int>(mDamageTextY), damageText, wcslen(damageText));
         SelectObject(hdc, hOldFont);
         DeleteObject(hFont);
     }

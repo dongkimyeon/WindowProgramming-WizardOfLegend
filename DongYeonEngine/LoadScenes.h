@@ -6,8 +6,8 @@
 
 void LoadScenes()
 {
-	SceneManager::CreateScene<Stage1>(L"Stage1");
 	SceneManager::CreateScene<TitleScene>(L"TitleScene");
-
+	SceneManager::CreateScene<Stage1>(L"Stage1");
+	//SceneManager::CreateScene<Stage2>(L"Stage2");
 	SceneManager::LoadScene(L"TitleScene");
 }

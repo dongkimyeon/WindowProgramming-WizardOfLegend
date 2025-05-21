@@ -33,8 +33,19 @@ void Time::Render(HDC hdc)
 
     wchar_t str[50] = L"";
     swprintf_s(str, 50, L"FPS : %d", (int)fps);
-    int len = wcsnlen_s(str, 50);
 	SetTextColor(hdc, RGB(255, 255, 255));
-    TextOut(hdc, 1280/2, 0, str, len);
+    SetBkMode(hdc, TRANSPARENT); // 배경을 투명하게 설정
+    HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, L"EXO 2");
+
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+    TextOut(hdc, 1280/2, 0, str, wcslen(str));
+
+
+    SelectObject(hdc, hOldFont);
+    DeleteObject(hFont);
+
 }
 float Time::DeltaTime() { return DeltaTimeValue; }

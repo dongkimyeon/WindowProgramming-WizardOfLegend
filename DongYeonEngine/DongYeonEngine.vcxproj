@@ -131,7 +131,9 @@
   <ItemGroup>
     <ClInclude Include="Archer.h" />
     <ClInclude Include="Arrow.h" />
+    <ClInclude Include="BossStage.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EndScene.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FireBall.h" />
     <ClInclude Include="Game.h" />
@@ -147,17 +149,21 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
+    <ClInclude Include="Stage2.h" />
     <ClInclude Include="SwordMan.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="TutorialStage.h" />
     <ClInclude Include="UI.h" />
     <ClInclude Include="Wizard.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Archer.cpp" />
     <ClCompile Include="Arrow.cpp" />
+    <ClCompile Include="BossStage.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EndScene.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FireBall.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -173,10 +179,12 @@
     <ClCompile Include="Stage1.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Stage2.cpp" />
     <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="TutorialStage.cpp" />
     <ClCompile Include="UI.cpp" />
     <ClCompile Include="Wizard.cpp" />
   </ItemGroup>

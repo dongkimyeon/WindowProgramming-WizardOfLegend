@@ -35,9 +35,14 @@ public:
 	static void Render(HDC hdc);
 	static Player* GetSharedPlayer() { return mSharedPlayer; }
 	static Scene* GetActiveScene() { return mActiveScene; }
+	static void SetmIsGameStart(bool isGameStart) { mIsGameStart = isGameStart; }
+	static float GetPlayTime() { return playTime; }
 private:
 	static Player* mSharedPlayer;
 	static std::map<std::wstring, Scene*> mScene;
 	static Scene* mActiveScene;
 	static CImage mMouseCursorImage;
+	static float playTime;
+	static bool mIsGameStart;
+
 };
