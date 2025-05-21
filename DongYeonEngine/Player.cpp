@@ -33,6 +33,11 @@ Player::Player()
     fireBallReady = true;
     fireDragonReady = true;
     isUsingSkill = false;
+
+    mIsTeleporting = true;          // 생성 시 텔레포트 애니메이션 활성화
+    mTeleportTimer = 0.0f;          // 타이머 초기화
+    mCurrentTeleportFrame = 0;      // 프레임 초기화
+
     for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
 
     // 애니메이션 로드 (기존 코드 유지)
@@ -181,10 +186,38 @@ Player::Player()
         mRightAttackEffectAnimation[i].Load(path);
         if (mRightAttackEffectAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
+
+    // 텔레포트 애니메이션 로드 (기존 코드 수정)
+    for (int i = 0; i < 8; ++i)
+    {
+        wchar_t path[256];
+        swprintf_s(path, L"resources/Player/Summon/SUMMON_%d.png", i);
+        mTeleportEffectAnimation[i].Load(path); // 텔레포트 애니메이션 로드
+        if (mTeleportEffectAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
+    }
 }
 
 void Player::Update(Scene* stage)
 {
+
+    // 텔레포트 애니메이션 처리
+    if (mIsTeleporting)
+    {
+        const float teleportFrameDuration = 0.1f; // 프레임당 0.1초
+        mTeleportTimer += Time::DeltaTime();
+        if (mTeleportTimer >= teleportFrameDuration)
+        {
+            mCurrentTeleportFrame++;
+            mTeleportTimer = 0.0f;
+            if (mCurrentTeleportFrame >= 8) // 8프레임 후 종료
+            {
+                mIsTeleporting = false; // 애니메이션 종료
+                mCurrentTeleportFrame = 0;
+            }
+        }
+        return; // 텔레포트 중에는 다른 동작 처리 안 함
+    }
+
     if (mIsDead) {
         static float dieTimer = 0.0f;
         if (mCurrentDieFrame < 6) {
@@ -467,6 +500,7 @@ void Player::LateUpdate()
 
 void Player::Render(HDC hdc)
 {
+
     Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
     if (mHasEffectHitbox) {
         HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
@@ -585,6 +619,29 @@ void Player::Render(HDC hdc)
             XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
             SetWorldTransform(hdc, &identity);
             SetGraphicsMode(hdc, GM_COMPATIBLE);
+        }
+    }
+
+    // 텔레포트 이펙트 렌더링
+    if (mIsTeleporting)
+    {
+        CImage& effectImage = mTeleportEffectAnimation[mCurrentTeleportFrame];
+        if (!effectImage.IsNull())
+        {
+            int effectWidth = effectImage.GetWidth() / 3.0f;
+            int effectHeight = effectImage.GetHeight() / 3.0f;
+            int drawX = static_cast<int>(mX - effectWidth / 2.0f) + 3;
+            int drawY = static_cast<int>(mY - effectHeight / 2.0f);
+
+            HDC srcDC = effectImage.GetDC();
+            TransparentBlt(
+                hdc,
+                drawX, drawY, effectWidth, effectHeight,
+                srcDC,
+                0, 0, effectImage.GetWidth(), effectImage.GetHeight(),
+                RGB(0, 0, 0) // 투명색
+            );
+            effectImage.ReleaseDC();
         }
     }
 }

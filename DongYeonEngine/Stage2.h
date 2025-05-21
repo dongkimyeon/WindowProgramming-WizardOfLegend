@@ -1,5 +1,7 @@
 #pragma once
-class Stage2
+#include "Scene.h"
+#include "CommonInclude.h"
+class Stage2 : public Scene
 {
 };
 

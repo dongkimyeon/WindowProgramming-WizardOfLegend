@@ -1,7 +1,7 @@
 #pragma once
 #include "CommonInclude.h"
 #include "Scene.h"
-class BossStage : public Scene
+class GameOverScene : public Scene
 {
 };
 

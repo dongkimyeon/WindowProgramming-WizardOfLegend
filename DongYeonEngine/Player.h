@@ -82,6 +82,12 @@ private:
     CImage mRightAttackEffectAnimation[6];
     CImage mLeftAttackEffectAnimation[6];
 
+	CImage mTeleportEffectAnimation[8];
+
+    bool mIsTeleporting;        // 텔레포트 애니메이션 진행 여부
+    float mTeleportTimer;       // 텔레포트 애니메이션 타이머
+    int mCurrentTeleportFrame;  // 텔레포트 애니메이션 현재 프레임
+
 
     PlayerState state = PlayerState::FRONT;
 

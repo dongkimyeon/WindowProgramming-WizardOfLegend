@@ -27,6 +27,8 @@ Stage1::Stage1()
     wizards.back()->SetPosition(900, 800);
     archers.push_back(new Archer());
     archers.back()->SetPosition(950, 800);
+
+	portal.SetPosition(400, 1600);
 }
 
 Stage1::~Stage1()
@@ -420,6 +422,13 @@ void Stage1::Update()
         for (auto* archer : archers) archer->SetHitFlag(false);
     }
 
+    RECT temp;
+	RECT playerRect = player->GetRect();
+	RECT portalRect = portal.GetRect();
+    if(IntersectRect(&temp, &playerRect, &portalRect))
+    {
+		SceneManager::LoadScene(L"Stage2");
+	}
     //객체간에 충돌처리 밀어내는거
 	HandleCollision();
 
@@ -445,7 +454,11 @@ void Stage1::Render(HDC hdc)
 
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
-
+    HDC portalDC = hdc;
+    int savedPortalDC = SaveDC(portalDC);
+    OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+    portal.Render(portalDC);
+    RestoreDC(portalDC, savedPortalDC);
   
 
     for (auto* wizard : wizards)

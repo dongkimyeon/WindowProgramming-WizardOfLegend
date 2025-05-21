@@ -126,9 +126,6 @@
     <ClInclude Include="UI.h">
       <Filter>UI</Filter>
     </ClInclude>
-    <ClInclude Include="EndScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="BossStage.h">
       <Filter>Scenes\Stage</Filter>
     </ClInclude>
@@ -140,6 +137,15 @@
     </ClInclude>
     <ClInclude Include="TutorialStage.h">
       <Filter>Scenes\Stage</Filter>
+    </ClInclude>
+    <ClInclude Include="Portal.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="GameClearScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverScene.h">
+      <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +218,6 @@
     <ClCompile Include="UI.cpp">
       <Filter>UI</Filter>
     </ClCompile>
-    <ClCompile Include="EndScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="BossStage.cpp">
       <Filter>Scenes\Stage</Filter>
     </ClCompile>
@@ -226,6 +229,12 @@
     </ClCompile>
     <ClCompile Include="TutorialStage.cpp">
       <Filter>Scenes\Stage</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOverScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="GameClearScene.cpp">
+      <Filter>Scenes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,6 +7,7 @@
 #include "Arrow.h"
 #include "FireBall.h"
 #include "MapManager.h"
+#include "Portal.h"
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
 #include "Player_Skill_FireDragon.h"
@@ -37,5 +38,6 @@ private:
     std::vector<FireBall*> fireballs;
     std::vector<Player_Skill_FireBall*> playerFireballs;
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
+	Portal portal;
     Camera camera;
 };
