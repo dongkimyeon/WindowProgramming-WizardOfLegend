@@ -420,7 +420,9 @@ void Stage1::Update()
         for (auto* archer : archers) archer->SetHitFlag(false);
     }
 
+    //객체간에 충돌처리 밀어내는거
 	HandleCollision();
+
     // 플레이어 벽 충돌 처리
     if (map)
     {
