@@ -51,7 +51,7 @@ private:
     float mY;                         // 현재 y 위치
     float mDirectionX;                // 이동 방향 x
     float mDirectionY;                // 이동 방향 y
-    float speed;                      // 이동 속도
+    float speed;                   // 이동 속도
     bool mIsActive;                   // 활성화 여부
     int damage;                       // 데미지
     int mCurrentFrame;                // 현재 애니메이션 프레임

@@ -27,12 +27,12 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
             std::cout << "Failed to load particle image: " << i << std::endl;
         }
         else {
-            std::cout << "Loaded particle image: " << i << std::endl;
+            //std::cout << "Loaded particle image: " << i << std::endl;
         }
     }
 
     UpdateHitbox();
-    std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
+   // std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
 }
 
 Player_Skill_FireDragon::~Player_Skill_FireDragon()
@@ -163,6 +163,7 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     LineTo(hdc, hitboxPoints[0].x, hitboxPoints[0].y);
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
+	std::cout << speed << std::endl;
 }
 
 void Player_Skill_FireDragon::UpdateHitbox()
@@ -251,13 +252,13 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
         savedMX = mX;
         savedMY = mY;
         savedAngle = angle;
-        std::cout << "Firing started at (" << savedMX << ", " << savedMY << ") with angle " << savedAngle << std::endl;
+       // std::cout << "Firing started at (" << savedMX << ", " << savedMY << ") with angle " << savedAngle << std::endl;
     }
 
     if (isFiring)
     {
         accumulatedTime += Time::DeltaTime();
-        std::cout << "Active called: accumulatedTime = " << accumulatedTime << ", dragonsSpawned = " << dragonsSpawned << std::endl;
+       // std::cout << "Active called: accumulatedTime = " << accumulatedTime << ", dragonsSpawned = " << dragonsSpawned << std::endl;
 
         if (dragonsSpawned < numDragons && accumulatedTime >= spawnInterval)
         {
@@ -265,7 +266,7 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
             float dirY = sin(savedAngle);
             float phaseOffset = (dragonsSpawned % 2 == 0) ? 0.0f : 3.1415926535f;
 
-            std::cout << "Spawning FireDragon #" << dragonsSpawned + 1 << " at (" << savedMX << ", " << savedMY << ") with phaseOffset = " << phaseOffset << std::endl;
+            //std::cout << "Spawning FireDragon #" << dragonsSpawned + 1 << " at (" << savedMX << ", " << savedMY << ") with phaseOffset = " << phaseOffset << std::endl;
 
             stage->AddPlayerSkillFireDragon(new Player_Skill_FireDragon(savedMX, savedMY, dirX, dirY, phaseOffset));
 
@@ -275,7 +276,7 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
 
         if (dragonsSpawned >= numDragons)
         {
-            std::cout << "All " << numDragons << " FireDragons spawned, stopping firing." << std::endl;
+           // std::cout << "All " << numDragons << " FireDragons spawned, stopping firing." << std::endl;
             isFiring = false;
             dragonsSpawned = 0;
             accumulatedTime = 0.0f;
@@ -312,7 +313,7 @@ void Player_Skill_FireDragon::SpawnParticle()
     particle.frame = 0;
 
     mParticles.emplace_back(particle);
-    std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
+  //  std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
 }
 
 void Player_Skill_FireDragon::UpdateParticles()

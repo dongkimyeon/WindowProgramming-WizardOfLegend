@@ -21,9 +21,20 @@ public:
     void LateUpdate() override;
     void Render(HDC hdc) override;
     void AddArrow(Arrow* arrow) override { arrows.push_back(arrow); }
-    void AddFireBall(FireBall* fireball) override { fireballs.push_back(fireball); }
-    void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball) override { playerFireballs.push_back(fireball); }
-    void AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon) override { playerFireDragon.push_back(fireDragon); }
+    void AddFireBall(FireBall* fireball) override 
+    {
+   
+        fireballs.push_back(fireball);
+    }
+    void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball) override 
+    {
+        playerFireballs.push_back(fireball); 
+    }
+    void AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon) override 
+    { 
+		
+        playerFireDragon.push_back(fireDragon); 
+    }
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
     void HandleCollisionMap(int (*map)[40], GameObject& obj); // ¼öÁ¤: Tile** -> int (*)[40]

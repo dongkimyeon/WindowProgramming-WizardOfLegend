@@ -32,7 +32,7 @@ Player_Skill_FireBall::Player_Skill_FireBall(float x, float y, float dirX, float
             std::cout << "Failed to load particle image: " << i << std::endl;
         }
         else {
-            std::cout << "Loaded particle image: " << i << std::endl;
+            //std::cout << "Loaded particle image: " << i << std::endl;
         }
     }
 
@@ -151,6 +151,8 @@ void Player_Skill_FireBall::Render(HDC hdc)
     SelectObject(hdc, oldPen);
     SelectObject(hdc, oldBrush);
     DeleteObject(hitboxPen);
+
+
 }
 
 void Player_Skill_FireBall::SpawnParticle()
@@ -178,7 +180,7 @@ void Player_Skill_FireBall::SpawnParticle()
     particle.frame = 0;
 
     mParticles.emplace_back(particle);
-    std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
+    //std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
 }
 
 void Player_Skill_FireBall::UpdateParticles()

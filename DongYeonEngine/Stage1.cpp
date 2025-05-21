@@ -15,8 +15,7 @@
 Stage1::Stage1()
 {
     camera.SetTarget(SceneManager::GetSharedPlayer());
-    SceneManager::GetSharedPlayer()->SetCameraX(camera.GetPositionX());
-    SceneManager::GetSharedPlayer()->SetCameraY(camera.GetPositionY());
+   
     SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
 
     swordmans.push_back(new SwordMan());
@@ -97,12 +96,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
-                                (*it)->SetActive(false);
+                              
                                 collided = true;
                             }
                         }
@@ -425,10 +419,10 @@ void Stage1::Update()
     RECT temp;
 	RECT playerRect = player->GetRect();
 	RECT portalRect = portal.GetRect();
-    if(IntersectRect(&temp, &playerRect, &portalRect))
+    if(IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
 		SceneManager::LoadScene(L"Stage2");
-		SceneManager::GetSharedPlayer()->SetPosition(100, 100);
+		SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
 	}
     //객체간에 충돌처리 밀어내는거
 	HandleCollision();
