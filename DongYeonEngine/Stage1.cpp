@@ -131,7 +131,12 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                              
+								printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
+									i, j,
+									wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+									points[0].x, points[0].y, points[1].x, points[1].y,
+									points[2].x, points[2].y, points[3].x, points[3].y);
+								(*it)->SetActive(false);
                                 collided = true;
                             }
                         }
