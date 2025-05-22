@@ -391,6 +391,7 @@ void Stage2::Update()
     {
         SceneManager::LoadScene(L"Stage1");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+        SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거
     HandleCollision();

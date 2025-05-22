@@ -55,6 +55,9 @@
     <Filter Include="Scenes\Stage">
       <UniqueIdentifier>{66b14d5c-59ff-4dc8-a739-6c6497a5ef4d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Dummy">
+      <UniqueIdentifier>{5ec5e0e0-a76e-4540-b586-9cf4b0c08574}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -147,6 +150,9 @@
     <ClInclude Include="GameOverScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Dummy.h">
+      <Filter>Object\Dummy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -235,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="GameClearScene.cpp">
       <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Dummy.cpp">
+      <Filter>Object\Dummy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,8 @@ public:
 
     void SetPosition(float x, float y) override;
     void TakeDamage(int d);
+	void SetTelporting(bool isTeleporting) { mIsTeleporting = isTeleporting; }
+
     int GetHp() { return hp; }
 	int GetMp() { return mp; }
     int GetDamage() { return damage; }
@@ -31,6 +33,7 @@ public:
     bool GetEffectHitbox(POINT outPoints[4]);
     bool CheckCollisionWithRect(RECT& otherRect);
     void ResetFireDragonTriggered() { fireDragonTriggered = false; }
+    
 
 	float GetFireBallCooldown() { return fireBallCooldown; }    
 	float GetFireDragonCooldown() { return fireDragonCooldown; }

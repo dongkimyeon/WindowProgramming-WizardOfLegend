@@ -61,4 +61,6 @@ void SceneManager::Render(HDC hdc)
 		SelectObject(hdc, hOldFont);
 		DeleteObject(hFont);
 	}
+
+
 }

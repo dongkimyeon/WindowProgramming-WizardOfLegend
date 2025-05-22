@@ -18,8 +18,9 @@ void TutorialStage::Initialize()
     camera.SetTarget(SceneManager::GetSharedPlayer());
 
     //몬스터 추가
-    archers.push_back(new Archer());
-    archers.back()->SetPosition(1800, 1700);
+	dummies.push_back(new Dummy());
+	dummies.back()->SetPosition(1100, 1100);
+
     //포탈 위치 설정
     portal.SetPosition(1900, 1700);
 
@@ -242,6 +243,17 @@ void TutorialStage::Update()
                         }
                     }
                     if (!enemyCollided)
+                    {
+                        for (auto* dummy : dummies)
+                        {
+                            if ((*it)->CheckCollision(*dummy))
+                            {
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+					}
+                    if (!enemyCollided)
                         ++it;
                 }
                 else
@@ -331,6 +343,18 @@ void TutorialStage::Update()
                         }
                     }
                     if (!enemyCollided)
+                    {
+                        for (auto* dummy : dummies)
+                        {
+                            if ((*it)->CheckCollision(*dummy))
+                            {
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!enemyCollided)
                         ++it;
                 }
                 else
@@ -377,12 +401,22 @@ void TutorialStage::Update()
                 archer->SetHitFlag(true);
             }
         }
+        for (auto* dummy : dummies)
+        {
+            RECT enemyRect = dummy->GetRect();
+            if (player->CheckCollisionWithRect(enemyRect) && !dummy->HasBeenHit())
+            {
+                dummy->TakeDamage(player->GetDamage());
+                dummy->SetHitFlag(true);
+            }
+		}
     }
     else
     {
         for (auto* swordman : swordmans) swordman->SetHitFlag(false);
         for (auto* wizard : wizards) wizard->SetHitFlag(false);
         for (auto* archer : archers) archer->SetHitFlag(false);
+		for (auto* dummy : dummies) dummy->SetHitFlag(false);
     }
 
     //포탈 넘어갈 때 설정해주는거
@@ -393,6 +427,7 @@ void TutorialStage::Update()
     {
         SceneManager::LoadScene(L"Stage1");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+        SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거
     HandleCollision();
@@ -461,7 +496,6 @@ void TutorialStage::Render(HDC hdc)
             RestoreDC(swordmanDC, savedSwordmanDC);
         }
     }
-
     for (auto* arrow : arrows)
     {
         POINT* points = arrow->GetHitboxPoints();
@@ -550,7 +584,19 @@ void TutorialStage::Render(HDC hdc)
             RestoreDC(FireDragonDC, saveFireDragonDC);
         }
     }
-
+    for(auto* dummy : dummies)
+    {
+        RECT rect = dummy->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC dummyDC = hdc;
+            int savedDummyDC = SaveDC(dummyDC);
+            OffsetViewportOrgEx(dummyDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            dummy->Render(dummyDC, *player);
+            RestoreDC(dummyDC, savedDummyDC);
+        }
+	}
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
     OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
@@ -586,6 +632,14 @@ void TutorialStage::Render(HDC hdc)
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
   
+    WCHAR mousePosText[100];
+    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
+    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
+    wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d",
+        static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
+    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
+        static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
+
 }
 
 
@@ -596,6 +650,7 @@ void TutorialStage::HandleCollision()
     for (auto* swordman : swordmans) allObjects.push_back(swordman);
     for (auto* wizard : wizards) allObjects.push_back(wizard);
     for (auto* archer : archers) allObjects.push_back(archer);
+	for (auto* dummies : dummies) allObjects.push_back(dummies);
     for (size_t i = 0; i < allObjects.size(); ++i)
     {
         for (size_t j = i + 1; j < allObjects.size(); ++j)

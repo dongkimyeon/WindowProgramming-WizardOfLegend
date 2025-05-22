@@ -15,13 +15,10 @@
 Stage1::Stage1()
 {
     camera.SetTarget(SceneManager::GetSharedPlayer());
-
     SceneManager::GetSharedPlayer()->SetPosition(1000, 1200);
 
-    archers.push_back(new Archer());
-    archers.back()->SetPosition(1250, 900);
 
-    /*//middle room
+    //middle room
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(800, 900);
     swordmans.push_back(new SwordMan());
@@ -61,7 +58,7 @@ Stage1::Stage1()
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(500, 1500);
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(350, 1600);*/
+    swordmans.back()->SetPosition(350, 1600);
 
     //right up room
     portal.SetPosition(1700, 450);
@@ -446,6 +443,7 @@ void Stage1::Update()
     {
         SceneManager::LoadScene(L"Stage2");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+        SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
 
     HandleCollision();
