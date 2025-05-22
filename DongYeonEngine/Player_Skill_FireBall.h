@@ -11,20 +11,18 @@ public:
     Player_Skill_FireBall(float x, float y, float dirX, float dirY);
     ~Player_Skill_FireBall();
 
-    void Update(GameObject& obj);
+    void Move(); // 이동 로직
+    bool CheckCollision(GameObject& obj); // 충돌 체크
     void Render(HDC hdc);
 
     static void Active(float mX, float mY, float angle, Scene* stage);
 
     bool IsActive() const { return mIsActive; }
-
-	//상태 변경
-	void SetActive(bool active) { mIsActive = active; }
-
+    void SetActive(bool active) { mIsActive = active; }
     POINT* GetHitboxPoints() { return hitboxPoints; }
-
     float GetPositionX() const { return mX; }
     float GetPositionY() const { return mY; }
+    int GetDamage() const { return damage; } 
 
     // 파티클 관련 함수
     void SpawnParticle();
@@ -51,7 +49,7 @@ private:
     float mY;                         // 현재 y 위치
     float mDirectionX;                // 이동 방향 x
     float mDirectionY;                // 이동 방향 y
-    float speed;                   // 이동 속도
+    float speed;                      // 이동 속도
     bool mIsActive;                   // 활성화 여부
     int damage;                       // 데미지
     int mCurrentFrame;                // 현재 애니메이션 프레임

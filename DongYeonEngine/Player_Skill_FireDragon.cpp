@@ -2,19 +2,18 @@
 #include "Stage1.h"
 #include "Time.h"
 #include <cmath>
-#include <iostream>
 #include <random>
+#include <iostream>
 
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(200.0f), mIsActive(true), damage(25),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(600.0f), mIsActive(true), damage(25),
     mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
     mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f),
     mFrameDuration(0.1f)
 {
-    
-    float offsetDistance = 30.0f; 
-    mX += dirX * offsetDistance;  
-    mY += dirY * offsetDistance;  
+    float offsetDistance = 30.0f;
+    mX += dirX * offsetDistance;
+    mY += dirY * offsetDistance;
 
     mFireDragonLeftImage.Load(L"resources/Player/Player_Skill_FireDragonL/SKILL_FIREDRAGON_00.png");
     mFireDragonRightImage.Load(L"resources/Player/Player_Skill_FireDragonR/SKILL_FIREDRAGON_00.png");
@@ -26,13 +25,9 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
         if (mFireParticleImage[i].Load(path) != S_OK) {
             std::cout << "Failed to load particle image: " << i << std::endl;
         }
-        else {
-            //std::cout << "Loaded particle image: " << i << std::endl;
-        }
     }
 
     UpdateHitbox();
-   // std::cout << "FireDragon created at (" << mX << ", " << mY << ")" << std::endl;
 }
 
 Player_Skill_FireDragon::~Player_Skill_FireDragon()
@@ -44,10 +39,11 @@ Player_Skill_FireDragon::~Player_Skill_FireDragon()
     }
 }
 
-void Player_Skill_FireDragon::Update(GameObject& obj)
+void Player_Skill_FireDragon::Move()
 {
     if (!mIsActive) return;
 
+    // 물결 효과 계산
     mWaveTime += Time::DeltaTime();
 
     float baseVelX = mDirectionX * speed;
@@ -64,12 +60,14 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
     mInstantDirX = baseVelX + perpX * waveVel;
     mInstantDirY = baseVelY + perpY * waveVel;
 
+    // 위치 업데이트
     mX += mInstantDirX * Time::DeltaTime();
     mY += mInstantDirY * Time::DeltaTime();
 
     UpdateHitbox();
     UpdateParticles();
 
+    // 애니메이션 업데이트
     mAnimationTimer += Time::DeltaTime();
     if (mAnimationTimer >= mFrameDuration)
     {
@@ -77,20 +75,26 @@ void Player_Skill_FireDragon::Update(GameObject& obj)
         mAnimationTimer -= mFrameDuration;
     }
 
+    // 맵 경계 체크
     const float mapWidth = 5000.0f;
     const float mapHeight = 5000.0f;
     if (mX < 0 || mX > mapWidth || mY < 0 || mY > mapHeight)
     {
         mIsActive = false;
-        return;
     }
+}
 
-    if (CheckCollisionWithRect(obj.GetRect()) && !obj.GetIsDead())
+bool Player_Skill_FireDragon::CheckCollision(GameObject& obj)
+{
+    if (!mIsActive || obj.GetIsDead()) return false;
+
+    if (CheckCollisionWithRect(obj.GetRect()))
     {
         obj.TakeDamage(damage);
         mIsActive = false;
-        return;
+        return true;
     }
+    return false;
 }
 
 void Player_Skill_FireDragon::Render(HDC hdc)
@@ -108,12 +112,12 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     float angle = static_cast<float>(atan2(mInstantDirY, mInstantDirX));
 
     XFORM xForm = { 0 };
-    xForm.eM11 = cos(angle);         // 회전만 적용
+    xForm.eM11 = cos(angle);
     xForm.eM12 = sin(angle);
     xForm.eM21 = -sin(angle);
     xForm.eM22 = cos(angle);
-    xForm.eDx = mX;                  // 중심점 X
-    xForm.eDy = mY;                  // 중심점 Y
+    xForm.eDx = mX;
+    xForm.eDy = mY;
 
     SetGraphicsMode(hdc, GM_ADVANCED);
     SetWorldTransform(hdc, &xForm);
@@ -132,6 +136,7 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     SetWorldTransform(hdc, &identity);
     SetGraphicsMode(hdc, GM_COMPATIBLE);
 
+    // 파티클 렌더링
     for (const auto& particle : mParticles)
     {
         CImage& particleImage = mFireParticleImage[particle.frame];
@@ -154,6 +159,7 @@ void Player_Skill_FireDragon::Render(HDC hdc)
         particleImage.ReleaseDC();
     }
 
+    // 히트박스 디버깅
     HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
     HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
     MoveToEx(hdc, hitboxPoints[0].x, hitboxPoints[0].y, nullptr);
@@ -163,7 +169,6 @@ void Player_Skill_FireDragon::Render(HDC hdc)
     LineTo(hdc, hitboxPoints[0].x, hitboxPoints[0].y);
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
-	std::cout << speed << std::endl;
 }
 
 void Player_Skill_FireDragon::UpdateHitbox()
@@ -252,21 +257,17 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
         savedMX = mX;
         savedMY = mY;
         savedAngle = angle;
-       // std::cout << "Firing started at (" << savedMX << ", " << savedMY << ") with angle " << savedAngle << std::endl;
     }
 
     if (isFiring)
     {
         accumulatedTime += Time::DeltaTime();
-       // std::cout << "Active called: accumulatedTime = " << accumulatedTime << ", dragonsSpawned = " << dragonsSpawned << std::endl;
 
         if (dragonsSpawned < numDragons && accumulatedTime >= spawnInterval)
         {
             float dirX = cos(savedAngle);
             float dirY = sin(savedAngle);
             float phaseOffset = (dragonsSpawned % 2 == 0) ? 0.0f : 3.1415926535f;
-
-            //std::cout << "Spawning FireDragon #" << dragonsSpawned + 1 << " at (" << savedMX << ", " << savedMY << ") with phaseOffset = " << phaseOffset << std::endl;
 
             stage->AddPlayerSkillFireDragon(new Player_Skill_FireDragon(savedMX, savedMY, dirX, dirY, phaseOffset));
 
@@ -276,7 +277,6 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
 
         if (dragonsSpawned >= numDragons)
         {
-           // std::cout << "All " << numDragons << " FireDragons spawned, stopping firing." << std::endl;
             isFiring = false;
             dragonsSpawned = 0;
             accumulatedTime = 0.0f;
@@ -313,7 +313,6 @@ void Player_Skill_FireDragon::SpawnParticle()
     particle.frame = 0;
 
     mParticles.emplace_back(particle);
-  //  std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
 }
 
 void Player_Skill_FireDragon::UpdateParticles()

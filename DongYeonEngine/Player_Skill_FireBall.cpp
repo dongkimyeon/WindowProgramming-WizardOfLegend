@@ -6,17 +6,16 @@
 #include <iostream>
 
 Player_Skill_FireBall::Player_Skill_FireBall(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(200.0f), mIsActive(true), damage(25),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(400.0f), mIsActive(true), damage(25),
     mCurrentFrame(0), mAnimationTimer(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f),
-    mFrameDuration(0.1f) // mFrameDuration 초기화 추가
+    mFrameDuration(0.1f)
 {
-
     // 마우스 방향(진행 방향)으로 오프셋 적용
-    float offsetDistance = 50.0f; 
-    mX += dirX * offsetDistance;  
-    mY += dirY * offsetDistance;  
+    float offsetDistance = 50.0f;
+    mX += dirX * offsetDistance;
+    mY += dirY * offsetDistance;
 
-
+    // 파이어볼 애니메이션 이미지 로드
     for (int i = 0; i < 5; ++i)
     {
         wchar_t path[256];
@@ -24,15 +23,13 @@ Player_Skill_FireBall::Player_Skill_FireBall(float x, float y, float dirX, float
         mFireBallAnimation[i].Load(path);
     }
 
+    // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
     {
         wchar_t path[256];
         swprintf_s(path, L"resources/Player/FireEffect/FIRE_PARTICLE_%02d.png", i);
         if (mFireParticleImage[i].Load(path) != S_OK) {
             std::cout << "Failed to load particle image: " << i << std::endl;
-        }
-        else {
-            //std::cout << "Loaded particle image: " << i << std::endl;
         }
     }
 
@@ -51,15 +48,19 @@ Player_Skill_FireBall::~Player_Skill_FireBall()
     }
 }
 
-void Player_Skill_FireBall::Update(GameObject& obj)
+void Player_Skill_FireBall::Move()
 {
     if (!mIsActive) return;
 
+    // 위치 업데이트
     mX += mDirectionX * speed * Time::DeltaTime();
     mY += mDirectionY * speed * Time::DeltaTime();
     UpdateHitbox();
+
+    // 파티클 업데이트
     UpdateParticles();
 
+    // 애니메이션 업데이트
     mAnimationTimer += Time::DeltaTime();
     if (mAnimationTimer >= mFrameDuration)
     {
@@ -67,21 +68,26 @@ void Player_Skill_FireBall::Update(GameObject& obj)
         mAnimationTimer -= mFrameDuration;
     }
 
+    // 맵 경계 체크
     const float mapWidth = 5000.0f;
     const float mapHeight = 5000.0f;
     if (mX < 0 || mX > mapWidth || mY < 0 || mY > mapHeight)
     {
         mIsActive = false;
-        return;
     }
+}
 
+bool Player_Skill_FireBall::CheckCollision(GameObject& obj)
+{
+    if (!mIsActive || obj.GetIsDead()) return false;
 
-    if (CheckCollisionWithRect(obj.GetRect()) && !obj.GetIsDead())
+    if (CheckCollisionWithRect(obj.GetRect()))
     {
         obj.TakeDamage(damage);
         mIsActive = false;
-        return;
+        return true;
     }
+    return false;
 }
 
 void Player_Skill_FireBall::Render(HDC hdc)
@@ -98,12 +104,12 @@ void Player_Skill_FireBall::Render(HDC hdc)
     float angle = static_cast<float>(atan2(mDirectionY, mDirectionX));
 
     XFORM xForm = { 0 };
-    xForm.eM11 = cos(angle);         // 회전만 적용
+    xForm.eM11 = cos(angle);
     xForm.eM12 = sin(angle);
     xForm.eM21 = -sin(angle);
     xForm.eM22 = cos(angle);
-    xForm.eDx = mX;                  // 중심점 X
-    xForm.eDy = mY;                  // 중심점 Y
+    xForm.eDx = mX;
+    xForm.eDy = mY;
 
     SetGraphicsMode(hdc, GM_ADVANCED);
     SetWorldTransform(hdc, &xForm);
@@ -122,6 +128,7 @@ void Player_Skill_FireBall::Render(HDC hdc)
     SetWorldTransform(hdc, &identity);
     SetGraphicsMode(hdc, GM_COMPATIBLE);
 
+    // 파티클 렌더링
     for (const auto& particle : mParticles)
     {
         CImage& particleImage = mFireParticleImage[particle.frame];
@@ -144,6 +151,7 @@ void Player_Skill_FireBall::Render(HDC hdc)
         particleImage.ReleaseDC();
     }
 
+    // 히트박스 디버깅
     HPEN hitboxPen = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
     HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
     HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
@@ -151,8 +159,6 @@ void Player_Skill_FireBall::Render(HDC hdc)
     SelectObject(hdc, oldPen);
     SelectObject(hdc, oldBrush);
     DeleteObject(hitboxPen);
-
-
 }
 
 void Player_Skill_FireBall::SpawnParticle()
@@ -180,7 +186,6 @@ void Player_Skill_FireBall::SpawnParticle()
     particle.frame = 0;
 
     mParticles.emplace_back(particle);
-    //std::cout << "Spawned particle at (" << spawnX << ", " << spawnY << ")" << std::endl;
 }
 
 void Player_Skill_FireBall::UpdateParticles()
@@ -208,14 +213,14 @@ void Player_Skill_FireBall::UpdateParticles()
 void Player_Skill_FireBall::UpdateHitbox()
 {
     float scale = 1.5f;
-    int imageWidth = static_cast<int>(mFireBallAnimation[0].GetWidth() * scale)- 40;
+    int imageWidth = static_cast<int>(mFireBallAnimation[0].GetWidth() * scale) - 40;
     int imageHeight = static_cast<int>(mFireBallAnimation[0].GetHeight() * scale) - 10;
 
     POINT basePoints[4] = {
         { -imageWidth / 2, -imageHeight / 2 },
-        {  imageWidth / 2, -imageHeight / 2 },
-        {  imageWidth / 2,  imageHeight / 2 },
-        { -imageWidth / 2,  imageHeight / 2 }
+        { imageWidth / 2, -imageHeight / 2 },
+        { imageWidth / 2, imageHeight / 2 },
+        { -imageWidth / 2, imageHeight / 2 }
     };
 
     float angle = static_cast<float>(atan2(mDirectionY, mDirectionX));

@@ -40,7 +40,12 @@ void Stage2::Update()
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);
     for (auto* swordman : swordmans) swordman->Update(*player);
-
+    //플레이어 발사체 움직임
+    for (auto* fireball : playerFireballs)
+    {
+        if (fireball->IsActive())
+            fireball->Move();
+    }
     // 발사체 벽 충돌 체크
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
@@ -169,6 +174,7 @@ void Stage2::Update()
         {
             if ((*it)->IsActive())
             {
+                // 벽 충돌
                 POINT* points = (*it)->GetHitboxPoints();
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
@@ -195,24 +201,21 @@ void Stage2::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("PlayerFireball collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), PlayerFireball Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                printf("PlayerFireball collided with wall at tile [%d, %d]\n", i, j);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
                         }
                     }
                 }
+
+                // 적 충돌
                 if (!collided)
                 {
                     bool enemyCollided = false;
                     for (auto* swordman : swordmans)
                     {
-                        (*it)->Update(*swordman);
-                        if (!(*it)->IsActive())
+                        if ((*it)->CheckCollision(*swordman))
                         {
                             enemyCollided = true;
                             break;
@@ -222,8 +225,7 @@ void Stage2::Update()
                     {
                         for (auto* wizard : wizards)
                         {
-                            (*it)->Update(*wizard);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*wizard))
                             {
                                 enemyCollided = true;
                                 break;
@@ -234,22 +236,15 @@ void Stage2::Update()
                     {
                         for (auto* archer : archers)
                         {
-                            (*it)->Update(*archer);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*archer))
                             {
                                 enemyCollided = true;
                                 break;
                             }
                         }
                     }
-                    if (!(*it)->IsActive())
-                    {
+                    if (!enemyCollided)
                         ++it;
-                    }
-                    else
-                    {
-                        ++it;
-                    }
                 }
                 else
                 {
@@ -268,6 +263,7 @@ void Stage2::Update()
         {
             if ((*it)->IsActive())
             {
+                // 벽 충돌
                 POINT* points = (*it)->GetHitboxPoints();
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
@@ -294,24 +290,21 @@ void Stage2::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("FireDragon collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), FireDragon Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                               
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
                         }
                     }
                 }
+
+                // 적 충돌
                 if (!collided)
                 {
                     bool enemyCollided = false;
                     for (auto* swordman : swordmans)
                     {
-                        (*it)->Update(*swordman);
-                        if (!(*it)->IsActive())
+                        if ((*it)->CheckCollision(*swordman))
                         {
                             enemyCollided = true;
                             break;
@@ -321,8 +314,7 @@ void Stage2::Update()
                     {
                         for (auto* wizard : wizards)
                         {
-                            (*it)->Update(*wizard);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*wizard))
                             {
                                 enemyCollided = true;
                                 break;
@@ -333,22 +325,15 @@ void Stage2::Update()
                     {
                         for (auto* archer : archers)
                         {
-                            (*it)->Update(*archer);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*archer))
                             {
                                 enemyCollided = true;
                                 break;
                             }
                         }
                     }
-                    if (!(*it)->IsActive())
-                    {
+                    if (!enemyCollided)
                         ++it;
-                    }
-                    else
-                    {
-                        ++it;
-                    }
                 }
                 else
                 {

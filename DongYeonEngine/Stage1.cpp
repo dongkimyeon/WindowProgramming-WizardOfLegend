@@ -1,4 +1,4 @@
-#include "Stage1.h"
+ï»¿#include "Stage1.h"
 #include "Input.h"
 #include "Time.h"
 #include "Archer.h"
@@ -15,7 +15,7 @@
 Stage1::Stage1()
 {
     camera.SetTarget(SceneManager::GetSharedPlayer());
-   
+
     SceneManager::GetSharedPlayer()->SetPosition(1000, 1200);
 
 
@@ -60,9 +60,9 @@ Stage1::Stage1()
     swordmans.back()->SetPosition(500, 1500);
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(350, 1600);
-    
+
     //right up room
-	portal.SetPosition(1700, 450);
+    portal.SetPosition(1700, 450);
 }
 
 Stage1::~Stage1()
@@ -78,7 +78,7 @@ Stage1::~Stage1()
 
 void Stage1::Initialize()
 {
-	UI::Initialize();
+    UI::Initialize();
     MapManager::GetInstance()->Initialize();
     camera.Update();
 }
@@ -94,8 +94,17 @@ void Stage1::Update()
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);
     for (auto* swordman : swordmans) swordman->Update(*player);
+    for (auto* fireDragon : playerFireDragon)
+    {
+        if (fireDragon->IsActive())
+            fireDragon->Move();
+    }
+    for (auto* fireball : playerFireballs)
+    {
+        if (fireball->IsActive())
+            fireball->Move();
+    }
 
-    // ¹ß»çÃ¼ º® Ãæµ¹ Ã¼Å©
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
     {
@@ -105,7 +114,7 @@ void Stage1::Update()
             if ((*it)->IsActive())
             {
                 POINT* points = (*it)->GetHitboxPoints();
-                // POINT[4]¿¡¼­ RECT »ý¼º
+
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
                 {
@@ -131,12 +140,12 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-								printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-									i, j,
-									wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-									points[0].x, points[0].y, points[1].x, points[1].y,
-									points[2].x, points[2].y, points[3].x, points[3].y);
-								(*it)->SetActive(false);
+                                printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
+                                    i, j,
+                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                                    points[0].x, points[0].y, points[1].x, points[1].y,
+                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                (*it)->SetActive(false);
                                 collided = true;
                             }
                         }
@@ -223,6 +232,7 @@ void Stage1::Update()
         {
             if ((*it)->IsActive())
             {
+                // ë²½ ì¶©ëŒ
                 POINT* points = (*it)->GetHitboxPoints();
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
@@ -249,24 +259,21 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("PlayerFireball collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), PlayerFireball Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                printf("PlayerFireball collided with wall at tile [%d, %d]\n", i, j);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
                         }
                     }
                 }
+
+                // ì  ì¶©ëŒ
                 if (!collided)
                 {
                     bool enemyCollided = false;
                     for (auto* swordman : swordmans)
                     {
-                        (*it)->Update(*swordman);
-                        if (!(*it)->IsActive())
+                        if ((*it)->CheckCollision(*swordman))
                         {
                             enemyCollided = true;
                             break;
@@ -276,8 +283,7 @@ void Stage1::Update()
                     {
                         for (auto* wizard : wizards)
                         {
-                            (*it)->Update(*wizard);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*wizard))
                             {
                                 enemyCollided = true;
                                 break;
@@ -288,22 +294,15 @@ void Stage1::Update()
                     {
                         for (auto* archer : archers)
                         {
-                            (*it)->Update(*archer);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*archer))
                             {
                                 enemyCollided = true;
                                 break;
                             }
                         }
                     }
-                    if (!(*it)->IsActive())
-                    {
+                    if (!enemyCollided)
                         ++it;
-                    }
-                    else
-                    {
-                        ++it;
-                    }
                 }
                 else
                 {
@@ -322,6 +321,7 @@ void Stage1::Update()
         {
             if ((*it)->IsActive())
             {
+                // ë²½ ì¶©ëŒ
                 POINT* points = (*it)->GetHitboxPoints();
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
@@ -348,24 +348,21 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("FireDragon collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), FireDragon Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                                printf("FireDragon collided with wall at tile [%d, %d]\n", i, j);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
                         }
                     }
                 }
+
+                // ì  ì¶©ëŒ
                 if (!collided)
                 {
                     bool enemyCollided = false;
                     for (auto* swordman : swordmans)
                     {
-                        (*it)->Update(*swordman);
-                        if (!(*it)->IsActive())
+                        if ((*it)->CheckCollision(*swordman))
                         {
                             enemyCollided = true;
                             break;
@@ -375,8 +372,7 @@ void Stage1::Update()
                     {
                         for (auto* wizard : wizards)
                         {
-                            (*it)->Update(*wizard);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*wizard))
                             {
                                 enemyCollided = true;
                                 break;
@@ -387,22 +383,15 @@ void Stage1::Update()
                     {
                         for (auto* archer : archers)
                         {
-                            (*it)->Update(*archer);
-                            if (!(*it)->IsActive())
+                            if ((*it)->CheckCollision(*archer))
                             {
                                 enemyCollided = true;
                                 break;
                             }
                         }
                     }
-                    if (!(*it)->IsActive())
-                    {
+                    if (!enemyCollided)
                         ++it;
-                    }
-                    else
-                    {
-                        ++it;
-                    }
                 }
                 else
                 {
@@ -415,8 +404,8 @@ void Stage1::Update()
                 it = playerFireDragon.erase(it);
             }
         }
-    }
 
+    }
     POINT effectHitboxPoints[4];
     bool hasEffectHitbox = player->GetEffectHitbox(effectHitboxPoints);
     if (hasEffectHitbox)
@@ -457,22 +446,25 @@ void Stage1::Update()
     }
 
     RECT temp;
-	RECT playerRect = player->GetRect();
-	RECT portalRect = portal.GetRect();
-    if(IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
+    RECT playerRect = player->GetRect();
+    RECT portalRect = portal.GetRect();
+    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
-		SceneManager::LoadScene(L"Stage2");
-		SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
-	}
-    //°´Ã¼°£¿¡ Ãæµ¹Ã³¸® ¹Ð¾î³»´Â°Å
-	HandleCollision();
+        SceneManager::LoadScene(L"Stage2");
+        SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+    }
+    //ï¿½ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹Ã³ï¿½ï¿½ ï¿½Ð¾î³»ï¿½Â°ï¿½
+    HandleCollision();
 
-    // ÇÃ·¹ÀÌ¾î º® Ãæµ¹ Ã³¸®
+    // ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ ï¿½æµ¹ Ã³ï¿½ï¿½
     if (map)
     {
         HandleCollisionMap(map, *player);
     }
 }
+   
+   
+
 void Stage1::LateUpdate()
 {
     Scene::LateUpdate();
@@ -494,7 +486,7 @@ void Stage1::Render(HDC hdc)
     OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
     portal.Render(portalDC);
     RestoreDC(portalDC, savedPortalDC);
-  
+
 
     for (auto* wizard : wizards)
     {
@@ -535,7 +527,7 @@ void Stage1::Render(HDC hdc)
             RestoreDC(swordmanDC, savedSwordmanDC);
         }
     }
-    
+
     for (auto* arrow : arrows)
     {
         POINT* points = arrow->GetHitboxPoints();
@@ -633,18 +625,18 @@ void Stage1::Render(HDC hdc)
 
     RestoreDC(hdc, savedDC);
 
-	UI::Render(hdc);
+    UI::Render(hdc);
 
 
-   WCHAR playerPosText[100];
-    wsprintf(playerPosText, L"ÇÃ·¹ÀÌ¾î ÁÂÇ¥: X = %d, Y = %d",
+    WCHAR playerPosText[100];
+    wsprintf(playerPosText, L"ï¿½Ã·ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½Ç¥: X = %d, Y = %d",
         static_cast<int>(player->GetPositionX()), static_cast<int>(player->GetPositionY()));
     TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
 
     WCHAR mousePosText[100];
     float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
     float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-    wsprintf(mousePosText, L"¸¶¿ì½º ÁÂÇ¥: X = %d, Y = %d",
+    wsprintf(mousePosText, L"ï¿½ï¿½ï¿½ì½º ï¿½ï¿½Ç¥: X = %d, Y = %d",
         static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
         static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
@@ -656,7 +648,7 @@ void Stage1::Render(HDC hdc)
         if (arrow->IsActive())
         {
             WCHAR arrowPosText[100];
-            wsprintf(arrowPosText, L"È­»ì %d ÁÂÇ¥: X = %d, Y = %d",
+            wsprintf(arrowPosText, L"È­ï¿½ï¿½ %d ï¿½ï¿½Ç¥: X = %d, Y = %d",
                 arrowIndex, static_cast<int>(arrow->GetPositionX()),
                 static_cast<int>(arrow->GetPositionY()));
             TextOut(hdc, 0, arrowTextOffsetY, arrowPosText, lstrlen(arrowPosText));
@@ -775,7 +767,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                             enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
                         ResolveCollisionMap(wallRect, *wizard);
                     }
-				}
+                }
                 for (auto* archer : archers)
                 {
                     RECT enemyRect = archer->GetRect();
@@ -790,7 +782,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 }
 
             }
-        }       
+        }
     }
 }
 
