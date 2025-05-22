@@ -16,18 +16,53 @@ Stage1::Stage1()
 {
     camera.SetTarget(SceneManager::GetSharedPlayer());
    
-    SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+    SceneManager::GetSharedPlayer()->SetPosition(1000, 1200);
 
+
+    //middle room
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(800, 800);
+    swordmans.back()->SetPosition(800, 900);
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(850, 800);
+    swordmans.back()->SetPosition(950, 900);
     wizards.push_back(new Wizard());
-    wizards.back()->SetPosition(900, 800);
+    wizards.back()->SetPosition(1100, 900);
     archers.push_back(new Archer());
-    archers.back()->SetPosition(950, 800);
+    archers.back()->SetPosition(1250, 900);
 
-	portal.SetPosition(400, 1600);
+    // middle under room
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(800, 1700);
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(1200, 1700);
+    wizards.push_back(new Wizard());
+    wizards.back()->SetPosition(1000, 1700);
+
+    //middle Up room
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(800, 400);
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(1200, 400);
+    archers.push_back(new Archer());
+    archers.back()->SetPosition(1000, 200);
+
+    //Left Long room
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(500, 400);
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(500, 600);
+    archers.push_back(new Archer());
+    archers.back()->SetPosition(250, 500);
+    wizards.push_back(new Wizard());
+    wizards.back()->SetPosition(350, 1000);
+    wizards.push_back(new Wizard());
+    wizards.back()->SetPosition(250, 1400);
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(500, 1500);
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(350, 1600);
+    
+    //right up room
+	portal.SetPosition(1700, 450);
 }
 
 Stage1::~Stage1()
