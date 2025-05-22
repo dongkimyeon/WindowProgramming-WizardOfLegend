@@ -41,11 +41,17 @@ void Stage2::Update()
     for (auto* wizard : wizards) wizard->Update(*player, this);
     for (auto* swordman : swordmans) swordman->Update(*player);
     //플레이어 발사체 움직임
+    for (auto* fireDragon : playerFireDragon)
+    {
+        if (fireDragon->IsActive())
+            fireDragon->Move();
+    }
     for (auto* fireball : playerFireballs)
     {
         if (fireball->IsActive())
             fireball->Move();
     }
+
     // 발사체 벽 충돌 체크
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
@@ -82,12 +88,8 @@ void Stage2::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                              /*  printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
-                                (*it)->SetActive(false);*/
+                             
+                                (*it)->SetActive(false);
                                 collided = true;
                             }
                         }
@@ -141,11 +143,7 @@ void Stage2::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("Fireball collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Fireball Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                             
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -201,7 +199,6 @@ void Stage2::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("PlayerFireball collided with wall at tile [%d, %d]\n", i, j);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -562,35 +559,29 @@ void Stage2::Render(HDC hdc)
 
     UI::Render(hdc);
 
+    
+    //몇 스테이지인지 텍스트 출력
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(255, 255, 255));
+    HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
-    WCHAR playerPosText[100];
-    wsprintf(playerPosText, L"플레이어 좌표: X = %d, Y = %d",
-        static_cast<int>(player->GetPositionX()), static_cast<int>(player->GetPositionY()));
-    TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
+    wchar_t StageIdText[20];
+    swprintf_s(StageIdText, L"Stage2");
 
-    WCHAR mousePosText[100];
-    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
-    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-    wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d",
-        static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
-    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
-        static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
+ 
+    SIZE textSize;
+    GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
 
-    /*int arrowTextOffsetY = 80;
-    int arrowIndex = 0;
-    for (const auto* arrow : arrows)
-    {
-        if (arrow->IsActive())
-        {
-            WCHAR arrowPosText[100];
-            wsprintf(arrowPosText, L"화살 %d 좌표: X = %d, Y = %d",
-                arrowIndex, static_cast<int>(arrow->GetPositionX()),
-                static_cast<int>(arrow->GetPositionY()));
-            TextOut(hdc, 0, arrowTextOffsetY, arrowPosText, lstrlen(arrowPosText));
-            arrowTextOffsetY += 20;
-            ++arrowIndex;
-        }
-    }*/
+    int textX = viewWidth - textSize.cx; 
+    int textY = viewHeight - textSize.cy; 
+
+    TextOut(hdc, textX - 20, textY, StageIdText, wcslen(StageIdText));
+
+    SelectObject(hdc, hOldFont);
+    DeleteObject(hFont);
 }
 
 
@@ -672,10 +663,7 @@ void Stage2::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 RECT intersect;
                 if (IntersectRect(&intersect, &wallRect, &playerRect))
                 {
-                    printf("Player collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Player RECT: (%ld, %ld, %ld, %ld)\n",
-                        i, j,
-                        wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                        playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);
+               
                     ResolveCollisionMap(wallRect, *player);
                 }
             }

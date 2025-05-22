@@ -18,8 +18,10 @@ Stage1::Stage1()
 
     SceneManager::GetSharedPlayer()->SetPosition(1000, 1200);
 
+    archers.push_back(new Archer());
+    archers.back()->SetPosition(1250, 900);
 
-    //middle room
+    /*//middle room
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(800, 900);
     swordmans.push_back(new SwordMan());
@@ -59,7 +61,7 @@ Stage1::Stage1()
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(500, 1500);
     swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(350, 1600);
+    swordmans.back()->SetPosition(350, 1600);*/
 
     //right up room
     portal.SetPosition(1700, 450);
@@ -140,11 +142,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("Arrow collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Arrow Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                            
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -199,11 +197,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("Fireball collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Fireball Points: [(%ld,%ld), (%ld,%ld), (%ld,%ld), (%ld,%ld)]\n",
-                                    i, j,
-                                    wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                                    points[0].x, points[0].y, points[1].x, points[1].y,
-                                    points[2].x, points[2].y, points[3].x, points[3].y);
+                              
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -259,7 +253,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("PlayerFireball collided with wall at tile [%d, %d]\n", i, j);
+                               
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -348,7 +342,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                                printf("FireDragon collided with wall at tile [%d, %d]\n", i, j);
+                            
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -453,10 +447,10 @@ void Stage1::Update()
         SceneManager::LoadScene(L"Stage2");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
     }
-    //��ü���� �浹ó�� �о�°�
+
     HandleCollision();
 
-    // �÷��̾� �� �浹 ó��
+
     if (map)
     {
         HandleCollisionMap(map, *player);
@@ -628,34 +622,29 @@ void Stage1::Render(HDC hdc)
     UI::Render(hdc);
 
 
-    WCHAR playerPosText[100];
-    wsprintf(playerPosText, L"�÷��̾� ��ǥ: X = %d, Y = %d",
-        static_cast<int>(player->GetPositionX()), static_cast<int>(player->GetPositionY()));
-    TextOut(hdc, 0, 60, playerPosText, lstrlen(playerPosText));
 
-    WCHAR mousePosText[100];
-    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
-    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-    wsprintf(mousePosText, L"���콺 ��ǥ: X = %d, Y = %d",
-        static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
-    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
-        static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
+    //몇 스테이지인지 텍스트 출력
+    SetBkMode(hdc, TRANSPARENT);
+    SetTextColor(hdc, RGB(255, 255, 255));
+    HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
-    /*int arrowTextOffsetY = 80;
-    int arrowIndex = 0;
-    for (const auto* arrow : arrows)
-    {
-        if (arrow->IsActive())
-        {
-            WCHAR arrowPosText[100];
-            wsprintf(arrowPosText, L"ȭ�� %d ��ǥ: X = %d, Y = %d",
-                arrowIndex, static_cast<int>(arrow->GetPositionX()),
-                static_cast<int>(arrow->GetPositionY()));
-            TextOut(hdc, 0, arrowTextOffsetY, arrowPosText, lstrlen(arrowPosText));
-            arrowTextOffsetY += 20;
-            ++arrowIndex;
-        }
-    }*/
+    wchar_t StageIdText[20];
+    swprintf_s(StageIdText, L"Stage1");
+
+
+    SIZE textSize;
+    GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
+
+    int textX = viewWidth - textSize.cx;
+    int textY = viewHeight - textSize.cy;
+
+    TextOut(hdc, textX - 20, textY, StageIdText, wcslen(StageIdText));
+
+    SelectObject(hdc, hOldFont);
+    DeleteObject(hFont);
 }
 
 
@@ -738,10 +727,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 RECT intersect;
                 if (IntersectRect(&intersect, &wallRect, &playerRect))
                 {
-                    printf("Player collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Player RECT: (%ld, %ld, %ld, %ld)\n",
-                        i, j,
-                        wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                        playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);
+                   
                     ResolveCollisionMap(wallRect, *player);
                 }
                 for (auto* swordman : swordmans)
@@ -749,10 +735,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = swordman->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-                        printf("Swordman collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Swordman RECT: (%ld, %ld, %ld, %ld)\n",
-                            i, j,
-                            wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                            enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
+                       
                         ResolveCollisionMap(wallRect, *swordman);
                     }
                 }
@@ -761,10 +744,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = wizard->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-                        printf("Wizard collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Wizard RECT: (%ld, %ld, %ld, %ld)\n",
-                            i, j,
-                            wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                            enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
+                       
                         ResolveCollisionMap(wallRect, *wizard);
                     }
                 }
@@ -773,10 +753,7 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = archer->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-                        printf("Archer collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Archer RECT: (%ld, %ld, %ld, %ld)\n",
-                            i, j,
-                            wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
-                            enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
+                      
                         ResolveCollisionMap(wallRect, *archer);
                     }
                 }

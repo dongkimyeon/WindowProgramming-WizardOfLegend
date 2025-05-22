@@ -19,5 +19,5 @@ void LoadScenes()
 	SceneManager::CreateScene<GameOverScene>(L"GameOverScene");
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
 	
-	SceneManager::LoadScene(L"TitleScene");
+	SceneManager::LoadScene(L"TutorialStage");
 }

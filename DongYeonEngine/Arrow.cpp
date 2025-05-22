@@ -8,6 +8,11 @@ Arrow::Arrow(float x, float y, float dirX, float dirY)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(10)
 {
     
+    float offsetDistance = 20.0f;
+    mX += dirX * offsetDistance;
+    mY += dirY * offsetDistance;
+
+
     mArrowImage.Load(L"resources/Monster/ARCHER/ARCHER_BOW/Attack/ARCHER_BOW_0.png");
     if (mArrowImage.IsNull()) wprintf(L"Failed to load: resources/Monster/ARCHER/ARCHER_BOW/Attack/ARCHER_BOW_0.png\n");
     UpdateHitbox();
@@ -32,9 +37,6 @@ void Arrow::Update(Player& player)
         mIsActive = false;
         return;
     }
-
-
-	
 
 }
 

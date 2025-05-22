@@ -6,9 +6,9 @@
 #include <iostream>
 
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(600.0f), mIsActive(true), damage(25),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(10),
     mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
-    mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.15f),
+    mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.05f),
     mFrameDuration(0.1f)
 {
     float offsetDistance = 30.0f;
@@ -50,7 +50,7 @@ void Player_Skill_FireDragon::Move()
     float baseVelY = mDirectionY * speed;
 
     float waveAmplitude = 60.0f;
-    float waveFrequency = 2.0f;
+	float waveFrequency = 10.0f; // 주파수
 
     float perpX = mDirectionY;
     float perpY = -mDirectionX;
