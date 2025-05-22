@@ -712,8 +712,45 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                         playerRect.left, playerRect.top, playerRect.right, playerRect.bottom);
                     ResolveCollisionMap(wallRect, *player);
                 }
+                for (auto* swordman : swordmans)
+                {
+                    RECT enemyRect = swordman->GetRect();
+                    if (IntersectRect(&intersect, &wallRect, &enemyRect))
+                    {
+                        printf("Swordman collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Swordman RECT: (%ld, %ld, %ld, %ld)\n",
+                            i, j,
+                            wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                            enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
+                        ResolveCollisionMap(wallRect, *swordman);
+                    }
+                }
+                for (auto* wizard : wizards)
+                {
+                    RECT enemyRect = wizard->GetRect();
+                    if (IntersectRect(&intersect, &wallRect, &enemyRect))
+                    {
+                        printf("Wizard collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Wizard RECT: (%ld, %ld, %ld, %ld)\n",
+                            i, j,
+                            wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                            enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
+                        ResolveCollisionMap(wallRect, *wizard);
+                    }
+				}
+                for (auto* archer : archers)
+                {
+                    RECT enemyRect = archer->GetRect();
+                    if (IntersectRect(&intersect, &wallRect, &enemyRect))
+                    {
+                        printf("Archer collided with wall at tile [%d, %d] - Wall RECT: (%ld, %ld, %ld, %ld), Archer RECT: (%ld, %ld, %ld, %ld)\n",
+                            i, j,
+                            wallRect.left, wallRect.top, wallRect.right, wallRect.bottom,
+                            enemyRect.left, enemyRect.top, enemyRect.right, enemyRect.bottom);
+                        ResolveCollisionMap(wallRect, *archer);
+                    }
+                }
+
             }
-        }
+        }       
     }
 }
 
