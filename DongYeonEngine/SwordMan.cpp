@@ -36,7 +36,7 @@ SwordMan::SwordMan()
     mDamageTextY = 0.0f;
     mDamageTextSpeed = 50.0f; // 텍스트 상승 속도 (초당 픽셀)
     mShowDamage = false;
-
+    mHitEffectAngle = 0.0f; // 초기화
     rect = { (int)(mX - 20), (int)(mY - 20), (int)(mX + 20), (int)(mY + 20) };
 
     // 이미지 로드 (기존 코드 유지)
@@ -169,6 +169,7 @@ void SwordMan::Update(Player& p)
         if (mShowDamage) {
             mDamageTextY -= mDamageTextSpeed * deltaTime;
         }
+        
         return;
     }
 
@@ -477,7 +478,7 @@ void SwordMan::TakeDamage(int d)
     mDamageTaken = d; // 데미지 값 저장
     mShowDamage = true; // 데미지 텍스트 표시 활성화
     mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
-
+    mHitEffectAngle = static_cast<float>(rand()) / RAND_MAX * 2.0f * 3.14159f;
     if (hp <= 0) {
         hp = 0;
         mIsDead = true;

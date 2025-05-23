@@ -17,6 +17,7 @@ Stage1::Stage1()
     camera.SetTarget(SceneManager::GetSharedPlayer());
     
 
+
     //middle room
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(800, 900);
@@ -441,8 +442,10 @@ void Stage1::Update()
     {
         SceneManager::LoadScene(L"Stage2");
         MapManager::GetInstance()->LoadMap(L"Stage2.txt");
+     
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
-        SceneManager::GetSharedPlayer()->SetTelporting(true);
+		SceneManager::GetSharedPlayer()->SetTelporting(true);
+     
     }
 
     HandleCollision();
@@ -631,7 +634,6 @@ void Stage1::Render(HDC hdc)
     wchar_t StageIdText[20];
     swprintf_s(StageIdText, L"Stage1");
 
-
     SIZE textSize;
     GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
 
@@ -642,6 +644,9 @@ void Stage1::Render(HDC hdc)
 
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
+
+   
+
 }
 
 

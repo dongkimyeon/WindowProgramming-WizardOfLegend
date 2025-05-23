@@ -4,6 +4,7 @@
 Dummy::Dummy()
 {
     DummyImage.Load(L"resources/Dummy.png");
+
     mX = 0.0f;
     mY = 0.0f;
     rect = { (int)(mX - 22), (int)(mY - 38), (int)(mX + 20), (int)(mY + 38) };

@@ -56,7 +56,7 @@ private:
     CImage mAttackEffectAnimation[4];
 
     CImage mHitEffectAnimation[4];
-
+    float mHitEffectAngle;
     EnemyState state = EnemyState::RIGHT;
 
     bool mIsMoving = false;

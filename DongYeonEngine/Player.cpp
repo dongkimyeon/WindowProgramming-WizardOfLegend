@@ -37,7 +37,7 @@ Player::Player()
     mIsTeleporting = true;          // 생성 시 텔레포트 애니메이션 활성화
     mTeleportTimer = 0.0f;          // 타이머 초기화
     mCurrentTeleportFrame = 0;      // 프레임 초기화
-
+    mHitEffectAngle = 0.0f; // 초기화
     for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
 
     // 애니메이션 로드 (기존 코드 유지)
@@ -217,13 +217,18 @@ void Player::Update(Scene* stage)
         {
             mCurrentTeleportFrame++;
             mTeleportTimer = 0.0f;
+			mIsMoving = false; // 텔레포트 중에는 이동하지 않음
+			mIsDashing = false; // 텔레포트 중에는 대쉬하지 않음
+			mIsAttack = false; // 텔레포트 중에는 공격하지 않음
+			mIsHit = false; // 텔레포트 중에는 피격하지 않음
+			mMouseClickFlag = false; // 텔레포트 중에는 마우스 클릭 플래그 초기화
+
             if (mCurrentTeleportFrame >= 8) // 8프레임 후 종료
             {
                 mIsTeleporting = false; // 애니메이션 종료
                 mCurrentTeleportFrame = 0;
             }
         }
-        return; // 텔레포트 중에는 다른 동작 처리 안 함
     }
 
     if (mIsDead) {
@@ -290,6 +295,7 @@ void Player::Update(Scene* stage)
             mCurrentHitFrame = (mCurrentHitFrame + 1) % 2;
             animationTimer = 0.0f;
         }
+       
         return;
     }
 
@@ -587,18 +593,38 @@ void Player::Render(HDC hdc)
         {
             int effectWidth = effectImage.GetWidth() / 3.0f;
             int effectHeight = effectImage.GetHeight() / 3.0f;
-            int drawX = static_cast<int>(mX - effectWidth / 2.0f) + 3;
-            int drawY = static_cast<int>(mY - effectHeight / 2.0f);
+            float drawX = mX - effectWidth / 2.0f + 3;
+            float drawY = mY - effectHeight / 2.0f;
+
+            // 변환 행렬 설정
+            XFORM xForm = { 0 };
+            xForm.eM11 = cos(mHitEffectAngle); // X 스케일 및 회전
+            xForm.eM12 = sin(mHitEffectAngle); // X에 대한 Y의 기울기
+            xForm.eM21 = -sin(mHitEffectAngle); // Y에 대한 X의 기울기
+            xForm.eM22 = cos(mHitEffectAngle); // Y 스케일 및 회전
+            xForm.eDx = mX; // 중심점 X로 이동
+            xForm.eDy = mY; // 중심점 Y로 이동
+
+            // 그래픽 모드 및 변환 적용
+            SetGraphicsMode(hdc, GM_ADVANCED);
+            SetWorldTransform(hdc, &xForm);
+
+            // 이펙트 렌더링
             HDC srcDC = effectImage.GetDC();
             TransparentBlt(
                 hdc,
-                drawX, drawY, effectWidth, effectHeight,
+                -effectWidth / 2, -effectHeight / 2, effectWidth, effectHeight,
                 srcDC,
                 0, 0, effectImage.GetWidth(), effectImage.GetHeight(),
                 RGB(0, 0, 0) // 투명색
             );
             effectImage.ReleaseDC();
-		}
+
+            // 변환 행렬 초기화
+            XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+            SetWorldTransform(hdc, &identity);
+            SetGraphicsMode(hdc, GM_COMPATIBLE);
+        }
     }
     // 공격 이펙트 렌더링 (스킬 사용 시 제외)
     if (mIsAttack && !isUsingSkill && mCurrentAttackFrame >= 4) {
@@ -688,6 +714,7 @@ void Player::TakeDamage(int d)
 {
     if (mIsDead) return;
     hp -= d;
+    mHitEffectAngle = static_cast<float>(rand()) / RAND_MAX * 2.0f * 3.14159f;
     if (hp <= 0) {
         hp = 0;
         mIsDead = true;

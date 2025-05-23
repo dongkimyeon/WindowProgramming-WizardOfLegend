@@ -32,4 +32,5 @@ private:
     float mDamageTextSpeed;   // 텍스트 상승 속도
     bool mShowDamage;         // 데미지 텍스트 표시 플래그
     float mHitTimer;          // 피격 표시 지속 시간
+
 };

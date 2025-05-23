@@ -92,7 +92,7 @@ private:
     int mCurrentTeleportFrame;  // 텔레포트 애니메이션 현재 프레임
 
     CImage mHitEffectAnimation[4];
-
+    float mHitEffectAngle;
     PlayerState state = PlayerState::FRONT;
 
     // 상태 변수

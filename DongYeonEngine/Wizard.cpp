@@ -34,7 +34,7 @@ Wizard::Wizard()
     mDamageTextY = 0.0f;
     mDamageTextSpeed = 50.0f; // 텍스트 상승 속도 (초당 픽셀)
     mShowDamage = false;
-
+    mHitEffectAngle = 0.0f; // 초기화
     // Right 애니메이션 로드
     mRightIdleAnimation.Load(L"resources/Monster/WIZARD/WizardRight/WizardIdle/WIZARD_RIGHT_00.png");
     if (mRightIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Monster/WIZARD/WizardRight/WizardIdle/WIZARD_RIGHT_00.png\n");
@@ -157,7 +157,7 @@ void Wizard::Update(Player& p, Scene* stage)
         if (mShowDamage) {
             mDamageTextY -= mDamageTextSpeed * deltaTime;
         }
-        return;
+       
     }
 
     float playerX = p.GetPositionX();
@@ -313,17 +313,37 @@ void Wizard::Render(HDC hdc, Player& p)
         {
             int effectWidth = effectImage.GetWidth() / 3.0f;
             int effectHeight = effectImage.GetHeight() / 3.0f;
-            int drawX = static_cast<int>(mX - effectWidth / 2.0f) + 3;
-            int drawY = static_cast<int>(mY - effectHeight / 2.0f);
+            float drawX = mX - effectWidth / 2.0f + 3;
+            float drawY = mY - effectHeight / 2.0f;
+
+            // 변환 행렬 설정
+            XFORM xForm = { 0 };
+            xForm.eM11 = cos(mHitEffectAngle); // X 스케일 및 회전
+            xForm.eM12 = sin(mHitEffectAngle); // X에 대한 Y의 기울기
+            xForm.eM21 = -sin(mHitEffectAngle); // Y에 대한 X의 기울기
+            xForm.eM22 = cos(mHitEffectAngle); // Y 스케일 및 회전
+            xForm.eDx = mX; // 중심점 X로 이동
+            xForm.eDy = mY; // 중심점 Y로 이동
+
+            // 그래픽 모드 및 변환 적용
+            SetGraphicsMode(hdc, GM_ADVANCED);
+            SetWorldTransform(hdc, &xForm);
+
+            // 이펙트 렌더링
             HDC srcDC = effectImage.GetDC();
             TransparentBlt(
                 hdc,
-                drawX, drawY, effectWidth, effectHeight,
+                -effectWidth / 2, -effectHeight / 2, effectWidth, effectHeight,
                 srcDC,
                 0, 0, effectImage.GetWidth(), effectImage.GetHeight(),
                 RGB(0, 0, 0) // 투명색
             );
             effectImage.ReleaseDC();
+
+            // 변환 행렬 초기화
+            XFORM identity = { 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
+            SetWorldTransform(hdc, &identity);
+            SetGraphicsMode(hdc, GM_COMPATIBLE);
         }
     }
 
@@ -374,7 +394,7 @@ void Wizard::TakeDamage(int d)
     mDamageTaken = d; // 데미지 값 저장
     mShowDamage = true; // 데미지 텍스트 표시 활성화
     mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
-
+    mHitEffectAngle = static_cast<float>(rand()) / RAND_MAX * 2.0f * 3.14159f;
     if (hp <= 0) {
         hp = 0;
         mIsDead = true;

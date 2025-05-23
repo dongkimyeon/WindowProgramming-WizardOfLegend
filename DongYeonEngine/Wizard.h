@@ -50,7 +50,7 @@ private:
     CImage mLeftWalkAnimation[4];
     
 	CImage mHitEffectAnimation[4];
-
+    float mHitEffectAngle;
     EnemyState state = EnemyState::RIGHT;
 
     // 움직임 변수
