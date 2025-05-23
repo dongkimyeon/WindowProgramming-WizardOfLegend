@@ -91,6 +91,7 @@ private:
     float mTeleportTimer;       // 텔레포트 애니메이션 타이머
     int mCurrentTeleportFrame;  // 텔레포트 애니메이션 현재 프레임
 
+    CImage mHitEffectAnimation[4];
 
     PlayerState state = PlayerState::FRONT;
 

@@ -47,6 +47,8 @@ private:
 
     CImage mBowAttackAnimation[4];
 
+    CImage mHitEffectAnimation[4];
+
     EnemyState state = EnemyState::RIGHT;
 
     bool mIsMoving;

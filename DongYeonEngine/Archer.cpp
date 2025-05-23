@@ -100,6 +100,15 @@ Archer::Archer()
         mBowAttackAnimation[i].Load(path);
         if (mBowAttackAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
+
+    // 피격 이펙트
+    for (int i = 0; i < 4; ++i)
+    {
+        wchar_t path[256];
+        swprintf_s(path, L"resources/HitEffect/HITEFFECT_%d.png", i);
+        mHitEffectAnimation[i].Load(path); // 텔레포트 애니메이션 로드
+        if (mHitEffectAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
+    }
 }
 
 Archer::~Archer()
@@ -298,6 +307,28 @@ void Archer::Render(HDC hdc, Player& p)
     int drawY = static_cast<int>(mY - imageHeight / 2.0f);
 
     currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
+
+    // 피격 이펙트 렌더링
+    if (mIsHit)
+    {
+        CImage& effectImage = mHitEffectAnimation[mCurrentHitFrame];
+        if (!effectImage.IsNull())
+        {
+            int effectWidth = effectImage.GetWidth() / 3.0f;
+            int effectHeight = effectImage.GetHeight() / 3.0f;
+            int drawX = static_cast<int>(mX - effectWidth / 2.0f) + 3;
+            int drawY = static_cast<int>(mY - effectHeight / 2.0f);
+            HDC srcDC = effectImage.GetDC();
+            TransparentBlt(
+                hdc,
+                drawX, drawY, effectWidth, effectHeight,
+                srcDC,
+                0, 0, effectImage.GetWidth(), effectImage.GetHeight(),
+                RGB(0, 0, 0) // 투명색
+            );
+            effectImage.ReleaseDC();
+        }
+    }
 
     // 데미지 텍스트 렌더링
     if (mShowDamage && mIsHit)

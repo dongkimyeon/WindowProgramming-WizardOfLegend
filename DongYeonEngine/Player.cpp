@@ -187,13 +187,21 @@ Player::Player()
         if (mRightAttackEffectAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
 
-    // 텔레포트 애니메이션 로드 (기존 코드 수정)
     for (int i = 0; i < 8; ++i)
     {
         wchar_t path[256];
         swprintf_s(path, L"resources/Player/Summon/SUMMON_%d.png", i);
         mTeleportEffectAnimation[i].Load(path); // 텔레포트 애니메이션 로드
         if (mTeleportEffectAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
+    }
+    
+    // 피격 이펙트
+    for (int i = 0; i < 4; ++i)
+    {
+        wchar_t path[256];
+        swprintf_s(path, L"resources/HitEffect/HITEFFECT_%d.png", i);
+        mHitEffectAnimation[i].Load(path); // 텔레포트 애니메이션 로드
+        if (mHitEffectAnimation[i].IsNull()) wprintf(L"Failed to load: %s\n", path);
     }
 }
 
@@ -503,7 +511,7 @@ void Player::LateUpdate()
 void Player::Render(HDC hdc)
 {
 
-    Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+    /*Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
     if (mHasEffectHitbox) {
         HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
         HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
@@ -512,7 +520,7 @@ void Player::Render(HDC hdc)
         SelectObject(hdc, oldPen);
         SelectObject(hdc, oldBrush);
         DeleteObject(hitboxPen);
-    }
+    }*/
 
     CImage* currentImage = nullptr;
     int imageWidth = 0;
@@ -571,7 +579,27 @@ void Player::Render(HDC hdc)
         int drawY = static_cast<int>(mY - imageHeight / 2.0f);
         currentImage->Draw(hdc, drawX, drawY, imageWidth, imageHeight);
     }
-
+    // 피격 이펙트 렌더링
+    if (mIsHit)
+    {
+        CImage& effectImage = mHitEffectAnimation[mCurrentHitFrame];
+        if (!effectImage.IsNull())
+        {
+            int effectWidth = effectImage.GetWidth() / 3.0f;
+            int effectHeight = effectImage.GetHeight() / 3.0f;
+            int drawX = static_cast<int>(mX - effectWidth / 2.0f) + 3;
+            int drawY = static_cast<int>(mY - effectHeight / 2.0f);
+            HDC srcDC = effectImage.GetDC();
+            TransparentBlt(
+                hdc,
+                drawX, drawY, effectWidth, effectHeight,
+                srcDC,
+                0, 0, effectImage.GetWidth(), effectImage.GetHeight(),
+                RGB(0, 0, 0) // 투명색
+            );
+            effectImage.ReleaseDC();
+		}
+    }
     // 공격 이펙트 렌더링 (스킬 사용 시 제외)
     if (mIsAttack && !isUsingSkill && mCurrentAttackFrame >= 4) {
         CImage* effectImage = nullptr;

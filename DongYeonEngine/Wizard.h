@@ -48,6 +48,8 @@ private:
     CImage mLeftDieAnimaion[5];
     CImage mLeftHitAnimation[2];
     CImage mLeftWalkAnimation[4];
+    
+	CImage mHitEffectAnimation[4];
 
     EnemyState state = EnemyState::RIGHT;
 

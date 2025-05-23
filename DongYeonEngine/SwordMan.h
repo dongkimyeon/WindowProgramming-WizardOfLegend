@@ -55,6 +55,8 @@ private:
     CImage mLeftWalkAnimation[6];
     CImage mAttackEffectAnimation[4];
 
+    CImage mHitEffectAnimation[4];
+
     EnemyState state = EnemyState::RIGHT;
 
     bool mIsMoving = false;
