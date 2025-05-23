@@ -431,7 +431,7 @@ void TutorialStage::Update()
     {
         SceneManager::LoadScene(L"Stage1");
 		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
-        SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+        SceneManager::GetSharedPlayer()->SetPosition(180, 270);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거

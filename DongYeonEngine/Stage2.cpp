@@ -21,7 +21,7 @@ void Stage2::Initialize()
     archers.push_back(new Archer());
     archers.back()->SetPosition(1800, 1700);
     //포탈 위치 설정
-	portal.SetPosition(1900, 1700);
+    portal.SetPosition(1650, 1750);
 }
 
 void Stage2::LateUpdate()
@@ -390,7 +390,7 @@ void Stage2::Update()
     {
         SceneManager::LoadScene(L"Stage1");
 		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
-        SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
+        SceneManager::GetSharedPlayer()->SetPosition(180, 270);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거
