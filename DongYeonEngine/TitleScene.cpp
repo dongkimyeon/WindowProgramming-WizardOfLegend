@@ -181,4 +181,29 @@ void TitleScene::Render(HDC hdc)
         // 동적 할당 해제
         delete[] fontFamilies;
     }
+
+
+    // 디벨롭퍼 이름 출력 (우측 하단, 세 줄)
+    HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+        DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+    const wchar_t* devText1 = L"DEVELOPER";
+    const wchar_t* devText2 = L"DONGYEON";
+    const wchar_t* devText3 = L"HYEONGMIN";
+    int margin = 10;
+    int lineHeight = 20;
+
+    SIZE devSize1, devSize2, devSize3;
+    GetTextExtentPoint32(hdc, devText1, wcslen(devText1), &devSize1);
+    GetTextExtentPoint32(hdc, devText2, wcslen(devText2), &devSize2);
+    GetTextExtentPoint32(hdc, devText3, wcslen(devText3), &devSize3);
+    SetTextColor(hdc, RGB(231, 231, 231));
+    TextOut(hdc, width - devSize1.cx - margin, height - lineHeight * 3 - margin, devText1, wcslen(devText1));
+    TextOut(hdc, width - devSize2.cx - margin, height - lineHeight * 2 - margin, devText2, wcslen(devText2));
+    TextOut(hdc, width - devSize3.cx - margin, height - lineHeight - margin, devText3, wcslen(devText3));
+
+    SelectObject(hdc, hOldFont);
+    DeleteObject(hFont);
 }
