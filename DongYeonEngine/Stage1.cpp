@@ -15,8 +15,7 @@
 Stage1::Stage1()
 {
     camera.SetTarget(SceneManager::GetSharedPlayer());
-    SceneManager::GetSharedPlayer()->SetPosition(1000, 1200);
-
+    
 
     //middle room
     swordmans.push_back(new SwordMan());

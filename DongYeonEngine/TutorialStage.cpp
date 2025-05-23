@@ -17,6 +17,10 @@ void TutorialStage::Initialize()
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
 
+    //플레이어 위치 초기화
+    SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
+
+
     //몬스터 추가
 	dummies.push_back(new Dummy());
 	dummies.back()->SetPosition(1000, 760);
