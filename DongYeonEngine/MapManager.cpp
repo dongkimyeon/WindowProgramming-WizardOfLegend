@@ -164,10 +164,6 @@ void MapManager::LoadMap(const std::wstring& name)
 	{
 		for (int j = 0; j < MAP_COLS; j++)
 		{
-			tiles[i][j] = new Tile();
-			float x = (j * 50) + (50 / 2.0f);
-			float y = (i * 50) + (50 / 2.0f);
-			tiles[i][j]->SetPosition(x, y);
 			switch (map[i][j])
 			{
 			case 0:

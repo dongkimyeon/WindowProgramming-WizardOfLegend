@@ -388,9 +388,9 @@ void Stage2::Update()
     RECT portalRect = portal.GetRect();
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
-        SceneManager::LoadScene(L"Stage1");
-		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
-        SceneManager::GetSharedPlayer()->SetPosition(180, 270);
+        SceneManager::LoadScene(L"BossStage");
+		MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
+        SceneManager::GetSharedPlayer()->SetPosition(1000, 150);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거

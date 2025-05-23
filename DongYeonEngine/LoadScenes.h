@@ -14,7 +14,7 @@ void LoadScenes()
 	SceneManager::CreateScene<TitleScene>(L"TitleScene");
 	SceneManager::CreateScene<Stage1>(L"Stage1");
 	SceneManager::CreateScene<Stage2>(L"Stage2");
-	SceneManager::CreateScene<BossStage>(L"BossStage");
+	//SceneManager::CreateScene<BossStage>(L"BossStage");
 	SceneManager::CreateScene<TutorialStage>(L"TutorialStage");
 	SceneManager::CreateScene<GameOverScene>(L"GameOverScene");
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
