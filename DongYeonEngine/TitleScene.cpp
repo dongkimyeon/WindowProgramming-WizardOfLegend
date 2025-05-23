@@ -17,7 +17,7 @@ void TitleScene::Initialize()
     mLogoImage.Load(L"resources/TitileLogo.png");
 
     // 폰트 파일 로드
-    mFontCollection.AddFontFile(L"resources/Font/8bitWonder.ttf");
+    mFontCollection.AddFontFile(L"resources/Font/NotoSans-ExtraBold.ttf");
 
     // 버튼 사각형 초기화 (세로 배치, 중앙 정렬, 텍스트 크기에 맞춘 너비)
     float scaleStart = 1.0f;
@@ -54,7 +54,7 @@ void TitleScene::Initialize()
         Gdiplus::RectF layoutRect(0, 0, 0, 0);
         Gdiplus::RectF boundRect;
         graphics.MeasureString(text, -1, &font, layoutRect, &format, &boundRect);
-        int buttonWidth = (int)(boundRect.Width * scale) + 10; // 여백 10px 추가
+        int buttonWidth = (int)(boundRect.Width * scale) + 70; 
         int buttonHeight = (int)(baseHeight * scale);
         int left = centerX - buttonWidth / 2;
         rect = { left, y, left + buttonWidth, y + buttonHeight };
@@ -150,7 +150,7 @@ void TitleScene::Render(HDC hdc)
         mFontCollection.GetFamilies(fontCount, fontFamilies, &foundCount);
 
         // 첫 번째 폰트 패밀리 사용
-        Gdiplus::Font font(&fontFamilies[0], 24, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
+        Gdiplus::Font font(&fontFamilies[0], 30, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
         Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0, 0)); // 기본 검정
         Gdiplus::StringFormat format;
         format.SetAlignment(Gdiplus::StringAlignmentCenter);
@@ -171,12 +171,12 @@ void TitleScene::Render(HDC hdc)
             graphics.DrawString(text, -1, &font, textRect, &format, &brush);
             };
 
-        renderButton(mStartButtonRect, L"Start", mButtonHovered[0]);
-        renderButton(mQuitButtonRect, L"quit", mButtonHovered[1]);
-        renderButton(mSettingButtonRect, L"Settings", mButtonHovered[2]);
-        renderButton(mTutorialButtonRect, L"Tutorial", mButtonHovered[3]);
-        renderButton(mCustomStageButtonRect, L"Custom Stage", mButtonHovered[4]);
-        renderButton(mMapToolButtonRect, L"Map Tool", mButtonHovered[5]);
+        renderButton(mStartButtonRect, L"START", mButtonHovered[0]);
+        renderButton(mQuitButtonRect, L"EXIT", mButtonHovered[1]);
+        renderButton(mSettingButtonRect, L"SETTING", mButtonHovered[2]);
+        renderButton(mTutorialButtonRect, L"TUTORIAL", mButtonHovered[3]);
+        renderButton(mCustomStageButtonRect, L"CUSTOM STAGE", mButtonHovered[4]);
+        renderButton(mMapToolButtonRect, L"MAP TOOL", mButtonHovered[5]);
 
         // 동적 할당 해제
         delete[] fontFamilies;
