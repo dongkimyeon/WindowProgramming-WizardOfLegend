@@ -5,7 +5,7 @@
 void MapManager::Initialize()
 {
     // 맵 데이터 읽기
-    FILE* fp = fopen("mapTutorial.txt", "r");
+    FILE* fp = fopen("StageTutorial.txt", "r");
     if (fp == nullptr)
     {
         for (int i = 0; i < MAP_ROWS; i++)

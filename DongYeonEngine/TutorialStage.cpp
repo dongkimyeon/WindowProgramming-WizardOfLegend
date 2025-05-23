@@ -19,10 +19,10 @@ void TutorialStage::Initialize()
 
     //몬스터 추가
 	dummies.push_back(new Dummy());
-	dummies.back()->SetPosition(1100, 1100);
+	dummies.back()->SetPosition(1000, 760);
 
     //포탈 위치 설정
-    portal.SetPosition(1900, 1700);
+    portal.SetPosition(1000, 330);
 
 }
 
