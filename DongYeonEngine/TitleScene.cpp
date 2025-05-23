@@ -1,5 +1,6 @@
 ﻿#include "TitleScene.h"
 #include "SceneManager.h"
+#include "MapManager.h"
 #include "Time.h"
 
 extern const UINT width;
@@ -36,6 +37,7 @@ void TitleScene::Update()
     if (GetAsyncKeyState(VK_SPACE) & 0x8000)
     {
         SceneManager::LoadScene(L"Stage1");
+		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
         //플레이타임 활성화
 		SceneManager::SetmIsGameStart(true);
     }

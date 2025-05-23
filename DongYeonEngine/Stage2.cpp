@@ -22,8 +22,6 @@ void Stage2::Initialize()
     archers.back()->SetPosition(1800, 1700);
     //포탈 위치 설정
 	portal.SetPosition(1900, 1700);
-	
- 
 }
 
 void Stage2::LateUpdate()
@@ -666,9 +664,37 @@ void Stage2::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 RECT intersect;
                 if (IntersectRect(&intersect, &wallRect, &playerRect))
                 {
-               
+
                     ResolveCollisionMap(wallRect, *player);
                 }
+                for (auto* swordman : swordmans)
+                {
+                    RECT enemyRect = swordman->GetRect();
+                    if (IntersectRect(&intersect, &wallRect, &enemyRect))
+                    {
+
+                        ResolveCollisionMap(wallRect, *swordman);
+                    }
+                }
+                for (auto* wizard : wizards)
+                {
+                    RECT enemyRect = wizard->GetRect();
+                    if (IntersectRect(&intersect, &wallRect, &enemyRect))
+                    {
+
+                        ResolveCollisionMap(wallRect, *wizard);
+                    }
+                }
+                for (auto* archer : archers)
+                {
+                    RECT enemyRect = archer->GetRect();
+                    if (IntersectRect(&intersect, &wallRect, &enemyRect))
+                    {
+
+                        ResolveCollisionMap(wallRect, *archer);
+                    }
+                }
+
             }
         }
     }
