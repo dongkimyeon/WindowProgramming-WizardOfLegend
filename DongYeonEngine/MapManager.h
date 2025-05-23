@@ -17,6 +17,8 @@ public:
     Tile* (*GetTiles())[40];
     int (*GetMap())[40]; // map 배열 반환 추가
 
+	void LoadMap(const std::wstring& name);
+
 private:
     static const int MAP_WIDTH = 2000;
     static const int MAP_HEIGHT = 2000;

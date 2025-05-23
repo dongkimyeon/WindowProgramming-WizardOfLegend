@@ -22,6 +22,7 @@ void Stage2::Initialize()
     archers.back()->SetPosition(1800, 1700);
     //포탈 위치 설정
 	portal.SetPosition(1900, 1700);
+	
  
 }
 
@@ -390,6 +391,7 @@ void Stage2::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         SceneManager::LoadScene(L"Stage1");
+		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }

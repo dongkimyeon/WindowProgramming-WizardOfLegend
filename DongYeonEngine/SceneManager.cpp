@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "Input.h"
 #include "Time.h"
+
 std::map<std::wstring, Scene*> SceneManager::mScene = {};
 Scene* SceneManager::mActiveScene = nullptr;
 CImage SceneManager::mMouseCursorImage;
@@ -13,6 +14,8 @@ void SceneManager::Initialize()
 	mMouseCursorImage.Load(L"resources/MouseCursor.png");
 	mSharedPlayer = new Player(); // 플레이어 객체 초기화
 	playTime = 0.0f; // 플레이 타임 초기화
+
+	MapManager::GetInstance()->Initialize();
 
 }
 

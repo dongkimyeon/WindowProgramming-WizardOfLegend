@@ -426,6 +426,7 @@ void TutorialStage::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         SceneManager::LoadScene(L"Stage1");
+		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }

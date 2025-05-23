@@ -78,7 +78,6 @@ Stage1::~Stage1()
 void Stage1::Initialize()
 {
     UI::Initialize();
-    MapManager::GetInstance()->Initialize();
     camera.Update();
 }
 
@@ -442,6 +441,7 @@ void Stage1::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         SceneManager::LoadScene(L"Stage2");
+        MapManager::GetInstance()->LoadMap(L"Stage2.txt");
         SceneManager::GetSharedPlayer()->SetPosition(1200, 1200);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }

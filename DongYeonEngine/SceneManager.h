@@ -1,6 +1,8 @@
 #pragma once
 #include "Scene.h"
 #include "Player.h"
+#include "MapManager.h"
+
 
 class SceneManager
 {
@@ -26,6 +28,7 @@ public:
 
 		mActiveScene = iter->second;
 
+		
 		return iter->second;
 	}
 
