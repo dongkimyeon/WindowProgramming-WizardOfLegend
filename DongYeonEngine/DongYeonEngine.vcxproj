@@ -200,6 +200,12 @@
     <Image Include="resources\Player\Skill_FireBall\Fireball_02.png" />
     <Image Include="resources\Player\Skill_FireBall\Fireball_03.png" />
     <Image Include="resources\Player\Skill_FireBall\Fireball_04.png" />
+    <Image Include="resources\TitleSceneUI\CustomStageButton.png" />
+    <Image Include="resources\TitleSceneUI\MapToolButton.png" />
+    <Image Include="resources\TitleSceneUI\QuitButton.png" />
+    <Image Include="resources\TitleSceneUI\SettingButton.png" />
+    <Image Include="resources\TitleSceneUI\StartButton.png" />
+    <Image Include="resources\TitleSceneUI\TutorialButton.png" />
     <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -390,7 +390,7 @@ void Stage2::Update()
     {
         SceneManager::LoadScene(L"BossStage");
 		MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
-        SceneManager::GetSharedPlayer()->SetPosition(1000, 150);
+        SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거

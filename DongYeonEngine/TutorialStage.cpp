@@ -429,10 +429,8 @@ void TutorialStage::Update()
     RECT portalRect = portal.GetRect();
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
-        SceneManager::LoadScene(L"Stage1");
-		MapManager::GetInstance()->LoadMap(L"Stage1.txt");
-        SceneManager::GetSharedPlayer()->SetPosition(180, 270);
-        SceneManager::GetSharedPlayer()->SetTelporting(true);
+        SceneManager::LoadScene(L"TitleScene");
+		
     }
     //객체간에 충돌처리 밀어내는거
     HandleCollision();
