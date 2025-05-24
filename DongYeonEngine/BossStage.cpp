@@ -16,7 +16,6 @@ void BossStage::Initialize()
 {
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
-
    
 }
 
@@ -546,6 +545,12 @@ void BossStage::Render(HDC hdc)
             RestoreDC(FireDragonDC, saveFireDragonDC);
         }
     }
+
+    HDC bossDC = hdc;
+    int savedBossDC = SaveDC(bossDC);
+    OffsetViewportOrgEx(bossDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+    iceBoss.Render(bossDC, *player);
+    RestoreDC(bossDC, savedBossDC);
 
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);

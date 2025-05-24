@@ -58,6 +58,9 @@
     <Filter Include="Object\Dummy">
       <UniqueIdentifier>{5ec5e0e0-a76e-4540-b586-9cf4b0c08574}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Boss">
+      <UniqueIdentifier>{7dd2c175-4b41-43b3-bbaf-35221f789fc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -153,6 +156,15 @@
     <ClInclude Include="Dummy.h">
       <Filter>Object\Dummy</Filter>
     </ClInclude>
+    <ClInclude Include="BossSkill_AquaBall.h">
+      <Filter>Object\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossSkill_Spear.h">
+      <Filter>Object\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>Object\Boss</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -244,6 +256,15 @@
     </ClCompile>
     <ClCompile Include="Dummy.cpp">
       <Filter>Object\Dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="BossSkill_AquaBall.cpp">
+      <Filter>Object\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="BossSkill_Spear.cpp">
+      <Filter>Object\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>Object\Boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

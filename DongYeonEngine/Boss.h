@@ -1,16 +1,17 @@
 #pragma once
 #include "GameObject.h"
 #include "Player.h"
-#include "BossSkill_AquaBall.h"
-#include "BossSkill_Spear.h"
+
+
+class Scene;
 
 class Boss : public GameObject
 {
 public:
     Boss();
-    ~Boss(); // GDI+ 종료를 위한 소멸자
+    ~Boss(); 
     
-    void Update(Player& p);
+    void Update(Player& p, Scene* stage);
     void LateUpdate();
     void Render(HDC hdc, Player& p);
     void SetPosition(float x, float y) override;
@@ -114,9 +115,5 @@ private:
     float mDamageTextY;         // 데미지 텍스트의 Y 위치
     float mDamageTextSpeed;     // 텍스트의 상승 속도
     bool mShowDamage;           // 데미지 텍스트 표시 플래그
-
-    // GDI+ 관련
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
 };
 

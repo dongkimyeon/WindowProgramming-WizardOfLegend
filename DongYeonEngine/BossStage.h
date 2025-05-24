@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
 #include "Player_Skill_FireDragon.h"
+#include "Boss.h"
 
 class BossStage : public Scene
 {
@@ -48,6 +49,7 @@ private:
     std::vector<Player_Skill_FireBall*> playerFireballs;
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
 
+    Boss iceBoss;
     Portal portal;
     Camera camera;
 

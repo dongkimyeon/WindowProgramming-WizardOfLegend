@@ -131,6 +131,9 @@
   <ItemGroup>
     <ClInclude Include="Archer.h" />
     <ClInclude Include="Arrow.h" />
+    <ClInclude Include="Boss.h" />
+    <ClInclude Include="BossSkill_AquaBall.h" />
+    <ClInclude Include="BossSkill_Spear.h" />
     <ClInclude Include="BossStage.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Dummy.h" />
@@ -164,6 +167,9 @@
   <ItemGroup>
     <ClCompile Include="Archer.cpp" />
     <ClCompile Include="Arrow.cpp" />
+    <ClCompile Include="Boss.cpp" />
+    <ClCompile Include="BossSkill_AquaBall.cpp" />
+    <ClCompile Include="BossSkill_Spear.cpp" />
     <ClCompile Include="BossStage.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dummy.cpp" />

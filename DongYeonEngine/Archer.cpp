@@ -1,7 +1,7 @@
 ﻿#include "Archer.h"
 #include "Time.h"
 #include "Arrow.h"
-#include "Stage1.h"
+
 
 Archer::Archer()
 {
