@@ -183,7 +183,7 @@ void TitleScene::Render(HDC hdc)
     }
 
 
-    // 디벨롭퍼 이름 출력 (우측 하단, 세 줄)
+    
     HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
