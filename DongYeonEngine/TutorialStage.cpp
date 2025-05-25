@@ -27,7 +27,6 @@ void TutorialStage::Initialize()
 
     //포탈 위치 설정
     portal.SetPosition(1000, 330);
-
 }
 
 void TutorialStage::LateUpdate()

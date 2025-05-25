@@ -75,6 +75,8 @@ void TitleScene::Initialize()
     // 호버 상태 초기화
     for (int i = 0; i < 6; i++)
         mButtonHovered[i] = false;
+
+    SoundManager::GetInstance()->mPlaySound(L"resources/Audio/Tutorial_Jazz.wav");
 }
 
 void TitleScene::Update()
@@ -103,6 +105,7 @@ void TitleScene::Update()
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
             SceneManager::GetSharedPlayer()->SetPosition(180, 270);
             SceneManager::SetmIsGameStart(true);
+			
         } // Start
         if (mButtonHovered[1]) 
         {
@@ -115,7 +118,7 @@ void TitleScene::Update()
             SceneManager::LoadScene(L"TutorialStage");
             MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
 			SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
-		
+            
         } // Tutorial
         if (mButtonHovered[4]) {} // Custom Stage
         if (mButtonHovered[5]) {} // Map Tool

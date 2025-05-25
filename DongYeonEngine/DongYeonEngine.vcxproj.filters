@@ -58,6 +58,9 @@
     <Filter Include="Object\Dummy">
       <UniqueIdentifier>{5ec5e0e0-a76e-4540-b586-9cf4b0c08574}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{9dd1e934-988c-4a9e-998a-25e0bce15868}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -153,6 +156,12 @@
     <ClInclude Include="Dummy.h">
       <Filter>Object\Dummy</Filter>
     </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -244,6 +253,12 @@
     </ClCompile>
     <ClCompile Include="Dummy.cpp">
       <Filter>Object\Dummy</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
