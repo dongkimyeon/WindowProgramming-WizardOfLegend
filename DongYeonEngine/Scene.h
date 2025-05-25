@@ -6,7 +6,6 @@
 #include "FireBall.h"
 #include "Player_Skill_FireDragon.h"
 
-#include "SoundManager.h"
 
 class Player_Skill_FireBall;
 class Arrow;

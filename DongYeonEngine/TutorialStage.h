@@ -12,7 +12,6 @@
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
 #include "Player_Skill_FireDragon.h"
-#include "SoundManager.h"
 
 class TutorialStage : public Scene
 {

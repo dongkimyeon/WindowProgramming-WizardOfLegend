@@ -75,8 +75,6 @@ void TitleScene::Initialize()
     // 호버 상태 초기화
     for (int i = 0; i < 6; i++)
         mButtonHovered[i] = false;
-
-    SoundManager::GetInstance()->mPlaySound(L"resources/Audio/Tutorial_Jazz.wav");
 }
 
 void TitleScene::Update()
