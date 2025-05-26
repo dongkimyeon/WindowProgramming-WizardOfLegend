@@ -9,8 +9,10 @@ public:
     ~Camera();
     void Update();
     void SetTarget(Player* target);
+    
     float GetPositionX() const { return mX; }
     float GetPositionY() const { return mY; }
+
 private:
     float mX;
     float mY;

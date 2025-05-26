@@ -1,5 +1,5 @@
 #include "Camera.h"
-
+#include "Time.h"
 Camera::Camera()
     : mX(0)
     , mY(0)
@@ -28,3 +28,5 @@ void Camera::SetTarget(Player* target)
 {
     mTarget = target;
 }
+
+
