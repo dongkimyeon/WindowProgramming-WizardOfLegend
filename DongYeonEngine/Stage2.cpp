@@ -388,6 +388,7 @@ void Stage2::Update()
     RECT portalRect = portal.GetRect();
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
+        SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"BossStage");
 		MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
         SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);

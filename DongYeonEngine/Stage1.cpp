@@ -37,6 +37,7 @@ Stage1::~Stage1()
 
 void Stage1::Initialize()
 {
+    
     UI::Initialize();
     camera.Update();
 }
@@ -400,6 +401,7 @@ void Stage1::Update()
     RECT portalRect = portal.GetRect();
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
+        SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"Stage2");
         MapManager::GetInstance()->LoadMap(L"Stage2.txt");
      

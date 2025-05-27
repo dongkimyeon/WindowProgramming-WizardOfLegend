@@ -75,7 +75,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hInstance = hInstance;
     wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DONGYEONENGINE));
     wcex.hCursor = LoadCursor(NULL, NULL);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));
     wcex.lpszMenuName = nullptr; // 메뉴바 제거: nullptr로 설정
     wcex.lpszClassName = szWindowClass;
     wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
@@ -116,13 +116,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         AddFontResourceEx(L"resources/Font/Exo2-Bold.ttf", FR_PRIVATE, nullptr);
         break;
     }
-    case WM_PAINT:
-    {
-        PAINTSTRUCT ps;
-        HDC hdc = BeginPaint(hWnd, &ps);
-        EndPaint(hWnd, &ps);
-    }
-    break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

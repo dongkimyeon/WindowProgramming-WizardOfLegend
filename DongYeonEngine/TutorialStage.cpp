@@ -27,7 +27,6 @@ void TutorialStage::Initialize()
 
     //포탈 위치 설정
     portal.SetPosition(1000, 330);
-
 }
 
 void TutorialStage::LateUpdate()
@@ -613,7 +612,7 @@ void TutorialStage::Render(HDC hdc)
 
 
     //몇 스테이지인지 텍스트 출력
-    SetBkMode(hdc, TRANSPARENT);
+    //텍스트 설정 
     SetTextColor(hdc, RGB(255, 255, 255));
     HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,

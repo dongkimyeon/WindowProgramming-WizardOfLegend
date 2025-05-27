@@ -20,4 +20,5 @@ void LoadScenes()
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
 	
 	SceneManager::LoadScene(L"TitleScene");
+	SceneManager::StartFadeIn();
 }
