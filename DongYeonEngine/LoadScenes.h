@@ -7,7 +7,8 @@
 #include "GameOverScene.h"
 #include "GameClearScene.h"
 #include "TitleScene.h"
-#include "MapManager.h"
+#include "SoundManager.h"
+
 
 void LoadScenes()
 {
@@ -19,7 +20,8 @@ void LoadScenes()
 	SceneManager::CreateScene<GameOverScene>(L"GameOverScene");
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
 	
-	MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
-	SceneManager::LoadScene(L"BossStage");
+	SceneManager::LoadScene(L"TitleScene");
+	SoundManager::GetInstance()->Initialize();
+	SoundManager::GetInstance()->test();
 	SceneManager::StartFadeIn();
 }
