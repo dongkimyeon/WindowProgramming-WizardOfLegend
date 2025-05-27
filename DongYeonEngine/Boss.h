@@ -2,15 +2,14 @@
 #include "GameObject.h"
 #include "Player.h"
 
-
 class Scene;
 
 class Boss : public GameObject
 {
 public:
     Boss();
-    ~Boss(); 
-    
+    ~Boss();
+
     void Update(Player& p, Scene* stage);
     void LateUpdate();
     void Render(HDC hdc, Player& p);
@@ -20,100 +19,70 @@ public:
 
     int GetDamage() { return damage; }
     int GetHp() { return hp; }
-    
+
     float GetPositionX() override { return mX; }
     float GetPositionY() override { return mY; }
     float GetSpeed() override { return speed; }
     bool GetIsDead() override { return mIsDead; }
 
     bool GetEffectHitbox(POINT outPoints[4]);
-    bool CheckCollisionWithRect(RECT& otherRect); // 충돌 감지 메서드
+    bool CheckCollisionWithRect(RECT& otherRect);
 
     RECT GetRect() override { return rect; }
 
-    // 공격 플래그 Getter와 Setter
     bool HasAttackedPlayer() const { return mHasAttackedPlayer; }
     void ResetAttackFlag() { mHasAttackedPlayer = false; }
 
-
     bool HasBeenHit() const { return mHasBeenHit; }
     void SetHitFlag(bool hit) { mHasBeenHit = hit; }
+
 private:
     float mX;
     float mY;
     int hp;
     int damage;
-    Vector2 position;
+    float mScale = 1.0f;
 
-    //아이들 애니메이션
     CImage mIdleAnimation[6];
-
-    //죽은 상태 이미지
     CImage mDieImage;
-
-    //대쉬 이미지
-	CImage mDownDashImage;
-	CImage mLeftDashImage;
-	CImage mRightDashImage;
-	CImage mUpDashImage;
-
-    //피격 이미지
+    CImage mDownDashImage;
+    CImage mLeftDashImage;
+    CImage mRightDashImage;
+    CImage mUpDashImage;
     CImage mLeftHitAnimation[2];
-	CImage mRightHitAnimation[2];
-
-    //얼음칼 이미지 
+    CImage mRightHitAnimation[2];
     CImage mAnimaionIceSword[4];
-
-    //얼음칼 휘두르는 애니메이션
-	CImage mSpinImage[7];
-
-    //캐스팅 이미지
-	CImage mDownCastingImage[4];
-	CImage mLeftCastingImage[4];
-	CImage mRightCastingImage[4];
-	CImage mUpCastingImage[4];
-
-    
-
+    CImage mSpinImage[7];
+    CImage mDownCastingImage[4];
+    CImage mLeftCastingImage[4];
+    CImage mRightCastingImage[4];
+    CImage mUpCastingImage[4];
+    float mSwordX, mSwordY;
     float mHitEffectAngle;
-
-    bool mIsMoving = false;
-    int mCurrentWalkFrame = 0;
     bool mIsAttack = false;
     int mCurrenAttackFrame = 0;
     bool mIsDead = false;
-    int mCurrentDeadFrame = 0;
     bool mIsHit = false;
     int mCurrentHitFrame = 0;
-
-    // 공격 시작 방향
     float mAttackDirectionX;
     float mAttackDirectionY;
-
     float mHitTimer;
-    float mAttackCooldown = 0;
-    float mAttackFrameTime;
-    float PlayerDetectRange = 300.0f;
-    float AttackRange = 30.0f;
     float speed = 100.0f;
     RECT rect;
 
     POINT mEffectHitboxPoints[4];
     bool mHasEffectHitbox;
-
-    // 공격 이펙트로 플레이어에게 데미지를 입혔는지 여부
     bool mHasAttackedPlayer = false;
 
     bool CheckPointInPolygon(POINT& point, POINT polygon[4]);
 
+    bool mHasBeenHit = false;
+    int mDamageTaken;
+    float mDamageTextY;
+    float mDamageTextSpeed;
+    bool mShowDamage;
 
-    bool mHasBeenHit = false; // 피격 플래그 추가
-
-
-    // 데미지 표시 변수
-    int mDamageTaken;           // 받은 데미지 양
-    float mDamageTextY;         // 데미지 텍스트의 Y 위치
-    float mDamageTextSpeed;     // 텍스트의 상승 속도
-    bool mShowDamage;           // 데미지 텍스트 표시 플래그
+    float stateTimer = 0.0f;
+    int currentState = 0; // 0: Idle, 1: 스킬1(검 휘두르기), 2: 스킬2, 3: 스킬3, 4: 긴 Idle, 5: 검 휘두르기 준비
+    bool playerDetected = false; // 플레이어 감지 플래그
 };
-

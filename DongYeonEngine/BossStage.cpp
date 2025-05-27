@@ -28,6 +28,7 @@ void BossStage::Update()
 {
     Player* player = SceneManager::GetSharedPlayer();
     player->Update(this);
+	iceBoss.Update(*player, this);
     camera.Update();
     player->SetCameraX(camera.GetPositionX());
     player->SetCameraY(camera.GetPositionY());
