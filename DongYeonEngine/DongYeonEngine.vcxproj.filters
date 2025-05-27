@@ -168,9 +168,6 @@
     <ClInclude Include="Boss.h">
       <Filter>Object\Boss</Filter>
     </ClInclude>
-    <ClInclude Include="Sound.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
     <ClInclude Include="SoundManager.h">
       <Filter>Sound</Filter>
     </ClInclude>
@@ -274,9 +271,6 @@
     </ClCompile>
     <ClCompile Include="Boss.cpp">
       <Filter>Object\Boss</Filter>
-    </ClCompile>
-    <ClCompile Include="Sound.cpp">
-      <Filter>Sound</Filter>
     </ClCompile>
     <ClCompile Include="SoundManager.cpp">
       <Filter>Sound</Filter>

@@ -7,6 +7,7 @@
 #include "GameOverScene.h"
 #include "GameClearScene.h"
 #include "TitleScene.h"
+#include "SoundManager.h"
 
 
 void LoadScenes()
@@ -20,5 +21,7 @@ void LoadScenes()
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
 	
 	SceneManager::LoadScene(L"TitleScene");
+	SoundManager::GetInstance()->Initialize();
+	SoundManager::GetInstance()->test();
 	SceneManager::StartFadeIn();
 }
