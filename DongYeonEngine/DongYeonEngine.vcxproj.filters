@@ -61,6 +61,9 @@
     <Filter Include="Object\Boss">
       <UniqueIdentifier>{7dd2c175-4b41-43b3-bbaf-35221f789fc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sound">
+      <UniqueIdentifier>{60d7eee7-9849-4db8-8ef2-4a78ecb6ab2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -165,6 +168,12 @@
     <ClInclude Include="Boss.h">
       <Filter>Object\Boss</Filter>
     </ClInclude>
+    <ClInclude Include="Sound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -266,6 +275,12 @@
     <ClCompile Include="Boss.cpp">
       <Filter>Object\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="Sound.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="DongYeonEngine.ico">
@@ -274,34 +289,7 @@
     <Image Include="small.ico">
       <Filter>리소스 파일</Filter>
     </Image>
-    <Image Include="resources\Player\Skill_FireBall\Fireball_00.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Skill_FireBall\Fireball_01.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Skill_FireBall\Fireball_02.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Skill_FireBall\Fireball_03.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\Player\Skill_FireBall\Fireball_04.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
     <Image Include="resources\TitleSceneUI\TutorialButton.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\TitleSceneUI\CustomStageButton.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\TitleSceneUI\MapToolButton.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\TitleSceneUI\QuitButton.png">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="resources\TitleSceneUI\SettingButton.png">
       <Filter>리소스 파일</Filter>
     </Image>
     <Image Include="resources\TitleSceneUI\StartButton.png">
