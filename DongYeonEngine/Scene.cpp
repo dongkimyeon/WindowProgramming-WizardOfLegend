@@ -41,4 +41,11 @@ void Scene::AddFireBall(FireBall* fireball)
 void Scene::AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon)
 {
 }
+void Scene::AddBossSkillIceSpear(BossSkill_Spear* spears)
+{
+}
+void Scene::AddBossSkillAquaBall(BossSkill_AquaBall* aquaball)
+{
+
+}
 

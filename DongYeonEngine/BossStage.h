@@ -11,6 +11,8 @@
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
 #include "Player_Skill_FireDragon.h"
+#include "BossSkill_Spear.h"    
+#include "BossSkill_AquaBall.h"
 #include "Boss.h"
 
 class BossStage : public Scene
@@ -24,7 +26,6 @@ public:
     void AddArrow(Arrow* arrow) override { arrows.push_back(arrow); }
     void AddFireBall(FireBall* fireball) override
     {
-
         fireballs.push_back(fireball);
     }
     void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball) override
@@ -33,9 +34,17 @@ public:
     }
     void AddPlayerSkillFireDragon(Player_Skill_FireDragon* fireDragon) override
     {
-
         playerFireDragon.push_back(fireDragon);
     }
+    void AddBossSkillIceSpear(BossSkill_Spear* spear) override
+    {
+        spears.push_back(spear);
+    }
+    void AddBossSkillAquaBall(BossSkill_AquaBall* aquaball) override
+    {
+        aquaBalls.push_back(aquaball);
+    }
+    
     void HandleCollision();
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
     void HandleCollisionMap(int (*map)[40], GameObject& obj); // ¼öÁ¤: Tile** -> int (*)[40]
@@ -48,6 +57,8 @@ private:
     std::vector<FireBall*> fireballs;
     std::vector<Player_Skill_FireBall*> playerFireballs;
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
+    std::vector<BossSkill_Spear*> spears;
+    std::vector<BossSkill_AquaBall*> aquaBalls;
 
     Boss iceBoss;
     Portal portal;

@@ -5,7 +5,7 @@
 
 
 BossSkill_Spear::BossSkill_Spear(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(10)
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(700.0f), mIsActive(true), damage(10)
 {
 
     float offsetDistance = 20.0f;
@@ -57,7 +57,7 @@ void BossSkill_Spear::Render(HDC hdc)
 
     int imageWidth = mSpearImage.GetWidth();
     int imageHeight = mSpearImage.GetHeight();
-    float scale = 0.6f;
+    float scale = 1.3f;
     int renderWidth = static_cast<int>(imageWidth * scale);
     int renderHeight = static_cast<int>(imageHeight * scale);
     int drawX = static_cast<int>(mX - renderWidth / 2.0f);
@@ -87,15 +87,38 @@ void BossSkill_Spear::ThrowSpear(Player& player, float mX, float mY, Scene* stag
     float playerX = player.GetPositionX();
     float playerY = player.GetPositionY();
     float distance = sqrt(pow(mX - playerX, 2) + pow(mY - playerY, 2));
-    float dirX = (distance > 0.0f) ? (playerX - mX) / distance : 1.0f;
-    float dirY = (distance > 0.0f) ? (playerY - mY) / distance : 0.0f;
 
-    stage->AddArrow(new Arrow(mX, mY, dirX, dirY));
+    // 기본 방향 (플레이어를 향하는 방향)
+    float baseDirX = (distance > 0.0f) ? (playerX - mX) / distance : 1.0f;
+    float baseDirY = (distance > 0.0f) ? (playerY - mY) / distance : 0.0f;
+
+    // 부채꼴 각도 설정 (총 60도, 파이어볼 5개 -> 각 파이어볼 간 15도)
+    const float totalAngle = 90.0f; // 총 각도 (도 단위)
+    const int numFireBalls = 7;
+    const float angleIncrement = totalAngle / (numFireBalls - 1); // 각 파이어볼 간 각도
+    const float startAngle = -totalAngle / 2.0f; // 시작 각도 (중앙에서 -30도)
+
+    // 기본 방향의 각도 계산
+    float baseAngle = atan2(baseDirY, baseDirX);
+
+    // 5개의 파이어볼 생성
+    for (int i = 0; i < numFireBalls; ++i)
+    {
+        // 현재 파이어볼의 각도 (라디안)
+        float currentAngle = baseAngle + (startAngle + i * angleIncrement) * 3.1415926535f / 180.0f;
+
+        // 방향 벡터 계산
+        float dirX = cos(currentAngle);
+        float dirY = sin(currentAngle);
+
+        // 새 파이어볼 추가
+        stage->AddBossSkillIceSpear(new BossSkill_Spear(mX, mY, dirX, dirY));
+    }
 }
 
 void BossSkill_Spear::UpdateHitbox()
 {
-    float scale = 0.6f;
+    float scale = 1.3f;
     int imageWidth = static_cast<int>(mSpearImage.GetWidth() * scale);
     int imageHeight = static_cast<int>(mSpearImage.GetHeight() * scale);
 

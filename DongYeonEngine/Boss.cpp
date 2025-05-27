@@ -176,23 +176,49 @@ void Boss::Update(Player& p, Scene* stage)
         break;
 
     case 2: // 스킬2
-    case 3: // 스킬3
-        if (stateTimer < 0.5f) {
+        if (stateTimer < 0.5f) { // 대쉬
             mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
             mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
         }
-        else if (stateTimer < 1.0f) {
-            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.125f) % 4;
+        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초 -> 1.5초)
+            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4; // 각 프레임 0.25초
+            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) { // 마지막 프레임에서 발사
+                BossSkill_AquaBall* aquaBall = new BossSkill_AquaBall(mX, mY, p.GetPositionX(), p.GetPositionY());
+                aquaBall->ThrowAquaBall(p, mX, mY, stage);
+                mHasAttackedPlayer = true;
+            }
         }
         else {
             mIsAttack = false;
+            mHasAttackedPlayer = false;
             stateTimer = 0.0f;
-            currentState = (currentState == 2) ? 3 : 4;
+            currentState = 3;
             mAttackDirectionX = dirX; // 스킬 종료 후 방향 갱신
             mAttackDirectionY = dirY;
         }
         break;
-
+    case 3: // 스킬3
+        if (stateTimer < 0.5f) { // 대쉬
+            mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
+            mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
+        }
+        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초 -> 1.5초)
+            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4; // 각 프레임 0.25초
+            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) { // 마지막 프레임에서 발사
+                BossSkill_Spear* spear = new BossSkill_Spear(mX, mY, dirX, dirY);
+                spear->ThrowSpear(p, mX, mY, stage);
+                mHasAttackedPlayer = true;
+            }
+        }
+        else {
+            mIsAttack = false;
+            mHasAttackedPlayer = false;
+            stateTimer = 0.0f;
+            currentState = 4;
+            mAttackDirectionX = dirX; // 스킬 종료 후 방향 갱신
+            mAttackDirectionY = dirY;
+        }
+        break;
     case 4: // 긴 Idle
         if (stateTimer >= 2.0f) {
             stateTimer = 0.0f;
@@ -290,12 +316,14 @@ void Boss::Render(HDC hdc, Player& p)
     }
     case 2: // 스킬2
     case 3: // 스킬3
-        if (stateTimer < 0.5f) {
+        if (stateTimer < 0.5f) 
+        {
             int width = static_cast<int>(dashImage->GetWidth() * mScale);
             int height = static_cast<int>(dashImage->GetHeight() * mScale);
             dashImage->Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
         }
-        else {
+        else 
+        {
             int width = static_cast<int>(castingImage[mCurrenAttackFrame].GetWidth() * mScale);
             int height = static_cast<int>(castingImage[mCurrenAttackFrame].GetHeight() * mScale);
             castingImage[mCurrenAttackFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);

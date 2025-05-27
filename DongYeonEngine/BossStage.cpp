@@ -52,6 +52,117 @@ void BossStage::Update()
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
     {
+        // BossSpear
+        for (auto it = spears.begin(); it != spears.end();)
+        {
+            if ((*it)->IsActive())
+            {
+                POINT* points = (*it)->GetHitboxPoints();
+                // POINT[4]俊辑 RECT 积己
+                LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
+                for (int k = 1; k < 4; ++k)
+                {
+                    minX = min(minX, points[k].x);
+                    maxX = max(maxX, points[k].x);
+                    minY = min(minY, points[k].y);
+                    maxY = max(maxY, points[k].y);
+                }
+                RECT projectileRect = { minX, minY, maxX, maxY };
+                bool collided = false;
+                for (int i = 0; i < MAP_ROWS && !collided; ++i)
+                {
+                    for (int j = 0; j < MAP_COLS && !collided; ++j)
+                    {
+                        if (map[i][j] == 1)
+                        {
+                            RECT wallRect = {
+                                j * TILE_SIZE,
+                                i * TILE_SIZE,
+                                (j + 1) * TILE_SIZE,
+                                (i + 1) * TILE_SIZE
+                            };
+                            RECT intersect;
+                            if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    (*it)->Update(*player);
+                    ++it;
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            else
+            {
+                delete* it;
+                it = spears.erase(it);
+            }
+        }
+
+        // BossAquaBal
+        for (auto it = aquaBalls.begin(); it != aquaBalls.end();)
+        {
+            if ((*it)->IsActive())
+            {
+                POINT* points = (*it)->GetHitboxPoints();
+                // POINT[4]俊辑 RECT 积己
+                LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
+                for (int k = 1; k < 4; ++k)
+                {
+                    minX = min(minX, points[k].x);
+                    maxX = max(maxX, points[k].x);
+                    minY = min(minY, points[k].y);
+                    maxY = max(maxY, points[k].y);
+                }
+                RECT projectileRect = { minX, minY, maxX, maxY };
+                bool collided = false;
+                for (int i = 0; i < MAP_ROWS && !collided; ++i)
+                {
+                    for (int j = 0; j < MAP_COLS && !collided; ++j)
+                    {
+                        if (map[i][j] == 1)
+                        {
+                            RECT wallRect = {
+                                j * TILE_SIZE,
+                                i * TILE_SIZE,
+                                (j + 1) * TILE_SIZE,
+                                (i + 1) * TILE_SIZE
+                            };
+                            RECT intersect;
+                            if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    (*it)->Update(*player);
+                    ++it;
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+            else
+            {
+                delete* it;
+                it = aquaBalls.erase(it);
+            }
+        }
         // Arrows
         for (auto it = arrows.begin(); it != arrows.end();)
         {
@@ -547,6 +658,50 @@ void BossStage::Render(HDC hdc)
         }
     }
 
+    for (auto* spear : spears)
+    {
+        POINT* points = spear->GetHitboxPoints();
+        bool inView = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            {
+                inView = true;
+                break;
+            }
+        }
+        if (inView)
+        {
+            HDC spearDC = hdc;
+            int savedSpearDC = SaveDC(spearDC);
+            OffsetViewportOrgEx(spearDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            spear->Render(spearDC);
+            RestoreDC(spearDC, savedSpearDC);
+        }
+    }
+    for (auto* aquaBall : aquaBalls)
+    {
+        POINT* points = aquaBall->GetHitboxPoints();
+        bool inView = false;
+        for (int i = 0; i < 4; ++i)
+        {
+            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            {
+                inView = true;
+                break;
+            }
+        }
+        if (inView)
+        {
+            HDC aquaBallDC = hdc;
+            int savedaquaBallrDC = SaveDC(aquaBallDC);
+            OffsetViewportOrgEx(aquaBallDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            aquaBall->Render(aquaBallDC, *player);
+            RestoreDC(aquaBallDC, savedaquaBallrDC);
+        }
+    }
     HDC bossDC = hdc;
     int savedBossDC = SaveDC(bossDC);
     OffsetViewportOrgEx(bossDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
