@@ -1,6 +1,7 @@
 #include "SwordMan.h"
 #include "Time.h"
 #include <cmath>
+#include "SoundManager.h"
 
 SwordMan::SwordMan()
 {
@@ -202,6 +203,9 @@ void SwordMan::Update(Player& p)
         if (mAttackFrameTime >= frameDuration)
         {
             mCurrenAttackFrame++;
+            if (mCurrenAttackFrame == 2) {
+                SoundManager::GetInstance()->mPlaySound("SwordManAttack", false);
+            }
             if (mCurrenAttackFrame >= 3)
             {
                 mIsAttack = false;

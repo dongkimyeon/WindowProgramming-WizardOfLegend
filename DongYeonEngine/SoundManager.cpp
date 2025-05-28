@@ -5,22 +5,23 @@
 
 void SoundManager::Initialize() {
     FMOD::System_Create(&mSystem);
-    mSystem->init(32, FMOD_INIT_NORMAL, 0); // 충분한 채널 수
+    mSystem->init(32, FMOD_INIT_NORMAL, 0);
 
-    // Initialize channel groups
     mBGMChannel = nullptr;
+
     mSystem->createChannelGroup("SEGroup", &mSEGroup);
     mSystem->createChannelGroup("BGMGroup", &mBGMGroup);
 
-    // Load sounds and populate map
     mSystem->createSound("resources/Audio/SE/ArcherRelease.wav", FMOD_DEFAULT, 0, &mSE[0]);
     mSoundMap["ArcherRelease"] = mSE[0];
     mSystem->createSound("resources/Audio/SE/ArcherReload.wav", FMOD_DEFAULT, 0, &mSE[1]);
     mSoundMap["ArcherReload"] = mSE[1];
     mSystem->createSound("resources/Audio/SE/ArcherShoot.wav", FMOD_DEFAULT, 0, &mSE[2]);
     mSoundMap["ArcherShoot"] = mSE[2];
+
     mSystem->createSound("resources/Audio/SE/SwordManAttack.wav", FMOD_DEFAULT, 0, &mSE[9]);
     mSoundMap["SwordManAttack"] = mSE[9];
+
     mSystem->createSound("resources/Audio/SE/PlayerFootstep.wav", FMOD_DEFAULT, 0, &mSE[8]);
     mSoundMap["PlayerFootstep"] = mSE[8];
     mSystem->createSound("resources/Audio/SE/Dash.wav", FMOD_DEFAULT, 0, &mSE[3]);
@@ -35,6 +36,8 @@ void SoundManager::Initialize() {
     mSoundMap["FireBlastStart"] = mSE[7];
     mSystem->createSound("resources/Audio/SE/StandardPlayerAttack.wav", FMOD_DEFAULT, 0, &mSE[10]);
     mSoundMap["PlayerAttack"] = mSE[10];
+
+
     mSystem->createSound("resources/Audio/BGM/Tutorial_Jazz.wav", FMOD_LOOP_NORMAL, 0, &mBGM);
     mSoundMap["Tutorial_Jazz"] = mBGM;
 

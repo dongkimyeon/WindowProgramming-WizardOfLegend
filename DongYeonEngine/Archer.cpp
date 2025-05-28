@@ -1,6 +1,7 @@
 ﻿#include "Archer.h"
 #include "Time.h"
 #include "Arrow.h"
+#include "SoundManager.h"
 
 
 Archer::Archer()
@@ -188,6 +189,10 @@ void Archer::Update(Player& p, Scene* stage)
         if (mAttackFrameTime >= frameDuration)
         {
             mCurrenAttackFrame++;
+            if (mCurrenAttackFrame == 1) {
+                SoundManager::GetInstance()->mPlaySound("ArcherReload", false);
+            }
+
             if (mCurrenAttackFrame >= 4)
             {
                 mIsAttack = false;

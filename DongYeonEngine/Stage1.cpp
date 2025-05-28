@@ -19,7 +19,8 @@ Stage1::Stage1()
     archers.push_back(new Archer());
     archers.back()->SetPosition( 200 , 270);
 
-
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(230, 270);
     
 
     // portal room
