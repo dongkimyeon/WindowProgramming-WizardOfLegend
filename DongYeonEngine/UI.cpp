@@ -1,7 +1,8 @@
 #include "UI.h"
 #include "SceneManager.h"	
 #include "Boss.h"
-
+#include "Time.h"
+#include "Input.h"
 ATL::CImage UI::UI_HPBAR;
 ATL::CImage UI::UI_MPBAR;
 ATL::CImage UI::UI_PLAYERBAR;
@@ -44,11 +45,50 @@ void UI::Initialize()
 
 void UI::Update()
 {
-
+   
 }
 
 void UI::Render(HDC hdc)
 {
+
+    static float alpha = 0.0f;
+    static float alphaTimer = 0.0f;
+    const float fadeDuration = 2.5f;
+
+    // 플레이어가 죽었는지 확인
+    if (SceneManager::GetSharedPlayer()->GetIsDead())
+    {
+        // 알파값 증가
+        alphaTimer += Time::DeltaTime();
+        alpha = min(1.0f, alphaTimer / fadeDuration);
+
+        // 게임 오버 텍스트 렌더링
+        SetBkMode(hdc, TRANSPARENT);
+        SetTextColor(hdc, RGB(255 * alpha, 0, 0)); // 알파값 적용
+        HFONT hFont = CreateFont(120, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"EXO 2");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+        // 화면 중앙에 텍스트 출력
+        int screenWidth = 1280;
+        int screenHeight = 720;
+        const wchar_t* gameOverText = L"GAMEOVER";
+        SIZE textSize;
+        GetTextExtentPoint32(hdc, gameOverText, wcslen(gameOverText), &textSize);
+        TextOut(hdc, (screenWidth - textSize.cx) / 2, (screenHeight - textSize.cy) / 2, gameOverText, wcslen(gameOverText));
+
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
+
+        // 알파값이 1.0에 도달하면 씬 전환
+        if (alpha >= 1.0f )
+        {
+            SceneManager::StartFadeIn();
+            SceneManager::LoadScene(L"GameOverScene");
+        }
+        return; // 더 이상 UI를 렌더링하지 않음
+    }
     // Boss UI
     if (SceneManager::GetActiveScene()->GetName() == L"BossStage")
     {
@@ -84,6 +124,7 @@ void UI::Render(HDC hdc)
     }
 
     //플레이어 UI
+    {
     Player* player = SceneManager::GetSharedPlayer();
 
     UI_PLAYERBAR.Draw(hdc, 0, 0);
@@ -138,4 +179,7 @@ void UI::Render(HDC hdc)
 
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
+    }
+
+
 }

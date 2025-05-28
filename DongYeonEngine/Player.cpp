@@ -3,6 +3,7 @@
 #include "Time.h"
 #include "SoundManager.h"
 
+
 Player::Player()
 {
     mX = 1920 / 2;
