@@ -12,35 +12,9 @@
 #define MAP_ROWS 40
 #define TILE_SIZE 50
 
-Stage1::Stage1()
-{
-    camera.SetTarget(SceneManager::GetSharedPlayer());
-    //몬스터 추가
-    archers.push_back(new Archer());
-    archers.back()->SetPosition( 200 , 270);
-
-    swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(230, 270);
-    
-
-    // portal room
-    portal.SetPosition(1830, 1720);
-}
-
-Stage1::~Stage1()
-{
-    for (auto* swordman : swordmans) delete swordman;
-    for (auto* wizard : wizards) delete wizard;
-    for (auto* archer : archers) delete archer;
-    for (auto* arrow : arrows) delete arrow;
-    for (auto* fireball : fireballs) delete fireball;
-    for (auto* playerFireball : playerFireballs) delete playerFireball;
-    for (auto* fireDragon : playerFireDragon) delete fireDragon;
-}
 
 void Stage1::Initialize()
 {
-    
     UI::Initialize();
     camera.Update();
     camera.SetTarget(SceneManager::GetSharedPlayer());
@@ -418,7 +392,9 @@ void Stage1::Update()
         SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"Stage2");
         MapManager::GetInstance()->LoadMap(L"Stage2.txt");
-     
+        wizards.clear();
+        archers.clear();
+        swordmans.clear();
         SceneManager::GetSharedPlayer()->SetPosition(180, 270);
 		SceneManager::GetSharedPlayer()->SetTelporting(true);
      

@@ -34,6 +34,7 @@ public:
     static Scene* GetActiveScene() { return mActiveScene; }
     static void SetmIsGameStart(bool isGameStart) { mIsGameStart = isGameStart; }
     static float GetPlayTime() { return playTime; }
+    static void ResetPlayTime() { playTime = 0; }
 
 private:
     static Player* mSharedPlayer;

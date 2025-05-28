@@ -102,6 +102,7 @@ void TitleScene::Update()
             
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"Stage1");
+          
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
             SceneManager::GetSharedPlayer()->SetPosition(180, 270);
             SceneManager::SetmIsGameStart(true);

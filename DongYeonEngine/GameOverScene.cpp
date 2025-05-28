@@ -33,9 +33,11 @@ void GameOverScene::Update()
     if (Input::GetKeyDown(eKeyCode::SPACE))
     {
         SceneManager::LoadScene(L"TitleScene");
-        
+        SceneManager::GetSharedPlayer()->SetHp(100);
+        SceneManager::GetSharedPlayer()->Setrevive();
+        SceneManager::ResetPlayTime();
+        SceneManager::SetmIsGameStart(false);
     }
-
 }
 
 void GameOverScene::LateUpdate()

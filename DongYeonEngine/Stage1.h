@@ -14,8 +14,7 @@
 
 class Stage1 : public Scene {
 public:
-    Stage1();
-    ~Stage1();
+
     void Initialize() override;
     void Update() override;
     void LateUpdate() override;
