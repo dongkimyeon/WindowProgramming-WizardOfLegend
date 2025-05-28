@@ -16,7 +16,7 @@ void BossStage::Initialize()
 {
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
-   
+ 
 }
 
 void BossStage::LateUpdate()
@@ -347,6 +347,13 @@ void BossStage::Update()
                             }
                         }
                     }
+                    if (!enemyCollided) {
+                        if ((*it)->CheckCollision(iceBoss))
+                        {
+                            enemyCollided = true;
+                            break;
+                        }
+                    }
                     if (!enemyCollided)
                         ++it;
                 }
@@ -436,6 +443,13 @@ void BossStage::Update()
                             }
                         }
                     }
+                    if (!enemyCollided) {
+                        if ((*it)->CheckCollision(iceBoss))
+                        {
+                            enemyCollided = true;
+                            break;
+                        }
+                    }
                     if (!enemyCollided)
                         ++it;
                 }
@@ -483,12 +497,21 @@ void BossStage::Update()
                 archer->SetHitFlag(true);
             }
         }
+      
+            RECT BossRect = iceBoss.GetRect();
+            if (player->CheckCollisionWithRect(BossRect) && !iceBoss.HasBeenHit())
+            {
+                iceBoss.TakeDamage(player->GetDamage());
+                iceBoss.SetHitFlag(true);
+            
+        }
     }
     else
     {
         for (auto* swordman : swordmans) swordman->SetHitFlag(false);
         for (auto* wizard : wizards) wizard->SetHitFlag(false);
         for (auto* archer : archers) archer->SetHitFlag(false);
+        iceBoss.SetHitFlag(false);
     }
 
     RECT temp;

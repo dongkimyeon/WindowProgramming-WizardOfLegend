@@ -20,6 +20,7 @@ void LoadScenes()
 	SceneManager::CreateScene<TutorialStage>(L"TutorialStage");
 	SceneManager::CreateScene<GameOverScene>(L"GameOverScene");
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
+
 	MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
 	SceneManager::LoadScene(L"BossStage");
 	SoundManager::GetInstance()->Initialize();

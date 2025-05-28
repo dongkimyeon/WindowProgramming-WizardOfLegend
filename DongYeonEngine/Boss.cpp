@@ -4,6 +4,7 @@
 #include "Time.h"
 #include <cmath>
 
+int Boss::hp;
 Boss::Boss()
 {
     mX = 1025.0f;
@@ -70,7 +71,10 @@ Boss::~Boss() {}
 
 void Boss::Update(Player& p, Scene* stage)
 {
-    if (mIsDead) return;
+    if (mIsDead) {
+        mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
+        return;
+    }
 
     mHitTimer -= Time::DeltaTime();
 
@@ -78,16 +82,21 @@ void Boss::Update(Player& p, Scene* stage)
         if (mHitTimer <= 0) {
             mIsHit = false;
             mCurrentHitFrame = 0;
+            mShowDamage = false; // 피격 애니메이션 종료 시 데미지 텍스트 비활성화
         }
         else {
             mCurrentHitFrame = static_cast<int>(mHitTimer / 0.1f) % 2;
+            // 데미지 텍스트 위로 이동
+            if (mShowDamage) {
+                mDamageTextY -= mDamageTextSpeed * Time::DeltaTime();
+            }
             return;
         }
     }
 
     if (mShowDamage) {
         mDamageTextY -= mDamageTextSpeed * Time::DeltaTime();
-        if (mDamageTextY < mY - 100) mShowDamage = false;
+        if (mDamageTextY < mY - 100) mShowDamage = false; // 텍스트가 일정 높이 이상 올라가면 사라짐
     }
 
     stateTimer += Time::DeltaTime();
@@ -111,7 +120,7 @@ void Boss::Update(Player& p, Scene* stage)
             stateTimer = 0.0f;
             currentState = 5;
             mCurrenAttackFrame = 0;
-            mAttackDirectionX = dirX; // 방향 갱신
+            mAttackDirectionX = dirX;
             mAttackDirectionY = dirY;
         }
         break;
@@ -136,41 +145,88 @@ void Boss::Update(Player& p, Scene* stage)
             mSwordY = mY + swordDistance * sin(swordAngle);
         }
         else if (stateTimer < 0.7f) { // 0.2초 멈춤 (spin0)
-            mCurrenAttackFrame = 0; // spin0 이미지 고정
+            mCurrenAttackFrame = 0;
             mSwordX = mX + swordDistance * cos(swordAngle);
             mSwordY = mY + swordDistance * sin(swordAngle);
         }
         else if (stateTimer < 0.9f) { // 칼 애니메이션 (0.2초, 4프레임)
-            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.7f) / 0.05f) % 4; // 각 프레임 0.05초
+            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.7f) / 0.05f) % 4;
             mHasEffectHitbox = true;
+            swordAngle = 0.0f;
             mSwordX = mX + swordDistance * cos(swordAngle);
             mSwordY = mY + swordDistance * sin(swordAngle);
-            // 히트박스 업데이트
-            float radius = 100.0f * mScale;
-            mEffectHitboxPoints[0] = { (LONG)(mSwordX), (LONG)(mSwordY) };
-            mEffectHitboxPoints[1] = { (LONG)(mSwordX + radius * cos(swordAngle + 1.5708f)), (LONG)(mSwordY + radius * sin(swordAngle + 1.5708f)) };
-            mEffectHitboxPoints[2] = { (LONG)(mSwordX + radius * cos(swordAngle + 3.14159f)), (LONG)(mSwordY + radius * sin(swordAngle + 3.14159f)) };
-            mEffectHitboxPoints[3] = { (LONG)(mSwordX + radius * cos(swordAngle + 4.71239f)), (LONG)(mSwordY + radius * sin(swordAngle + 4.71239f)) };
+            // 칼 이미지의 네 꼭짓점으로 히트박스 설정 (고정 방향)
+            int swordFrame = mCurrenAttackFrame;
+            float width = mAnimaionIceSword[swordFrame].GetWidth() * mScale;
+            float height = mAnimaionIceSword[swordFrame].GetHeight() * mScale;
+            float halfWidth = width / 2.0f;
+            float halfHeight = height / 2.0f;
+            // 피벗을 손잡이로 가정 (칼 하단)
+            POINTF pivotOffset = { 0.0f, halfHeight }; // 손잡이로 피벗 이동
+            POINTF localPoints[4] = {
+                { -halfWidth + pivotOffset.x, -halfHeight + pivotOffset.y }, // 왼쪽 상단
+                { halfWidth + pivotOffset.x, -halfHeight + pivotOffset.y },  // 오른쪽 상단
+                { halfWidth + pivotOffset.x, halfHeight + pivotOffset.y },   // 오른쪽 하단
+                { -halfWidth + pivotOffset.x, halfHeight + pivotOffset.y }   // 왼쪽 하단
+            };
+            for (int i = 0; i < 4; ++i) {
+                // 칼 이미지는 고정 방향(0도)
+                mEffectHitboxPoints[i].x = (LONG)round(mSwordX + localPoints[i].x);
+                mEffectHitboxPoints[i].y = (LONG)round(mSwordY + localPoints[i].y);
+            }
+            // 공격 이펙트가 활성화된 동안 충돌 감지 및 데미지 처리
+            if (mCurrenAttackFrame >= 1 && !mHasAttackedPlayer) {
+                RECT playerRect = p.GetRect();
+                if (CheckCollisionWithRect(playerRect)) {
+                    p.TakeDamage(damage);
+                    mHasAttackedPlayer = true;
+                }
+            }
         }
-        else if (stateTimer < 1.5f) { // 칼 회전 (0.6초, 7프레임)
-            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.9f) / 0.0857f) % 7; // 각 프레임 약 0.0857초
+        else if (stateTimer < 1.5f) { // 칼 회전 (0.6초)
+            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.9f) / 0.1f) % 6;
             mHasEffectHitbox = true;
-            swordAngle = mCurrenAttackFrame * (2 * 3.14159f / 7); // 한 바퀴 회전
+            swordAngle = (stateTimer - 0.9f) / 0.6f * 2 * 3.14159f; // 0.6초 동안 360도 회전
             mSwordX = mX + swordDistance * cos(swordAngle);
             mSwordY = mY + swordDistance * sin(swordAngle);
-            // 히트박스 업데이트
-            float radius = 100.0f * mScale;
-            mEffectHitboxPoints[0] = { (LONG)(mSwordX), (LONG)(mSwordY) };
-            mEffectHitboxPoints[1] = { (LONG)(mSwordX + radius * cos(swordAngle + 1.5708f)), (LONG)(mSwordY + radius * sin(swordAngle + 1.5708f)) };
-            mEffectHitboxPoints[2] = { (LONG)(mSwordX + radius * cos(swordAngle + 3.14159f)), (LONG)(mSwordY + radius * sin(swordAngle + 3.14159f)) };
-            mEffectHitboxPoints[3] = { (LONG)(mSwordX + radius * cos(swordAngle + 4.71239f)), (LONG)(mSwordY + radius * sin(swordAngle + 4.71239f)) };
+            // 칼 이미지의 네 꼭짓점으로 히트박스 설정 (칼끝이 보스 중심을 향함)
+            int swordFrame = 3;
+            float width = mAnimaionIceSword[swordFrame].GetWidth() * mScale;
+            float height = mAnimaionIceSword[swordFrame].GetHeight() * mScale;
+            float halfWidth = width / 2.0f;
+            float halfHeight = height / 2.0f;
+            // 피벗을 손잡이로 가정 (칼 하단)
+            POINTF pivotOffset = { 0.0f, halfHeight };
+            POINTF localPoints[4] = {
+                { -halfWidth + pivotOffset.x, -halfHeight + pivotOffset.y },
+                { halfWidth + pivotOffset.x, -halfHeight + pivotOffset.y },
+                { halfWidth + pivotOffset.x, halfHeight + pivotOffset.y },
+                { -halfWidth + pivotOffset.x, halfHeight + pivotOffset.y }
+            };
+            // 칼끝이 보스 중심을 향하도록 회전
+            float imageAngle = atan2(mY - mSwordY, mX - mSwordX); // 보스에서 칼로의 방향
+            for (int i = 0; i < 4; ++i) {
+                float x = localPoints[i].x;
+                float y = localPoints[i].y;
+                mEffectHitboxPoints[i].x = (LONG)round(mSwordX + x * cos(imageAngle) - y * sin(imageAngle));
+                mEffectHitboxPoints[i].y = (LONG)round(mSwordY + x * sin(imageAngle) + y * cos(imageAngle));
+            }
+            // 공격 이펙트가 활성화된 동안 충돌 감지 및 데미지 처리
+            if (mCurrenAttackFrame >= 1 && !mHasAttackedPlayer) {
+                RECT playerRect = p.GetRect();
+                if (CheckCollisionWithRect(playerRect)) {
+                    p.TakeDamage(damage);
+                    mHasAttackedPlayer = true;
+                }
+            }
+        
         }
         else {
             mIsAttack = false;
             mHasEffectHitbox = false;
             stateTimer = 0.0f;
             currentState = 2;
-            mAttackDirectionX = dirX; // 스킬 종료 후 방향 갱신
+            mAttackDirectionX = dirX;
             mAttackDirectionY = dirY;
         }
         break;
@@ -180,9 +236,9 @@ void Boss::Update(Player& p, Scene* stage)
             mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
             mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
         }
-        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초 -> 1.5초)
-            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4; // 각 프레임 0.25초
-            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) { // 마지막 프레임에서 발사
+        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초)
+            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4;
+            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) {
                 BossSkill_AquaBall* aquaBall = new BossSkill_AquaBall(mX, mY, p.GetPositionX(), p.GetPositionY());
                 aquaBall->ThrowAquaBall(p, mX, mY, stage);
                 mHasAttackedPlayer = true;
@@ -193,18 +249,19 @@ void Boss::Update(Player& p, Scene* stage)
             mHasAttackedPlayer = false;
             stateTimer = 0.0f;
             currentState = 3;
-            mAttackDirectionX = dirX; // 스킬 종료 후 방향 갱신
+            mAttackDirectionX = dirX;
             mAttackDirectionY = dirY;
         }
         break;
+
     case 3: // 스킬3
         if (stateTimer < 0.5f) { // 대쉬
             mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
             mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
         }
-        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초 -> 1.5초)
-            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4; // 각 프레임 0.25초
-            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) { // 마지막 프레임에서 발사
+        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초)
+            mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4;
+            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) {
                 BossSkill_Spear* spear = new BossSkill_Spear(mX, mY, dirX, dirY);
                 spear->ThrowSpear(p, mX, mY, stage);
                 mHasAttackedPlayer = true;
@@ -215,15 +272,16 @@ void Boss::Update(Player& p, Scene* stage)
             mHasAttackedPlayer = false;
             stateTimer = 0.0f;
             currentState = 4;
-            mAttackDirectionX = dirX; // 스킬 종료 후 방향 갱신
+            mAttackDirectionX = dirX;
             mAttackDirectionY = dirY;
         }
         break;
+
     case 4: // 긴 Idle
         if (stateTimer >= 2.0f) {
             stateTimer = 0.0f;
             currentState = 0;
-            mAttackDirectionX = dirX; // 스킬 종료 후 방향 갱신
+            mAttackDirectionX = dirX;
             mAttackDirectionY = dirY;
         }
         break;
@@ -231,11 +289,25 @@ void Boss::Update(Player& p, Scene* stage)
 
     SetPosition(mX, mY);
 }
-void Boss::LateUpdate() {}
+
+void Boss::LateUpdate()
+{
+}
 
 void Boss::Render(HDC hdc, Player& p)
 {
     Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+    // 히트박스 디버그 그리기
+    if (mHasEffectHitbox)
+    {
+        HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
+        HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
+        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
+        Polygon(hdc, mEffectHitboxPoints, 4);
+        SelectObject(hdc, oldPen);
+        SelectObject(hdc, oldBrush);
+        DeleteObject(hitboxPen);
+    }
 
     if (mIsDead) {
         int width = static_cast<int>(mDieImage.GetWidth() * mScale);
@@ -251,108 +323,111 @@ void Boss::Render(HDC hdc, Player& p)
             mLeftHitAnimation[mCurrentHitFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
         else
             mRightHitAnimation[mCurrentHitFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
-        return;
-    }
-
-    float dx = p.GetPositionX() - mX;
-    float dy = p.GetPositionY() - mY;
-    float distance = sqrt(dx * dx + dy * dy);
-    float dirX = distance > 0 ? dx / distance : 0;
-    float dirY = distance > 0 ? dy / distance : 0;
-
-    CImage* dashImage = &mDownDashImage;
-    if (fabs(dirX) > fabs(dirY)) {
-        dashImage = (dirX > 0) ? &mRightDashImage : &mLeftDashImage;
     }
     else {
-        dashImage = (dirY > 0) ? &mDownDashImage : &mUpDashImage;
-    }
+        float dx = p.GetPositionX() - mX;
+        float dy = p.GetPositionY() - mY;
+        float distance = sqrt(dx * dx + dy * dy);
+        float dirX = distance > 0 ? dx / distance : 0;
+        float dirY = distance > 0 ? dy / distance : 0;
 
-    CImage* castingImage = mDownCastingImage;
-    if (fabs(dirX) > fabs(dirY)) {
-        castingImage = (dirX > 0) ? mRightCastingImage : mLeftCastingImage;
-    }
-    else {
-        castingImage = (dirY > 0) ? mDownCastingImage : mUpCastingImage;
-    }
+        CImage* dashImage = &mDownDashImage;
+        if (fabs(dirX) > fabs(dirY)) {
+            dashImage = (dirX > 0) ? &mRightDashImage : &mLeftDashImage;
+        }
+        else {
+            dashImage = (dirY > 0) ? &mDownDashImage : &mUpDashImage;
+        }
 
-    // 보스 렌더링
-    switch (currentState) {
-    case 0: // Idle
-    case 4: // 긴 Idle
-    {
-        int frame = static_cast<int>(stateTimer / 0.1667f) % 6;
-        int width = static_cast<int>(mIdleAnimation[frame].GetWidth() * mScale);
-        int height = static_cast<int>(mIdleAnimation[frame].GetHeight() * mScale);
-        mIdleAnimation[frame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
-        break;
-    }
-    case 5: // 긴 Idle
-    {
-        int frame = static_cast<int>(stateTimer / 0.1667f) % 6;
-        int width = static_cast<int>(mIdleAnimation[frame].GetWidth() * mScale);
-        int height = static_cast<int>(mIdleAnimation[frame].GetHeight() * mScale);
-        mIdleAnimation[frame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
-        break;
-    }
-    case 1: // 스킬1
-    {
-        if (stateTimer < 0.5f) { // 대쉬
-            int width = static_cast<int>(dashImage->GetWidth() * mScale);
-            int height = static_cast<int>(dashImage->GetHeight() * mScale);
-            dashImage->Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+        CImage* castingImage = mDownCastingImage;
+        if (fabs(dirX) > fabs(dirY)) {
+            castingImage = (dirX > 0) ? mRightCastingImage : mLeftCastingImage;
         }
-        else if (stateTimer < 0.7f) { // 0.2초 멈춤 (spin0)
-            int width = static_cast<int>(mSpinImage[0].GetWidth() * mScale);
-            int height = static_cast<int>(mSpinImage[0].GetHeight() * mScale);
-            mSpinImage[0].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+        else {
+            castingImage = (dirY > 0) ? mDownCastingImage : mUpCastingImage;
         }
-        else { // 회전
-            int width = static_cast<int>(mSpinImage[mCurrenAttackFrame].GetWidth() * mScale);
-            int height = static_cast<int>(mSpinImage[mCurrenAttackFrame].GetHeight() * mScale);
-            mSpinImage[mCurrenAttackFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
-        }
-        break;
-    }
-    case 2: // 스킬2
-    case 3: // 스킬3
-        if (stateTimer < 0.5f) 
+
+        // 보스 렌더링
+        switch (currentState) {
+        case 0: // Idle
+        case 4: // 긴 Idle
         {
-            int width = static_cast<int>(dashImage->GetWidth() * mScale);
-            int height = static_cast<int>(dashImage->GetHeight() * mScale);
-            dashImage->Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            int frame = static_cast<int>(stateTimer / 0.1667f) % 6;
+            int width = static_cast<int>(mIdleAnimation[frame].GetWidth() * mScale);
+            int height = static_cast<int>(mIdleAnimation[frame].GetHeight() * mScale);
+            mIdleAnimation[frame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            break;
         }
-        else 
+        case 5: // 검 휘두르기 준비
         {
-            int width = static_cast<int>(castingImage[mCurrenAttackFrame].GetWidth() * mScale);
-            int height = static_cast<int>(castingImage[mCurrenAttackFrame].GetHeight() * mScale);
-            castingImage[mCurrenAttackFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            int frame = static_cast<int>(stateTimer / 0.1667f) % 6;
+            int width = static_cast<int>(mIdleAnimation[frame].GetWidth() * mScale);
+            int height = static_cast<int>(mIdleAnimation[frame].GetHeight() * mScale);
+            mIdleAnimation[frame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            break;
         }
-        break;
+        case 1: // 스킬1
+        {
+            if (stateTimer < 0.5f) { // 대쉬
+                int width = static_cast<int>(dashImage->GetWidth() * mScale);
+                int height = static_cast<int>(dashImage->GetHeight() * mScale);
+                dashImage->Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            }
+            else if (stateTimer < 0.7f) { // 0.2초 멈춤 (spin0)
+                int width = static_cast<int>(mSpinImage[0].GetWidth() * mScale);
+                int height = static_cast<int>(mSpinImage[0].GetHeight() * mScale);
+                mSpinImage[0].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            }
+            else { // 회전
+                int width = static_cast<int>(mSpinImage[mCurrenAttackFrame].GetWidth() * mScale);
+                int height = static_cast<int>(mSpinImage[mCurrenAttackFrame].GetHeight() * mScale);
+                mSpinImage[mCurrenAttackFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            }
+            break;
+        }
+        case 2: // 스킬2
+        case 3: // 스킬3
+            if (stateTimer < 0.5f)
+            {
+                int width = static_cast<int>(dashImage->GetWidth() * mScale);
+                int height = static_cast<int>(dashImage->GetHeight() * mScale);
+                dashImage->Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            }
+            else
+            {
+                int width = static_cast<int>(castingImage[mCurrenAttackFrame].GetWidth() * mScale);
+                int height = static_cast<int>(castingImage[mCurrenAttackFrame].GetHeight() * mScale);
+                castingImage[mCurrenAttackFrame].Draw(hdc, (int)(mX - width / 2), (int)(mY - height / 2), width, height);
+            }
+            break;
+        }
     }
 
     // 칼 렌더링
-    if (currentState == 1 && stateTimer >= 0.7f && stateTimer < 1.5f && mCurrenAttackFrame < 6) { // 스킬1, 마지막 프레임(6)에서 칼 숨김
-        int swordFrame = (stateTimer < 0.9f) ? static_cast<int>((stateTimer - 0.7f) / 0.05f) % 4 : 3; // 0.7~0.9초: 4프레임, 이후 3번 프레임 고정
-        float swordAngle = (stateTimer >= 0.9f) ? (mCurrenAttackFrame * (2 * 3.14159f / 7)) : 0.0f; // 0.9초 이후 회전
+    if (currentState == 1 && stateTimer >= 0.7f && stateTimer < 1.5f) {
+        int swordFrame = (stateTimer < 0.9f) ? static_cast<int>((stateTimer - 0.7f) / 0.05f) % 4 : 3;
+        float imageAngle = (stateTimer < 0.9f) ? 0.0f : atan2(mY - mSwordY, mX - mSwordX); // 칼끝이 보스 중심을 향함
         int swordWidth = static_cast<int>(mAnimaionIceSword[swordFrame].GetWidth() * mScale);
         int swordHeight = static_cast<int>(mAnimaionIceSword[swordFrame].GetHeight() * mScale);
 
         XFORM xForm = { 0 };
-        xForm.eM11 = cos(swordAngle);
-        xForm.eM12 = sin(swordAngle);
-        xForm.eM21 = -sin(swordAngle);
-        xForm.eM22 = cos(swordAngle);
+        xForm.eM11 = cos(imageAngle);
+        xForm.eM12 = sin(imageAngle);
+        xForm.eM21 = -sin(imageAngle);
+        xForm.eM22 = cos(imageAngle);
         xForm.eDx = mSwordX;
         xForm.eDy = mSwordY;
 
         SetGraphicsMode(hdc, GM_ADVANCED);
+        SetStretchBltMode(hdc, HALFTONE); // 렌더링 품질 개선
         SetWorldTransform(hdc, &xForm);
 
         HDC srcDC = mAnimaionIceSword[swordFrame].GetDC();
+
+        float halfHeight = swordHeight / 2.0f;
         TransparentBlt(
             hdc,
-            -swordWidth / 2, -swordHeight / 2, swordWidth, swordHeight,
+            (int)(-swordWidth / 2), (int)(-halfHeight), swordWidth, swordHeight,
             srcDC,
             0, 0, mAnimaionIceSword[swordFrame].GetWidth(), mAnimaionIceSword[swordFrame].GetHeight(),
             RGB(0, 0, 0)
@@ -364,12 +439,22 @@ void Boss::Render(HDC hdc, Player& p)
         SetGraphicsMode(hdc, GM_COMPATIBLE);
     }
 
-    if (mShowDamage) {
+    // 데미지 텍스트 렌더링
+    if (mShowDamage && mIsHit) {
+        SetTextColor(hdc, RGB(255, 255, 255));
+        HFONT hFont = CreateFont(30, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"EXO 2");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
         wchar_t damageText[32];
         swprintf_s(damageText, L"%d", mDamageTaken);
-        TextOut(hdc, (int)mX, (int)mDamageTextY, damageText, wcslen(damageText));
+
+        TextOut(hdc, static_cast<int>(mX) - 40, static_cast<int>(mDamageTextY), damageText, wcslen(damageText));
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
     }
 }
+
 void Boss::SetPosition(float x, float y)
 {
     mX = x;

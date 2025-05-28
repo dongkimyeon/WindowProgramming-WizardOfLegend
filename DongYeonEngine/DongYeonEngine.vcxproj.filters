@@ -289,6 +289,9 @@
     <Image Include="resources\TitleSceneUI\StartButton.png">
       <Filter>리소스 파일</Filter>
     </Image>
+    <Image Include="..\성준이형리소스\Boss\Boss\Boss_Name\BOSS_NAMEBAR.png">
+      <Filter>리소스 파일</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DongYeonEngine.rc">

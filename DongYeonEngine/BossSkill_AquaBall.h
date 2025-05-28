@@ -24,7 +24,7 @@ public:
     float GetPositionY() const { return mY; }
 
 private:
-    CImage AquaBallAnimation[28];
+    CImage AquaBallAnimation[27];
     CImage AquaBallFallingPointAnimation[25];
     CImage AquaBallExplosionEffectAnimation[7];
 

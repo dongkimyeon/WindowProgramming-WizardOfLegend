@@ -9,7 +9,11 @@ class Boss : public GameObject
 public:
     Boss();
     ~Boss();
-
+    static Boss* GetInstance()
+    {
+        static Boss instance;
+        return &instance;
+    }
     void Update(Player& p, Scene* stage);
     void LateUpdate();
     void Render(HDC hdc, Player& p);
@@ -39,7 +43,7 @@ public:
 private:
     float mX;
     float mY;
-    int hp;
+    static int hp;
     int damage;
     float mScale = 1.0f;
 

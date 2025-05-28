@@ -15,7 +15,9 @@
 Stage1::Stage1()
 {
     camera.SetTarget(SceneManager::GetSharedPlayer());
-    
+    //몬스터 추가
+    archers.push_back(new Archer());
+    archers.back()->SetPosition( 200 , 270);
 
 
     

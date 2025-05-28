@@ -134,7 +134,7 @@ void SceneManager::Render(HDC hdc)
         DeleteDC(memDC);
     }
 
-    Time::Render(hdc);
+    //Time::Render(hdc);
 
     // 플레이 타임 렌더링
     if (mIsGameStart)

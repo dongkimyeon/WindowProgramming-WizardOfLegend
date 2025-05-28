@@ -1,11 +1,13 @@
 #include "UI.h"
 #include "SceneManager.h"	
-
+#include "Boss.h"
 
 ATL::CImage UI::UI_HPBAR;
 ATL::CImage UI::UI_MPBAR;
 ATL::CImage UI::UI_PLAYERBAR;
 ATL::CImage UI::UI_SKILLBAR;
+ATL::CImage UI::UI_BOSSBAR;
+ATL::CImage UI::UI_BOSS_HPBAR;
 
 
 UI::UI()
@@ -14,6 +16,8 @@ UI::UI()
     UI_MPBAR.Load(L"resources/Ui/UI_MPBAR.png");
     UI_PLAYERBAR.Load(L"resources/Ui/UI_PLAYERBAR.png");
     UI_SKILLBAR.Load(L"resources/Ui/UI_SKILLBAR.png");
+    UI_BOSSBAR.Load(L"resources/Ui/UI_BOSS_BAR.png");
+    UI_BOSS_HPBAR.Load(L"resources/Ui/UI_BOSS_HPBAR.png");
 }
 
 UI::~UI()
@@ -23,7 +27,8 @@ UI::~UI()
 	UI_MPBAR.Destroy();
 	UI_PLAYERBAR.Destroy();
 	UI_SKILLBAR.Destroy();
-
+    UI_BOSSBAR.Destroy();
+    UI_BOSS_HPBAR.Destroy();
 }
 
 void UI::Initialize()
@@ -32,7 +37,8 @@ void UI::Initialize()
 	UI_MPBAR.Load(L"resources/Ui/UI_MPBAR.png");
 	UI_PLAYERBAR.Load(L"resources/Ui/UI_PLAYERBAR.png");
 	UI_SKILLBAR.Load(L"resources/Ui/UI_SKILLBAR.png");
-
+    UI_BOSSBAR.Load(L"resources/Ui/UI_BOSS_BAR.png");
+    UI_BOSS_HPBAR.Load(L"resources/Ui/UI_BOSS_HPBAR.png");
   
 }
 
@@ -43,6 +49,41 @@ void UI::Update()
 
 void UI::Render(HDC hdc)
 {
+    // Boss UI
+    if (SceneManager::GetActiveScene()->GetName() == L"BossStage")
+    {
+        Boss* boss = Boss::GetInstance();
+        if (boss)
+        {
+            
+            int screenWidth = 1280;
+            int bossBarX = (screenWidth - UI_BOSSBAR.GetWidth()) / 2;
+            int bossBarY = 40; // Adjust vertical position as needed
+            UI_BOSSBAR.Draw(hdc, bossBarX + 30, bossBarY);
+
+            // Render boss name
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, RGB(255, 255, 255));
+            HFONT hFont = CreateFont(30, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+                OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                DEFAULT_PITCH | FF_DONTCARE, L"EXO 2");
+            HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+            TextOut(hdc, bossBarX + 166, bossBarY - 30, L"서리 여왕 프리야", wcslen(L"서리 여왕 프리야"));
+            SelectObject(hdc, hOldFont);
+            DeleteObject(hFont);
+
+            
+            float bossHpRatio = static_cast<float>(boss->GetHp()) / 1000;
+            int bossHpBarWidth = static_cast<int>(UI_BOSS_HPBAR.GetWidth() * bossHpRatio);
+            if (bossHpBarWidth > 0) {
+                int srcX = UI_BOSS_HPBAR.GetWidth() - bossHpBarWidth; // Start from right
+                UI_BOSS_HPBAR.Draw(hdc, bossBarX + 80, bossBarY + 20, bossHpBarWidth, UI_BOSS_HPBAR.GetHeight(),
+                    srcX, 0, bossHpBarWidth, UI_BOSS_HPBAR.GetHeight());
+            }
+        }
+    }
+
+    //플레이어 UI
     Player* player = SceneManager::GetSharedPlayer();
 
     UI_PLAYERBAR.Draw(hdc, 0, 0);
