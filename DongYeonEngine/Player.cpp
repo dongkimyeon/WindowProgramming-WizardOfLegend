@@ -2,6 +2,7 @@
 #include "Input.h"
 #include "Time.h"
 
+
 Player::Player()
 {
     mX = 1920 / 2;

@@ -86,7 +86,7 @@ void SceneManager::Update()
         PostQuitMessage(0);
     }
 
-    if (mIsGameStart)
+    if (mIsGameStart && !SceneManager::GetSharedPlayer()->GetIsDead())
     {
         playTime += Time::DeltaTime();
     }
@@ -137,7 +137,7 @@ void SceneManager::Render(HDC hdc)
     //Time::Render(hdc);
 
     // 플레이 타임 렌더링
-    if (mIsGameStart)
+    if (mIsGameStart && !SceneManager::GetSharedPlayer( )->GetIsDead() )
     {
         SetTextColor(hdc, RGB(255, 255, 255));
         HFONT hFont = CreateFont(30, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,

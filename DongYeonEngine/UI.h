@@ -15,4 +15,6 @@ private:
     static CImage UI_SKILLBAR;
     static CImage UI_BOSSBAR;
     static CImage UI_BOSS_HPBAR;
+
+   
 };
