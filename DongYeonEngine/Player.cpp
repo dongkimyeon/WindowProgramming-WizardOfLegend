@@ -1,6 +1,7 @@
 ﻿#include "Player.h"
 #include "Input.h"
 #include "Time.h"
+#include "SoundManager.h"
 
 Player::Player()
 {
@@ -307,6 +308,8 @@ void Player::Update(Scene* stage)
         mCurrentAttackFrame = mMouseClickFlag ? 8 : 0;
         mMouseClickFlag = !mMouseClickFlag;
         isUsingSkill = false; // 기본 공격
+        SoundManager::GetInstance()->mPlaySound("PlayerAttack", false);
+
 
         Vector2 mousePos = Input::GetMousePosition();
         float worldMouseX = mousePos.x + mCameraX;
@@ -321,6 +324,8 @@ void Player::Update(Scene* stage)
         else if (angle >= 135.0f || angle < -135.0f) state = PlayerState::LEFT;
         else state = PlayerState::BACK;
 
+
+
         animationTimer = 0.0f;
     }
 
@@ -332,6 +337,9 @@ void Player::Update(Scene* stage)
         mCurrentAttackFrame = mMouseClickFlag ? 8 : 0;
         mMouseClickFlag = !mMouseClickFlag;
         isUsingSkill = true; // 스킬 사용
+        // 사운드 출력
+        SoundManager::GetInstance()->mPlaySound("Fireball", false);
+
 
         Vector2 mousePos = Input::GetMousePosition();
         float worldMouseX = mousePos.x + mCameraX;
@@ -444,6 +452,9 @@ void Player::Update(Scene* stage)
     static Vector2 dashDirection(0.0f, 0.0f);
     static float dashProgress = 0.0f;
     if (!mIsDashing && Input::GetKeyDown(eKeyCode::SPACE) && moveDirection.Length() > 0.0f) {
+        // 사운드 출력
+        SoundManager::GetInstance()->mPlaySound("Dash", false);
+
         mIsDashing = true;
         dashDirection = moveDirection.Normalize();
         dashProgress = 0.0f;
@@ -498,6 +509,8 @@ void Player::Update(Scene* stage)
         if (animationTimer >= walkFrameDuration) {
             mCurrentWalkFrame = (mCurrentWalkFrame + 1) % 10;
             animationTimer = 0.0f;
+            if(mCurrentWalkFrame % 5 == 0)
+            SoundManager::GetInstance()->mPlaySound("PlayerFootstep", false);
         }
     }
     else if (!mIsDashing && !mIsAttack && !mIsHit) {

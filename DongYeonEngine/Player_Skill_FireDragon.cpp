@@ -4,6 +4,7 @@
 #include <cmath>
 #include <random>
 #include <iostream>
+#include "SoundManager.h"
 
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(10),
@@ -27,6 +28,8 @@ Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, f
         }
     }
 
+    SoundManager::GetInstance()->mPlaySound("FireBlastStart", false);
+
     UpdateHitbox();
 }
 
@@ -37,6 +40,7 @@ Player_Skill_FireDragon::~Player_Skill_FireDragon()
     for (int i = 0; i < 20; ++i) {
         mFireParticleImage[i].Destroy();
     }
+    SoundManager::GetInstance()->mPlaySound("FireBlastEnd", false);
 }
 
 void Player_Skill_FireDragon::Move()

@@ -24,6 +24,6 @@ void LoadScenes()
 	//MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
 	SceneManager::LoadScene(L"TitleScene");
 	SoundManager::GetInstance()->Initialize();
-	SoundManager::GetInstance()->test();
+	SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
 	SceneManager::StartFadeIn();
 }

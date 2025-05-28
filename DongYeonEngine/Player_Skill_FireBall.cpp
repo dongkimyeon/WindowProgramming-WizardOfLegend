@@ -1,6 +1,7 @@
 ﻿#include "Player_Skill_FireBall.h"
 #include "Stage1.h"
 #include "Time.h"
+#include "SoundManager.h"
 #include <cmath>
 #include <random>
 #include <iostream>
@@ -33,6 +34,7 @@ Player_Skill_FireBall::Player_Skill_FireBall(float x, float y, float dirX, float
         }
     }
 
+    
     UpdateHitbox();
 }
 

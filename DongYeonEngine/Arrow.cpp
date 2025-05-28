@@ -2,7 +2,7 @@
 #include "Stage1.h"
 #include "Time.h"
 #include <cmath>
-
+#include "SoundManager.h"
 
 Arrow::Arrow(float x, float y, float dirX, float dirY)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(10)
@@ -17,6 +17,7 @@ Arrow::Arrow(float x, float y, float dirX, float dirY)
     if (mArrowImage.IsNull()) wprintf(L"Failed to load: resources/Monster/ARCHER/ARCHER_BOW/Attack/ARCHER_BOW_0.png\n");
     UpdateHitbox();
 
+    SoundManager::GetInstance()->mPlaySound("ArcherShoot", false);
 }
 
 Arrow::~Arrow()
