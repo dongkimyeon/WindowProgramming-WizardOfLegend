@@ -202,6 +202,7 @@ void TitleScene::Render(HDC hdc)
     GetTextExtentPoint32(hdc, devText2, wcslen(devText2), &devSize2);
     GetTextExtentPoint32(hdc, devText3, wcslen(devText3), &devSize3);
     SetTextColor(hdc, RGB(231, 231, 231));
+    SetBkMode(hdc, TRANSPARENT);
     TextOut(hdc, width - devSize1.cx - margin, height - lineHeight * 3 - margin, devText1, wcslen(devText1));
     TextOut(hdc, width - devSize2.cx - margin, height - lineHeight * 2 - margin, devText2, wcslen(devText2));
     TextOut(hdc, width - devSize3.cx - margin, height - lineHeight - margin, devText3, wcslen(devText3));
