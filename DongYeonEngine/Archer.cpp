@@ -2,7 +2,7 @@
 #include "Time.h"
 #include "Arrow.h"
 #include "SoundManager.h"
-
+#include "SceneManager.h"
 
 Archer::Archer()
 {
@@ -127,7 +127,9 @@ void Archer::Update(Player& p, Scene* stage)
     rect.bottom = static_cast<int>(mY + imageHeight / 2.0f) - 33;
 
     // 죽음 상태 처리
-    if (mIsDead) {
+    if (mIsDead) 
+    {
+       
         static float dieTimer = 0.0f;
         if (mCurrentDeadFrame < 5) { // 0~5까지 6프레임
             dieTimer += Time::DeltaTime();
@@ -442,6 +444,7 @@ void Archer::TakeDamage(int d)
         mIsMoving = false;
         mCurrentDeadFrame = 0;
         mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
+        SceneManager::GetSharedPlayer()->PlusKillCount();
     }
     else {
         mIsHit = true;

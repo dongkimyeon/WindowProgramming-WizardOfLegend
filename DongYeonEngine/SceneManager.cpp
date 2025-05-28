@@ -90,6 +90,8 @@ void SceneManager::Update()
     {
         playTime += Time::DeltaTime();
     }
+
+    
 }
 
 void SceneManager::LateUpdate()

@@ -1,7 +1,7 @@
 #include "Wizard.h"
 #include "Time.h"
 #include "FireBall.h"
-
+#include "SceneManager.h"
 Wizard::Wizard()
 {
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
@@ -125,6 +125,7 @@ void Wizard::Update(Player& p, Scene* stage)
 
     // 죽음 상태 처리
     if (mIsDead) {
+        
         static float dieTimer = 0.0f;
         if (mCurrentDeadFrame < 4) { // 0~4까지 5프레임
             dieTimer += Time::DeltaTime();
@@ -403,6 +404,7 @@ void Wizard::TakeDamage(int d)
         mIsMoving = false;
         mCurrentDeadFrame = 0;
         mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
+        SceneManager::GetSharedPlayer()->PlusKillCount();
     }
     else {
         mIsHit = true;

@@ -2,7 +2,7 @@
 #include "Input.h"
 #include "Time.h"
 #include "SoundManager.h"
-
+#include "SceneManager.h"
 
 Player::Player()
 {
@@ -36,6 +36,8 @@ Player::Player()
     fireDragonReady = true;
     isUsingSkill = false;
 
+    KillEnemyCnt = 0;
+    deadStage = L"Stage1";
     mIsTeleporting = true;          // 생성 시 텔레포트 애니메이션 활성화
     mTeleportTimer = 0.0f;          // 타이머 초기화
     mCurrentTeleportFrame = 0;      // 프레임 초기화
@@ -233,7 +235,9 @@ void Player::Update(Scene* stage)
         }
     }
 
-    if (mIsDead) {
+    if (mIsDead) 
+    {
+        deadStage = SceneManager::GetActiveScene()->GetName();
         static float dieTimer = 0.0f;
         if (mCurrentDieFrame < 6) {
             dieTimer += Time::DeltaTime();

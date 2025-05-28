@@ -43,6 +43,17 @@ void Stage1::Initialize()
     
     UI::Initialize();
     camera.Update();
+    camera.SetTarget(SceneManager::GetSharedPlayer());
+    //몬스터 추가
+    archers.push_back(new Archer());
+    archers.back()->SetPosition(200, 270);
+
+    swordmans.push_back(new SwordMan());
+    swordmans.back()->SetPosition(230, 270);
+
+
+    // portal room
+    portal.SetPosition(1830, 1720);
 }
 
 void Stage1::Update()

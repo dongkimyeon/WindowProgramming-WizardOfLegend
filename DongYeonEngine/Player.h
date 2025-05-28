@@ -14,9 +14,19 @@ public:
     void Render(HDC hdc) override;
 
     void SetPosition(float x, float y) override;
+    void SetHp(int i) { hp = i; }
+    void Setrevive() { mIsDead = false; }
     void TakeDamage(int d);
 	void SetTelporting(bool isTeleporting) { mIsTeleporting = isTeleporting; }
-
+    void PlusKillCount()
+    {
+        KillEnemyCnt++;
+    }
+    void SetDeadStageName(std::wstring playerDeadStage)
+    {
+        deadStage = playerDeadStage;
+    }
+ 
     int GetHp() { return hp; }
 	int GetMp() { return mp; }
     int GetDamage() { return damage; }
@@ -26,7 +36,8 @@ public:
     float GetSpeed() override;
     RECT GetRect() override;
     bool GetIsDead() { return mIsDead; }
-
+    int GetKillCount() { return KillEnemyCnt; }
+    std::wstring GetDeadStage() { return deadStage; }
     void SetCameraX(int cameraX) { mCameraX = cameraX; }
     void SetCameraY(int cameraY) { mCameraY = cameraY; }
 
@@ -45,6 +56,9 @@ private:
     int hp;
     int mp;
     int damage;
+
+    std::wstring deadStage;
+    int KillEnemyCnt;
 
     int mCameraX;
     int mCameraY;

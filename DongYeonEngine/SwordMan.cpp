@@ -2,6 +2,7 @@
 #include "Time.h"
 #include <cmath>
 #include "SoundManager.h"
+#include "SceneManager.h"
 
 SwordMan::SwordMan()
 {
@@ -146,6 +147,7 @@ void SwordMan::Update(Player& p)
                 dieTimer = 0.0f;
             }
         }
+
         rect = { (int)mX,(int)mY,(int)mX,(int)mY };
         mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
         return;
@@ -491,6 +493,7 @@ void SwordMan::TakeDamage(int d)
         mIsMoving = false;
         mCurrentDeadFrame = 0;
         mShowDamage = false; // 죽을 때 데미지 텍스트 비활성화
+        SceneManager::GetSharedPlayer()->PlusKillCount();
     }
     else {
         mIsHit = true;

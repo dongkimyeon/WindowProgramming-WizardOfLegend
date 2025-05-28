@@ -42,7 +42,7 @@ private:
     static CImage mMouseCursorImage;
     static float playTime;
     static bool mIsGameStart;
-
+   
     // 페이드 관련 변수
     static eFadeState mFadeState;
     static float mFadeAlpha;         // 알파값 (0.0f ~ 1.0f)
