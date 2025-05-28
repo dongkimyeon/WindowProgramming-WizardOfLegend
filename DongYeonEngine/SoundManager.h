@@ -1,25 +1,34 @@
 #pragma once
 #include "CommonInclude.h"
 #include "FMOD.hpp"
+#include <map>
+#include <string>
+#include <vector>
 
 class SoundManager {
 public:
-	void Initialize();
+    void Initialize();
+    void Release();
 
-	static SoundManager* GetInstance() {
-		static SoundManager instance;
-		return &instance;
-	}
+    static SoundManager* GetInstance() {
+        static SoundManager instance;
+        return &instance;
+    }
 
-	void play(const std::wstring& fileName, const std::wstring& TypeOfSound);
-
-
-	void test() { mSystem->playSound(mBGM, 0, false, &mBGMChannel); }
+    void mPlaySound(const std::string& SoundName, bool loop);
 
 private:
-	FMOD::System* mSystem;
-	FMOD::Channel* mSEChannel;
-	FMOD::Channel* mBGMChannel;
-	FMOD::Sound* mSE[15];
-	FMOD::Sound* mBGM;
+    SoundManager() : mSystem(nullptr), mBGMChannel(nullptr), mSEGroup(nullptr), mBGMGroup(nullptr), mBGM(nullptr) {
+        for (int i = 0; i < 15; i++) mSE[i] = nullptr;
+    }
+    ~SoundManager() { Release(); }
+
+    FMOD::System* mSystem;
+    FMOD::Channel* mBGMChannel;
+    FMOD::ChannelGroup* mSEGroup;
+    FMOD::ChannelGroup* mBGMGroup;
+    FMOD::Sound* mSE[15];
+    FMOD::Sound* mBGM;
+    std::map<std::string, FMOD::Sound*> mSoundMap;
+    std::vector<FMOD::Channel*> mSEChannels; // SE용 동적 채널 관리
 };
