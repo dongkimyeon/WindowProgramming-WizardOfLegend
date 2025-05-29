@@ -146,6 +146,7 @@ void Boss::Update(Player& p, Scene* stage)
         break;
 
     case 1: // 스킬1: 플레이어 위치로 대쉬 후 검 휘두르기
+    {
         if (stateTimer < dashDuration) { // 대쉬: 플레이어 위치까지 거리에 따라 이동
             mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
             mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
@@ -235,10 +236,12 @@ void Boss::Update(Player& p, Scene* stage)
             currentState = 2;
             mAttackDirectionX = dirX;
             mAttackDirectionY = dirY;
+            mHasAttackedPlayer = false;
         }
         break;
-
-    case 2: // 스킬2: 플레이어 위치로 대쉬 후 아쿠아볼
+    }
+    case 2:
+    {
         if (stateTimer < dashDuration) { // 대쉬: 플레이어 위치까지 거리에 따라 이동
             if (stateTimer == 0.0f) { // 대쉬 시작 시 거리 계산
                 dashDistance = distance;
@@ -247,12 +250,16 @@ void Boss::Update(Player& p, Scene* stage)
             mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
             mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
         }
-        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초)
+        else if (stateTimer < 1.5f) {
             mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4;
-            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) {
-                BossSkill_AquaBall* spear = new BossSkill_AquaBall(mX, mY, dirX, dirY);
-                spear->ThrowAquaBall(p, mX, mY, stage);
+            if (stateTimer >= 1.25f && !mHasAttackedPlayer) {
+                std::cout << "Case 2: Throwing AquaBall at stateTimer = " << stateTimer << std::endl;
+                BossSkill_AquaBall* aquaBall = new BossSkill_AquaBall(mX, mY, dirX, dirY);
+                aquaBall->ThrowAquaBall(p, mX, mY, stage);
                 mHasAttackedPlayer = true;
+            }
+            else {
+                std::cout << "조건 미충족: stateTimer = " << stateTimer << ", mHasAttackedPlayer = " << mHasAttackedPlayer << std::endl;
             }
         }
         else {
@@ -264,8 +271,9 @@ void Boss::Update(Player& p, Scene* stage)
             mAttackDirectionY = dirY;
         }
         break;
-
+    }
     case 3: // 스킬3: 플레이어 위치로 대쉬 후 창
+    {
         if (stateTimer < dashDuration) { // 대쉬: 플레이어 위치까지 거리에 따라 이동
             if (stateTimer == 0.0f) { // 대쉬 시작 시 거리 계산
                 dashDistance = distance;
@@ -274,10 +282,10 @@ void Boss::Update(Player& p, Scene* stage)
             mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
             mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
         }
-        else if (stateTimer < 1.5f) 
-        { 
+        else if (stateTimer < 1.5f) {
             mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4;
-            if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) {
+            if (stateTimer >= 1.25f && !mHasAttackedPlayer) {
+                std::cout << "Case 3: Throwing Spear at stateTimer = " << stateTimer << std::endl;
                 BossSkill_Spear* spear = new BossSkill_Spear(mX, mY, dirX, dirY);
                 spear->ThrowSpear(p, mX, mY, stage);
                 mHasAttackedPlayer = true;
@@ -292,7 +300,7 @@ void Boss::Update(Player& p, Scene* stage)
             mAttackDirectionY = dirY;
         }
         break;
-
+    }
     case 4: // 긴 대기 상태
         if (stateTimer >= 2.0f) {
             stateTimer = 0.0f;
