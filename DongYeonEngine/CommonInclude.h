@@ -11,6 +11,7 @@
 #include <gdiplus.h>
 #include <random>
 #include <atlimage.h>
+#include <queue>
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720

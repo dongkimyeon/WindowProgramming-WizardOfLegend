@@ -21,18 +21,31 @@ void TutorialStage::Initialize()
     //플레이어 위치 초기화
     SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
 
+   
 
     //몬스터 추가
 	dummies.push_back(new Dummy());
 	dummies.back()->SetPosition(1000, 760);
 
-    //포탈 위치 설정
-    portal.SetPosition(1000, 330);
+    //튜토리얼 메세지큐
+    tutorialQue.push(L"시작안내");
+
+    tutorialQue.push(L"움직이기");
+
+    tutorialQue.push(L"대쉬");
+    //아처소환
+    tutorialQue.push(L"기본공격 연습");
+    //몬스터 소환
+    tutorialQue.push(L"스킬: 파이어볼 연습");
+    //몬스터 소환
+    tutorialQue.push(L"스킬: 파이어드래곤 연습");
+    //몬스터소환
+    tutorialQue.push(L"종료 안내");
+
 }
 
 void TutorialStage::LateUpdate()
 {
-
 }
 void TutorialStage::Update()
 {
@@ -42,7 +55,8 @@ void TutorialStage::Update()
     SoundManager::GetInstance()->Update();
     player->SetCameraX(camera.GetPositionX());
     player->SetCameraY(camera.GetPositionY());
-
+    //기타 업데이트 로직
+    {
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);
     for (auto* swordman : swordmans) swordman->Update(*player);
@@ -57,7 +71,6 @@ void TutorialStage::Update()
         if (fireball->IsActive())
             fireball->Move();
     }
-
     // 발사체 벽 충돌 체크
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
@@ -436,12 +449,152 @@ void TutorialStage::Update()
     }
     //객체간에 충돌처리 밀어내는거
     HandleCollision();
-
     // 플레이어 벽 충돌 처리
     if (map)
     {
         HandleCollisionMap(map, *player);
     }
+    }
+
+
+    // 튜토리얼 로직
+    isStepCompleted = false;
+    currentTutorialStep = L"";
+
+    if (currentTutorialStep.empty() && !tutorialQue.empty())
+    {
+        currentTutorialStep = tutorialQue.front();
+        
+        isStepCompleted = false;
+    }
+
+    if (!currentTutorialStep.empty())
+    {
+        if (currentTutorialStep == L"시작안내")
+        {
+            // 플레이어에게 튜토리얼 시작 메시지 표시 (UI로 렌더링)
+            if (Input::GetKeyDown(eKeyCode::P)) // P키 입력확인
+            {
+                isStepCompleted = true;
+               
+            }
+        }
+        else if (currentTutorialStep == L"움직이기")
+        {
+            // WASD 키로 움직이는지 확인
+            if (Input::GetKey(eKeyCode::W) || Input::GetKey(eKeyCode::A) ||
+                Input::GetKey(eKeyCode::S) || Input::GetKey(eKeyCode::D))
+            {
+                isStepCompleted = true;
+              
+            }
+        }
+        else if (currentTutorialStep == L"대쉬")
+        {
+            // 대쉬 키 (예: Shift) 입력 확인
+            if (Input::GetKeyDown(eKeyCode::SPACE))
+            {
+                isStepCompleted = true;
+                
+            }
+        }
+        else if (currentTutorialStep == L"기본공격 연습")
+        {
+            // 아처 소환
+            if (archers.empty())
+            {
+                archers.push_back(new Archer());
+                archers.back()->SetPosition(1000, 600);
+            }
+            // 기본 공격 (예: 마우스 왼쪽 클릭)으로 아처 공격 확인
+            if (Input::GetKeyDown(eKeyCode::LButton))
+            {
+                for (auto* archer : archers)
+                {
+                    if (archer->GetIsDead())
+                    {
+                        isStepCompleted = true;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (currentTutorialStep == L"스킬: 파이어볼 연습")
+        {
+            // 몬스터 소환
+            if (swordmans.empty())
+            {
+                swordmans.push_back(new SwordMan());
+                swordmans.back()->SetPosition(1000, 600);
+            }
+            // 파이어볼 스킬 사용 확인
+            if (Input::GetKeyDown(eKeyCode::Q)) // 예: Q 키로 파이어볼
+            {
+                for (auto* swordMan : swordmans)
+                {
+                    if (swordMan->GetIsDead())
+                    {
+                        isStepCompleted = true;
+                        break;
+                    }
+                }
+
+            }
+        }
+        else if (currentTutorialStep == L"스킬: 파이어드래곤 연습")
+        {
+            // 몬스터 소환
+            if (wizards.empty())
+            {
+                wizards.push_back(new Wizard());
+                wizards.back()->SetPosition(1000, 600);
+            }
+            // 파이어드래곤 스킬 사용 확인
+            if (Input::GetKeyDown(eKeyCode::E)) // 예: E 키로 파이어드래곤
+            {
+                for (auto* wizard : wizards)
+                {
+                    if (wizard->GetIsDead())
+                    {
+                        isStepCompleted = true;
+                        break;
+                    }
+                }
+            }
+        }
+        else if (currentTutorialStep == L"종료 안내")
+        {
+            //포탈 위치 설정
+            portal.SetPosition(1000, 330);
+            // 포탈 근처로 이동 후 F 키 입력 안내
+            RECT playerRect = SceneManager::GetSharedPlayer()->GetRect();
+            RECT portalRect = portal.GetRect();
+            RECT temp;
+            wizards.clear();
+            swordmans.clear();
+            archers.clear();
+            dummies.clear();
+            if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
+            {
+                isStepCompleted = true;
+                SceneManager::LoadScene(L"TitleScene");
+            }
+
+        }
+
+        // 단계 완료 시 다음 단계로
+        if (isStepCompleted && !tutorialQue.empty())
+        {
+            currentTutorialStep = tutorialQue.front();
+            tutorialQue.pop();
+            isStepCompleted = false;
+        }
+        else if (isStepCompleted && tutorialQue.empty())
+        {
+            currentTutorialStep = L"";
+        }
+    }
+
 }
 
 void TutorialStage::Render(HDC hdc)
@@ -452,7 +605,9 @@ void TutorialStage::Render(HDC hdc)
     float cameraY = camera.GetPositionY();
     int viewWidth = 1280;
     int viewHeight = 720;
+    //기타 렌더
 
+    {
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
     HDC portalDC = hdc;
@@ -612,8 +767,6 @@ void TutorialStage::Render(HDC hdc)
 
     UI::Render(hdc);
 
-
-
     //몇 스테이지인지 텍스트 출력
     //텍스트 설정 
     SetTextColor(hdc, RGB(255, 255, 255));
@@ -644,7 +797,69 @@ void TutorialStage::Render(HDC hdc)
         static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
         static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
+    }
 
+    if (!currentTutorialStep.empty())
+    {
+        Gdiplus::Graphics graphics(hdc);
+        graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
+        Gdiplus::FontFamily fontFamily(L"EXO 2");
+        Gdiplus::Font font(&fontFamily, 50, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
+        Gdiplus::SolidBrush brush(Gdiplus::Color(255, 255, 255, 255)); // 알파 값 조정 가능
+
+        // 카메라 변환 행렬 적용
+        Gdiplus::Matrix transform;
+        transform.Translate(-cameraX, -cameraY);
+        graphics.SetTransform(&transform);
+
+        // 플레이어 위치 기준으로 텍스트 위치 설정
+        float baseTextX = player->GetPositionX();
+        float textY = player->GetRect().top - 209.0f; // 플레이어 위로 50픽셀
+
+        // 텍스트 길이 측정을 위한 함수
+        auto renderTextWithOffset = [&](const wchar_t* text) {
+            Gdiplus::RectF layoutRect(0, 0, 0, 0);
+            Gdiplus::RectF boundingBox;
+            graphics.MeasureString(text, -1, &font, layoutRect, &boundingBox);
+            float textWidth = boundingBox.Width;
+            float textX = baseTextX - (textWidth / 2.0f); // 텍스트 길이의 절반만큼 왼쪽으로 이동
+            graphics.DrawString(text, -1, &font, Gdiplus::PointF(textX, textY), &brush);
+            };
+
+        if (currentTutorialStep == L"시작안내")
+        {
+            renderTextWithOffset(L"Press P to Start");
+        }
+        else if (currentTutorialStep == L"움직이기")
+        {
+            renderTextWithOffset(L"Use WASD to Move");
+        }
+        else if (currentTutorialStep == L"대쉬")
+        {
+            renderTextWithOffset(L"Press Space to Dash");
+        }
+        else if (currentTutorialStep == L"기본공격 연습")
+        {
+            renderTextWithOffset(L"Click LMB to Attack");
+        }
+        else if (currentTutorialStep == L"스킬: 파이어볼 연습")
+        {
+            renderTextWithOffset(L"Press Q for Fireball");
+        }
+        else if (currentTutorialStep == L"스킬: 파이어드래곤 연습")
+        {
+            renderTextWithOffset(L"Press E for FireDragon");
+        }
+        else if (currentTutorialStep == L"종료 안내")
+        {
+            renderTextWithOffset(L"Press F at Portal");
+        }
+
+        // 변환 행렬 초기화
+        graphics.ResetTransform();
+    }
+     
+    
 }
 
 

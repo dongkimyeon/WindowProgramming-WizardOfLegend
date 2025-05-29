@@ -15,6 +15,7 @@
 
 void Stage2::Initialize()
 {
+   
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
   
