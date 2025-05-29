@@ -5,7 +5,7 @@
 #include "SoundManager.h"
 
 Arrow::Arrow(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(20)
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(100)
 {
     
     float offsetDistance = 20.0f;

@@ -49,7 +49,9 @@ private:
     std::vector<Player_Skill_FireBall*> playerFireballs;
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
 	std::vector<Dummy*> dummies;
-
+    std::queue<std::wstring> tutorialQue;
+    bool isStepCompleted;
+    std::wstring currentTutorialStep;
     Portal portal;
     Camera camera;
 
