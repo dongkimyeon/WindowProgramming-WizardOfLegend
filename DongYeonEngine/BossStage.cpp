@@ -16,6 +16,7 @@ void BossStage::Initialize()
 {
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
+    portalCreate = false;
  
 }
 
@@ -514,15 +515,18 @@ void BossStage::Update()
         iceBoss.SetHitFlag(false);
     }
 
+    if (iceBoss.GetHp() <= 0) //보스죽으면
+    {
+        portal.SetPosition(1035, 600);
+        SceneManager::SetmIsGameStart(false);
+    }
     RECT temp;
     RECT playerRect = player->GetRect();
     RECT portalRect = portal.GetRect();
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
-        SceneManager::LoadScene(L"BossStage");
-        MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
-        SceneManager::GetSharedPlayer()->SetPosition(1000, 150);
-        SceneManager::GetSharedPlayer()->SetTelporting(true);
+        SceneManager::LoadScene(L"GameClearScene");
+        SceneManager::StartFadeIn();
     }
     //객체간에 충돌처리 밀어내는거
     HandleCollision();

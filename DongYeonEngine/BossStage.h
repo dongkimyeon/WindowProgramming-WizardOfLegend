@@ -59,7 +59,7 @@ private:
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
     std::vector<BossSkill_Spear*> spears;
     std::vector<BossSkill_AquaBall*> aquaBalls;
-
+    bool portalCreate;
     Boss iceBoss;
     Portal portal;
     Camera camera;

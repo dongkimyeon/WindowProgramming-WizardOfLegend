@@ -81,6 +81,8 @@ void UI::Render(HDC hdc)
         SelectObject(hdc, hOldFont);
         DeleteObject(hFont);
 
+
+
         // 알파값이 1.0에 도달하면 씬 전환
         if (alpha >= 1.0f )
         {

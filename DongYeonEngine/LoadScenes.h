@@ -21,8 +21,8 @@ void LoadScenes()
 	SceneManager::CreateScene<GameOverScene>(L"GameOverScene");
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
 
-	MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
-	SceneManager::LoadScene(L"BossStage");
+	//MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
+	SceneManager::LoadScene(L"TitleScene");
 	SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);
 	SoundManager::GetInstance()->Initialize();
 	SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
