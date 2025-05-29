@@ -4,6 +4,7 @@
 #include "Archer.h"
 #include "Arrow.h"
 #include "SceneManager.h"
+#include "SoundManager.h"
 #include "MapManager.h"
 #include "UI.h"
 
@@ -30,6 +31,7 @@ void BossStage::Update()
     Player* player = SceneManager::GetSharedPlayer();
     player->Update(this);
 	iceBoss.Update(*player, this);
+    SoundManager::GetInstance()->Update();
     camera.Update();
     player->SetCameraX(camera.GetPositionX());
     player->SetCameraY(camera.GetPositionY());

@@ -6,6 +6,7 @@
 #include "SceneManager.h"
 #include "MapManager.h"
 #include "UI.h"
+#include "SoundManager.h"
 
 #define MAP_COLS 40
 #define MAP_ROWS 40
@@ -35,6 +36,7 @@ void Stage2::Update()
     camera.Update();
     player->SetCameraX(camera.GetPositionX());
     player->SetCameraY(camera.GetPositionY());
+    SoundManager::GetInstance()->Update();
 
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);
@@ -391,6 +393,9 @@ void Stage2::Update()
         SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"BossStage");
 		MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
+
+        SoundManager::GetInstance()->mPlaySound("Boss", true);
+        
         SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }

@@ -1,27 +1,30 @@
 #include "SoundManager.h"
 
-#define MAX_SE_SOUND 15
-#define MAX_BGM_SOUND 5
+#define MAX_SE_SOUND 20
+#define MAX_BGM_SOUND 10
 
 void SoundManager::Initialize() {
-    FMOD::System_Create(&mSystem);
-    mSystem->init(32, FMOD_INIT_NORMAL, 0);
+    // Create FMOD system
+    FMOD_RESULT result = FMOD::System_Create(&mSystem);
+    if (result != FMOD_OK) return;
+    result = mSystem->init(128, FMOD_INIT_NORMAL, 0);
+    if (result != FMOD_OK) return;
 
-    mBGMChannel = nullptr;
+    // Create channel groups
+    result = mSystem->createChannelGroup("SEGroup", &mSEGroup);
+    if (result != FMOD_OK) return;
+    result = mSystem->createChannelGroup("BGMGroup", &mBGMGroup);
+    if (result != FMOD_OK) return;
 
-    mSystem->createChannelGroup("SEGroup", &mSEGroup);
-    mSystem->createChannelGroup("BGMGroup", &mBGMGroup);
-
+    // Load SE sounds
     mSystem->createSound("resources/Audio/SE/ArcherRelease.wav", FMOD_DEFAULT, 0, &mSE[0]);
     mSoundMap["ArcherRelease"] = mSE[0];
     mSystem->createSound("resources/Audio/SE/ArcherReload.wav", FMOD_DEFAULT, 0, &mSE[1]);
     mSoundMap["ArcherReload"] = mSE[1];
     mSystem->createSound("resources/Audio/SE/ArcherShoot.wav", FMOD_DEFAULT, 0, &mSE[2]);
     mSoundMap["ArcherShoot"] = mSE[2];
-
     mSystem->createSound("resources/Audio/SE/SwordManAttack.wav", FMOD_DEFAULT, 0, &mSE[9]);
     mSoundMap["SwordManAttack"] = mSE[9];
-
     mSystem->createSound("resources/Audio/SE/PlayerFootstep.wav", FMOD_DEFAULT, 0, &mSE[8]);
     mSoundMap["PlayerFootstep"] = mSE[8];
     mSystem->createSound("resources/Audio/SE/Dash.wav", FMOD_DEFAULT, 0, &mSE[3]);
@@ -36,49 +39,115 @@ void SoundManager::Initialize() {
     mSoundMap["FireBlastStart"] = mSE[7];
     mSystem->createSound("resources/Audio/SE/StandardPlayerAttack.wav", FMOD_DEFAULT, 0, &mSE[10]);
     mSoundMap["PlayerAttack"] = mSE[10];
+    mSystem->createSound("resources/Audio/SE/BossBubbleRelease.wav", FMOD_DEFAULT, 0, &mSE[11]);
+    mSoundMap["BossBubbleRelease"] = mSE[11];
+    mSystem->createSound("resources/Audio/SE/BossDash.wav", FMOD_DEFAULT, 0, &mSE[12]);
+    mSoundMap["BossDash"] = mSE[12];
+    mSystem->createSound("resources/Audio/SE/BossAttackStart.wav", FMOD_DEFAULT, 0, &mSE[13]);
+    mSoundMap["BossAttackStart"] = mSE[13];
+    mSystem->createSound("resources/Audio/SE/BossSwordRelease.wav", FMOD_DEFAULT, 0, &mSE[14]);
+    mSoundMap["BossAttackRelease"] = mSE[14];
+    mSystem->createSound("resources/Audio/SE/BossAquaBallStart.wav", FMOD_DEFAULT, 0, &mSE[15]);
+    mSoundMap["BossAquaBallStart"] = mSE[15];
 
+    // Load BGM sounds
+    mSystem->createSound("resources/Audio/BGM/Tutorial_Jazz.wav", FMOD_LOOP_NORMAL, 0, &mBGM[0]);
+    mSoundMap["Tutorial_Jazz"] = mBGM[0];
+    mSystem->createSound("resources/Audio/BGM/Boss.wav", FMOD_LOOP_NORMAL, 0, &mBGM[1]);
+    mSoundMap["Boss"] = mBGM[1];
+    mSystem->createSound("resources/Audio/BGM/Earth.wav", FMOD_LOOP_NORMAL, 0, &mBGM[2]);
+    mSoundMap["Earth"] = mBGM[2];
+    mSystem->createSound("resources/Audio/BGM/TitleScreen.wav", FMOD_LOOP_NORMAL, 0, &mBGM[3]);
+    mSoundMap["TitleScreen"] = mBGM[3];
 
-    mSystem->createSound("resources/Audio/BGM/Tutorial_Jazz.wav", FMOD_LOOP_NORMAL, 0, &mBGM);
-    mSoundMap["Tutorial_Jazz"] = mBGM;
-
-    // Set default volumes for channel groups
+    // Set default volumes
     if (mSEGroup) mSEGroup->setVolume(0.1f);
-    if (mBGMGroup) mBGMGroup->setVolume(0.2f);
+    if (mBGMGroup) mBGMGroup->setVolume(0.05f);
 }
 
 void SoundManager::mPlaySound(const std::string& SoundName, bool loop) {
     auto it = mSoundMap.find(SoundName);
-    if (it != mSoundMap.end()) {
-        FMOD::Sound* sound = it->second;
-        FMOD::Channel* channel = nullptr;
-        FMOD::ChannelGroup* group = (sound == mBGM) ? mBGMGroup : mSEGroup;
+    if (it == mSoundMap.end()) return;
 
-        // BGM 처리
-        if (sound == mBGM) {
-            mSystem->playSound(sound, mBGMGroup, !loop, &mBGMChannel);
+    FMOD::Sound* sound = it->second;
+    FMOD::Channel* channel = nullptr;
+    bool isBGM = false;
+
+    // Check if the sound is a BGM
+    for (int i = 0; i < MAX_BGM_SOUND; i++) {
+        if (sound == mBGM[i]) {
+            isBGM = true;
+            break;
         }
-        // SE 처리
-        else {
-            FMOD_MODE mode = FMOD_DEFAULT;
-            if (loop) mode |= FMOD_LOOP_NORMAL;
-            sound->setMode(mode);
-            mSystem->playSound(sound, mSEGroup, false, &channel); // 항상 새 채널 할당
-            if (channel) {
-                mSEChannels.push_back(channel);
-            }
+    }
+
+    if (isBGM) {
+        if (mBGMChannel) {
+            mBGMChannel->stop();
+            mBGMChannel = nullptr;
         }
+        FMOD_RESULT result = mSystem->playSound(sound, mBGMGroup, !loop, &mBGMChannel);
+        if (result != FMOD_OK) return;
+    }
+    else {
+        FMOD_MODE mode = FMOD_DEFAULT;
+        if (loop) mode |= FMOD_LOOP_NORMAL;
+        sound->setMode(mode);
+        FMOD_RESULT result = mSystem->playSound(sound, mSEGroup, false, &channel);
+        if (result != FMOD_OK) return;
+        if (channel) mSEChannels.push_back(channel);
     }
 }
 
-void SoundManager::Release() {
-    for (int i = 0; i < MAX_SE_SOUND; i++) {
-        if (mSE[i]) mSE[i]->release();
+void SoundManager::Update() {
+    // Clean up finished SE channels
+    for (auto it = mSEChannels.begin(); it != mSEChannels.end();) {
+        bool isPlaying = false;
+        if (*it) {
+            (*it)->isPlaying(&isPlaying);
+            if (!isPlaying) {
+                it = mSEChannels.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
+        else {
+            it = mSEChannels.erase(it);
+        }
     }
-    if (mBGM) mBGM->release();
-    if (mSEGroup) mSEGroup->release();
-    if (mBGMGroup) mBGMGroup->release();
+    // Update FMOD system
+    if (mSystem) mSystem->update();
+}
+
+void SoundManager::Release() {
+    // Release SE sounds
+    for (int i = 0; i < MAX_SE_SOUND; i++) {
+        if (mSE[i]) {
+            mSE[i]->release();
+            mSE[i] = nullptr;
+        }
+    }
+    // Release BGM sounds
+    for (int i = 0; i < MAX_BGM_SOUND; i++) {
+        if (mBGM[i]) {
+            mBGM[i]->release();
+            mBGM[i] = nullptr;
+        }
+    }
+    // Release channel groups
+    if (mSEGroup) {
+        mSEGroup->release();
+        mSEGroup = nullptr;
+    }
+    if (mBGMGroup) {
+        mBGMGroup->release();
+        mBGMGroup = nullptr;
+    }
+    // Release system
     if (mSystem) {
         mSystem->release();
+        mSystem = nullptr;
     }
     mSEChannels.clear();
 }

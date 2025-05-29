@@ -3,6 +3,8 @@
 #include "BossSkill_Spear.h"
 #include "Time.h"
 #include <cmath>
+#include "SoundManager.h"
+
 float detectionRadius = 700.0f;
 int Boss::hp;
 
@@ -138,6 +140,7 @@ void Boss::Update(Player& p, Scene* stage)
                 mCurrenAttackFrame = 0;
                 currentState = 1;
                 mIsAttack = true;
+                SoundManager::GetInstance()->mPlaySound("BossDash", false);
                 // 대쉬 시작 시 플레이어와의 거리 계산
                 dashDistance = distance;
                 dashSpeed = dashDistance / dashDuration; // 플레이어까지의 거리를 0.5초 동안 이동
@@ -185,6 +188,11 @@ void Boss::Update(Player& p, Scene* stage)
             }
             // 공격 이펙트가 활성화된 동안 충돌 감지 및 데미지 처리
             if (mCurrenAttackFrame >= 1 && !mHasAttackedPlayer) {
+
+                if (mCurrenAttackFrame == 1) {
+                    SoundManager::GetInstance()->mPlaySound("BossAttackStart", false);
+                }
+
                 RECT playerRect = p.GetRect();
                 if (CheckCollisionWithRect(playerRect)) {
                     p.TakeDamage(damage);

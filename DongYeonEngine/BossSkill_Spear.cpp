@@ -2,7 +2,7 @@
 #include "Stage1.h"
 #include "Time.h"
 #include <cmath>
-
+#include "SoundManager.h"
 
 BossSkill_Spear::BossSkill_Spear(float x, float y, float dirX, float dirY)
     : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(600.0f), mIsActive(true), damage(0)
@@ -21,6 +21,7 @@ BossSkill_Spear::BossSkill_Spear(float x, float y, float dirX, float dirY)
 
 BossSkill_Spear::~BossSkill_Spear()
 {
+    SoundManager::GetInstance()->mPlaySound("BossAttackRelease", false);
 }
 
 void BossSkill_Spear::Update(Player& player)
@@ -112,6 +113,7 @@ void BossSkill_Spear::ThrowSpear(Player& player, float mX, float mY, Scene* stag
         // Ã¢ Ãß°¡
         stage->AddBossSkillIceSpear(new BossSkill_Spear(startX[i], startY[i], dirX, dirY));
     }
+    SoundManager::GetInstance()->mPlaySound("BossAttackStart", false);
 }
 void BossSkill_Spear::UpdateHitbox()
 {
