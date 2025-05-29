@@ -3,6 +3,7 @@
 #include "MapManager.h"
 #include "Time.h"
 #include "Input.h"
+#include "SoundManager.h"
 
 extern const UINT width;
 extern const UINT height;
@@ -102,7 +103,8 @@ void TitleScene::Update()
             
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"Stage1");
-            
+            SoundManager::GetInstance()->mPlaySound("Earth", true);
+
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
             SceneManager::GetSharedPlayer()->SetPosition(180, 270);
             SceneManager::SetmIsGameStart(true);
@@ -118,6 +120,7 @@ void TitleScene::Update()
         {
             SceneManager::LoadScene(L"TutorialStage");
             MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
+            SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
 			SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
             
         } // Tutorial

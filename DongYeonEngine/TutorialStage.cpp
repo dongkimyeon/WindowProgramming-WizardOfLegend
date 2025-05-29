@@ -5,6 +5,7 @@
 #include "Arrow.h"
 #include "SceneManager.h"
 #include "MapManager.h"
+#include "SoundManager.h"
 #include "UI.h"
 
 #define MAP_COLS 40
@@ -51,6 +52,7 @@ void TutorialStage::Update()
     Player* player = SceneManager::GetSharedPlayer();
     player->Update(this);
     camera.Update();
+    SoundManager::GetInstance()->Update();
     player->SetCameraX(camera.GetPositionX());
     player->SetCameraY(camera.GetPositionY());
     //기타 업데이트 로직
@@ -442,6 +444,7 @@ void TutorialStage::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         SceneManager::LoadScene(L"TitleScene");
+        SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
 		
     }
     //객체간에 충돌처리 밀어내는거

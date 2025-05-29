@@ -1,6 +1,7 @@
     #include "BossSkill_AquaBall.h"
     #include "Stage1.h"
     #include "Time.h"
+    #include "SoundManager.h"
     #include <cmath>
 
 BossSkill_AquaBall::BossSkill_AquaBall(float x, float y, float targetX, float targetY)
@@ -9,6 +10,8 @@ BossSkill_AquaBall::BossSkill_AquaBall(float x, float y, float targetX, float ta
     mTargetIndicatorFrame(0), mAquaBallFrame(0), mExplosionFrame(0),
     mAnimationTimer(0.0f), mIsTargetIndicating(true), mIsFalling(true), mIsExploding(false), mHasEffectHitbox(false)
 {
+
+    SoundManager::GetInstance()->mPlaySound("BossAquaBallStart", false);
 
     // 아쿠아볼 애니메이션 로드
     for (int i = 0; i < 27; ++i) {
@@ -48,6 +51,7 @@ BossSkill_AquaBall::~BossSkill_AquaBall()
     {
         AquaBallExplosionEffectAnimation[i].Destroy();
     }
+    
 }
 
 void BossSkill_AquaBall::Update(Player& player)
@@ -115,7 +119,11 @@ void BossSkill_AquaBall::Update(Player& player)
         if (mAnimationTimer >= 0.05f) {
             mExplosionFrame++;
             mAnimationTimer = 0.0f;
+
+            if(mExplosionFrame == 2) SoundManager::GetInstance()->mPlaySound("BossBubbleRelease", false);
+
             if (mExplosionFrame >= 7) {
+
                 mIsActive = false;
                 return;
             }

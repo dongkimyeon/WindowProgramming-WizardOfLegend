@@ -5,6 +5,7 @@
 #include "Arrow.h"
 #include "SceneManager.h"
 #include "MapManager.h"
+#include "SoundManager.h"
 #include "UI.h"
 
 
@@ -37,6 +38,7 @@ void Stage1::Update()
     camera.Update();
     player->SetCameraX(camera.GetPositionX());
     player->SetCameraY(camera.GetPositionY());
+    SoundManager::GetInstance()->Update();
 
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);

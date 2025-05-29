@@ -25,6 +25,6 @@ void LoadScenes()
 	SceneManager::LoadScene(L"Stage1");
 	SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);
 	SoundManager::GetInstance()->Initialize();
-	SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
+	SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
 	SceneManager::StartFadeIn();
 }
