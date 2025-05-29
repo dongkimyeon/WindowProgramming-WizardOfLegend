@@ -162,6 +162,8 @@ void Boss::Update(Player& p, Scene* stage)
             mSwordY = mY + swordDistance * sin(swordAngle);
         }
         else if (stateTimer < 0.9f) { // 칼 애니메이션 (0.2초, 4프레임)
+            if(mCurrenAttackFrame == 0 && (stateTimer < 0.71f && stateTimer > 0.7f))
+                SoundManager::GetInstance()->mPlaySound("BossAttackStart", false);
             mCurrenAttackFrame = static_cast<int>((stateTimer - 0.7f) / 0.05f) % 4;
             mHasEffectHitbox = true;
             swordAngle = 0.0f;
@@ -188,11 +190,6 @@ void Boss::Update(Player& p, Scene* stage)
             }
             // 공격 이펙트가 활성화된 동안 충돌 감지 및 데미지 처리
             if (mCurrenAttackFrame >= 1 && !mHasAttackedPlayer) {
-
-                if (mCurrenAttackFrame == 1) {
-                    SoundManager::GetInstance()->mPlaySound("BossAttackStart", false);
-                }
-
                 RECT playerRect = p.GetRect();
                 if (CheckCollisionWithRect(playerRect)) {
                     p.TakeDamage(damage);
@@ -236,6 +233,7 @@ void Boss::Update(Player& p, Scene* stage)
                     mHasAttackedPlayer = true;
                 }
             }
+
         }
         else {
             mIsAttack = false;
@@ -246,6 +244,7 @@ void Boss::Update(Player& p, Scene* stage)
             mAttackDirectionY = dirY;
             mHasAttackedPlayer = false;
         }
+
         break;
     }
     case 2:
@@ -254,6 +253,7 @@ void Boss::Update(Player& p, Scene* stage)
             if (stateTimer == 0.0f) { // 대쉬 시작 시 거리 계산
                 dashDistance = distance;
                 dashSpeed = dashDistance / dashDuration;
+                SoundManager::GetInstance()->mPlaySound("BossDash", false);
             }
             mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
             mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
@@ -286,6 +286,7 @@ void Boss::Update(Player& p, Scene* stage)
             if (stateTimer == 0.0f) { // 대쉬 시작 시 거리 계산
                 dashDistance = distance;
                 dashSpeed = dashDistance / dashDuration;
+                SoundManager::GetInstance()->mPlaySound("BossDash", false);
             }
             mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
             mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
@@ -318,7 +319,6 @@ void Boss::Update(Player& p, Scene* stage)
         }
         break;
     }
-
     SetPosition(mX, mY);
 }
 
