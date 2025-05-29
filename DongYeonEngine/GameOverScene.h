@@ -16,5 +16,7 @@ private:
 
     CImage mBackGroundImage;
     CImage mLogoImage;
-
+    float mAlpha;         // 기존 알파값
+    int mAlphaDir;        // 기존 알파 방향
+    float mSineTime;      // 사인파용 시간 누적 변수
 };

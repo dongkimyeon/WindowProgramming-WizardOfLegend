@@ -7,7 +7,7 @@
         : mX(x), mY(y), mTargetX(targetX), mTargetY(targetY + 50.0f), mInitialX(x), mInitialY(y),
         speed(700.0f), mIsActive(true), damage(10), mTime(0.0f), mHeight(200.0f),
         mTargetIndicatorFrame(0), mAquaBallFrame(0), mExplosionFrame(0),
-        mAnimationTimer(0.0f), mIsTargetIndicating(true), mIsFalling(true), mIsExploding(false)
+        mAnimationTimer(0.0f), mIsTargetIndicating(true), mIsFalling(true), mIsExploding(false), mHasEffectHitbox(false)
     {
    
         // 아쿠아볼 애니메이션 로드
@@ -90,6 +90,7 @@
                 if (mAnimationTimer >= 0.05f) 
                 {
                     mAquaBallFrame = (mAquaBallFrame + 1) % 27;
+                    
                     mAnimationTimer = 0.0f;
                 }
             }
@@ -174,7 +175,12 @@
     {
         float playerX = player.GetPositionX();
         float playerY = player.GetPositionY();
-        stage->AddBossSkillAquaBall(new BossSkill_AquaBall(mX, mY, playerX, playerY));
+
+        // 플레이어 주변에 삼각형 형태로 3개의 아쿠아볼 생성
+        float offset = 125.0f; // 플레이어 중심으로부터의 거리
+        stage->AddBossSkillAquaBall(new BossSkill_AquaBall(mX, mY, playerX, playerY)); // 중심
+        stage->AddBossSkillAquaBall(new BossSkill_AquaBall(mX, mY, playerX + offset, playerY + offset)); // 오른쪽 아래
+        stage->AddBossSkillAquaBall(new BossSkill_AquaBall(mX, mY, playerX - offset, playerY + offset)); // 왼쪽 아래
     }
 
     void BossSkill_AquaBall::UpdateHitbox()

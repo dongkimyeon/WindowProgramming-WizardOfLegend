@@ -28,6 +28,7 @@ public:
     void SpawnParticle();
     void UpdateParticles();
 
+
 private:
     // 파티클 구조체
     struct Particle {

@@ -114,6 +114,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         // 폰트 로드
         AddFontResourceEx(L"resources/Font/8bitWonder.ttf", FR_PRIVATE, nullptr);
         AddFontResourceEx(L"resources/Font/Exo2-Bold.ttf", FR_PRIVATE, nullptr);
+        AddFontResourceEx(L"resources/Font/DungGeunMo.ttf", FR_PRIVATE, nullptr);
         break;
     }
     case WM_DESTROY:

@@ -19,7 +19,7 @@ void Stage2::Initialize()
   
     //몬스터 추가
     archers.push_back(new Archer());
-    archers.back()->SetPosition(1800, 1700);
+    archers.back()->SetPosition(1650, 1750);
     //포탈 위치 설정
     portal.SetPosition(1650, 1750);
 }

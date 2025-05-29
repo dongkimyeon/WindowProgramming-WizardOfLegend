@@ -3,8 +3,9 @@
 #include "BossSkill_Spear.h"
 #include "Time.h"
 #include <cmath>
-
+float detectionRadius = 700.0f;
 int Boss::hp;
+
 Boss::Boss()
 {
     mX = 1025.0f;
@@ -107,15 +108,19 @@ void Boss::Update(Player& p, Scene* stage)
     float dirX = distance > 0 ? dx / distance : 0;
     float dirY = distance > 0 ? dy / distance : 0;
 
-    float detectionRadius = 10000.0f;
     playerDetected = (distance < detectionRadius);
 
     // 칼 위치 업데이트
     float swordDistance = 50.0f * mScale;
     float swordAngle = 0.0f;
 
+    // 대쉬 거리 및 속도 계산용 변수
+    static float dashDistance = 0.0f;
+    static float dashSpeed = 0.0f;
+    const float dashDuration = 0.5f; // 대쉬 지속 시간 (0.5초)
+
     switch (currentState) {
-    case 0: // Idle
+    case 0: // 대기 상태
         if (stateTimer >= 1.0f && playerDetected) {
             stateTimer = 0.0f;
             currentState = 5;
@@ -133,14 +138,17 @@ void Boss::Update(Player& p, Scene* stage)
                 mCurrenAttackFrame = 0;
                 currentState = 1;
                 mIsAttack = true;
+                // 대쉬 시작 시 플레이어와의 거리 계산
+                dashDistance = distance;
+                dashSpeed = dashDistance / dashDuration; // 플레이어까지의 거리를 0.5초 동안 이동
             }
         }
         break;
 
-    case 1: // 스킬1: 대쉬 후 검 휘두르기
-        if (stateTimer < 0.5f) { // 대쉬
-            mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
-            mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
+    case 1: // 스킬1: 플레이어 위치로 대쉬 후 검 휘두르기
+        if (stateTimer < dashDuration) { // 대쉬: 플레이어 위치까지 거리에 따라 이동
+            mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
+            mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
             mSwordX = mX + swordDistance * cos(swordAngle);
             mSwordY = mY + swordDistance * sin(swordAngle);
         }
@@ -219,7 +227,6 @@ void Boss::Update(Player& p, Scene* stage)
                     mHasAttackedPlayer = true;
                 }
             }
-        
         }
         else {
             mIsAttack = false;
@@ -231,16 +238,20 @@ void Boss::Update(Player& p, Scene* stage)
         }
         break;
 
-    case 2: // 스킬2
-        if (stateTimer < 0.5f) { // 대쉬
-            mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
-            mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
+    case 2: // 스킬2: 플레이어 위치로 대쉬 후 아쿠아볼
+        if (stateTimer < dashDuration) { // 대쉬: 플레이어 위치까지 거리에 따라 이동
+            if (stateTimer == 0.0f) { // 대쉬 시작 시 거리 계산
+                dashDistance = distance;
+                dashSpeed = dashDistance / dashDuration;
+            }
+            mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
+            mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
         }
         else if (stateTimer < 1.5f) { // 캐스팅 (1.0초)
             mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4;
             if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) {
-                BossSkill_AquaBall* aquaBall = new BossSkill_AquaBall(mX, mY, p.GetPositionX(), p.GetPositionY());
-                aquaBall->ThrowAquaBall(p, mX, mY, stage);
+                BossSkill_AquaBall* spear = new BossSkill_AquaBall(mX, mY, dirX, dirY);
+                spear->ThrowAquaBall(p, mX, mY, stage);
                 mHasAttackedPlayer = true;
             }
         }
@@ -254,12 +265,17 @@ void Boss::Update(Player& p, Scene* stage)
         }
         break;
 
-    case 3: // 스킬3
-        if (stateTimer < 0.5f) { // 대쉬
-            mX += mAttackDirectionX * speed * 4 * Time::DeltaTime();
-            mY += mAttackDirectionY * speed * 4 * Time::DeltaTime();
+    case 3: // 스킬3: 플레이어 위치로 대쉬 후 창
+        if (stateTimer < dashDuration) { // 대쉬: 플레이어 위치까지 거리에 따라 이동
+            if (stateTimer == 0.0f) { // 대쉬 시작 시 거리 계산
+                dashDistance = distance;
+                dashSpeed = dashDistance / dashDuration;
+            }
+            mX += mAttackDirectionX * dashSpeed * Time::DeltaTime();
+            mY += mAttackDirectionY * dashSpeed * Time::DeltaTime();
         }
-        else if (stateTimer < 1.5f) { // 캐스팅 (1.0초)
+        else if (stateTimer < 1.5f) 
+        { 
             mCurrenAttackFrame = static_cast<int>((stateTimer - 0.5f) / 0.25f) % 4;
             if (stateTimer >= 1.25f && mCurrenAttackFrame == 3 && !mHasAttackedPlayer) {
                 BossSkill_Spear* spear = new BossSkill_Spear(mX, mY, dirX, dirY);
@@ -277,7 +293,7 @@ void Boss::Update(Player& p, Scene* stage)
         }
         break;
 
-    case 4: // 긴 Idle
+    case 4: // 긴 대기 상태
         if (stateTimer >= 2.0f) {
             stateTimer = 0.0f;
             currentState = 0;
@@ -296,6 +312,7 @@ void Boss::LateUpdate()
 
 void Boss::Render(HDC hdc, Player& p)
 {
+
     Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
     // 히트박스 디버그 그리기
     if (mHasEffectHitbox)

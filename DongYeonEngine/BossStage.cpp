@@ -783,6 +783,7 @@ void BossStage::HandleCollision()
     for (auto* swordman : swordmans) allObjects.push_back(swordman);
     for (auto* wizard : wizards) allObjects.push_back(wizard);
     for (auto* archer : archers) allObjects.push_back(archer);
+    allObjects.push_back(&iceBoss);
     for (size_t i = 0; i < allObjects.size(); ++i)
     {
         for (size_t j = i + 1; j < allObjects.size(); ++j)
@@ -884,7 +885,12 @@ void BossStage::HandleCollisionMap(int (*map)[40], GameObject& obj)
                         ResolveCollisionMap(wallRect, *archer);
                     }
                 }
+                RECT iceBossRect = iceBoss.GetRect();
+                if (IntersectRect(&intersect, &wallRect, &iceBossRect))
+                {
 
+                    ResolveCollisionMap(wallRect, iceBoss);
+                }
             }
         }
     }

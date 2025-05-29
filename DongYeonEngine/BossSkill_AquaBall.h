@@ -45,6 +45,7 @@ private:
     int mTargetIndicatorFrame;
     int mAquaBallFrame;
     int mExplosionFrame;
+    bool mHasEffectHitbox;
     void UpdateHitbox();
     bool CheckCollisionWithRect(const RECT& rect);
 };

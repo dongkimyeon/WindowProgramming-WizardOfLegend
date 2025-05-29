@@ -42,7 +42,7 @@ void SoundManager::Initialize() {
     mSoundMap["Tutorial_Jazz"] = mBGM;
 
     // Set default volumes for channel groups
-    if (mSEGroup) mSEGroup->setVolume(1.5f);
+    if (mSEGroup) mSEGroup->setVolume(0.1f);
     if (mBGMGroup) mBGMGroup->setVolume(0.2f);
 }
 

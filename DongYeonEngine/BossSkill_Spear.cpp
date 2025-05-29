@@ -5,7 +5,7 @@
 
 
 BossSkill_Spear::BossSkill_Spear(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(700.0f), mIsActive(true), damage(10)
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(600.0f), mIsActive(true), damage(0)
 {
 
     float offsetDistance = 20.0f;
@@ -86,36 +86,33 @@ void BossSkill_Spear::ThrowSpear(Player& player, float mX, float mY, Scene* stag
 {
     float playerX = player.GetPositionX();
     float playerY = player.GetPositionY();
-    float distance = sqrt(pow(mX - playerX, 2) + pow(mY - playerY, 2));
 
-    // 기본 방향 (플레이어를 향하는 방향)
+    // 보스가 플레이어를 향하는 방향 계산
+    float distance = sqrt(pow(mX - playerX, 2) + pow(mY - playerY, 2));
     float baseDirX = (distance > 0.0f) ? (playerX - mX) / distance : 1.0f;
     float baseDirY = (distance > 0.0f) ? (playerY - mY) / distance : 0.0f;
 
-    // 부채꼴 각도 설정 (총 60도, 파이어볼 5개 -> 각 파이어볼 간 15도)
-    const float totalAngle = 90.0f; // 총 각도 (도 단위)
-    const int numFireBalls = 7;
-    const float angleIncrement = totalAngle / (numFireBalls - 1); // 각 파이어볼 간 각도
-    const float startAngle = -totalAngle / 2.0f; // 시작 각도 (중앙에서 -30도)
+    // 보스의 방향에 수직인 벡터 계산 (창 간격을 위해)
+    float perpDirX = -baseDirY; // 방향 벡터에 수직인 벡터 (90도 회전)
+    float perpDirY = baseDirX;
 
-    // 기본 방향의 각도 계산
-    float baseAngle = atan2(baseDirY, baseDirX);
+    // 창 간격 설정: 더 넓은 간격
+    float offset = 60.0f; // 창 간 수직 간격 (기존 30.0f에서 60.0f로 증가)
 
-    // 5개의 파이어볼 생성
-    for (int i = 0; i < numFireBalls; ++i)
-    {
-        // 현재 파이어볼의 각도 (라디안)
-        float currentAngle = baseAngle + (startAngle + i * angleIncrement) * 3.1415926535f / 180.0f;
+    // 창 3개의 시작 위치
+    float startX[3] = { mX, mX + perpDirX * offset, mX - perpDirX * offset };
+    float startY[3] = { mY, mY + perpDirY * offset, mY - perpDirY * offset };
 
-        // 방향 벡터 계산
-        float dirX = cos(currentAngle);
-        float dirY = sin(currentAngle);
+    // 각 창에 대해 플레이어를 향하는 방향 계산
+    for (int i = 0; i < 3; ++i) {
+        float spearDistance = sqrt(pow(startX[i] - playerX, 2) + pow(startY[i] - playerY, 2));
+        float dirX = (spearDistance > 0.0f) ? (playerX - startX[i]) / spearDistance : 1.0f;
+        float dirY = (spearDistance > 0.0f) ? (playerY - startY[i]) / spearDistance : 0.0f;
 
-        // 새 파이어볼 추가
-        stage->AddBossSkillIceSpear(new BossSkill_Spear(mX, mY, dirX, dirY));
+        // 창 추가
+        stage->AddBossSkillIceSpear(new BossSkill_Spear(startX[i], startY[i], dirX, dirY));
     }
 }
-
 void BossSkill_Spear::UpdateHitbox()
 {
     float scale = 1.3f;
