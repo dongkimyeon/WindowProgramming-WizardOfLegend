@@ -88,12 +88,15 @@ void TitleScene::Update()
     ScreenToClient(GetActiveWindow(), &mousePos);
 
     // 버튼 호버 상태 업데이트
+
     mButtonHovered[0] = PtInRect(&mStartButtonRect, mousePos);
     mButtonHovered[1] = PtInRect(&mQuitButtonRect, mousePos);
     mButtonHovered[2] = PtInRect(&mSettingButtonRect, mousePos);
     mButtonHovered[3] = PtInRect(&mTutorialButtonRect, mousePos);
     mButtonHovered[4] = PtInRect(&mCustomStageButtonRect, mousePos);
     mButtonHovered[5] = PtInRect(&mMapToolButtonRect, mousePos);
+
+
 
     // 버튼 클릭 처리
     if (Input::GetKeyDown(eKeyCode::LButton))
@@ -104,28 +107,41 @@ void TitleScene::Update()
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"Stage1");
             SoundManager::GetInstance()->mPlaySound("Earth", true);
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+
 
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
             SceneManager::GetSharedPlayer()->SetPosition(180, 270);
             SceneManager::SetmIsGameStart(true);
 			
+
+
         } // Start
         if (mButtonHovered[1]) 
         {
             PostQuitMessage(0); // Quit
 			
         } // Quit
-        if (mButtonHovered[2]) {} // Settings
+        if (mButtonHovered[2]) {
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+
+        } // Settings
         if (mButtonHovered[3]) 
         {
             SceneManager::LoadScene(L"TutorialStage");
             MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
             SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
 			SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
             
         } // Tutorial
-        if (mButtonHovered[4]) {} // Custom Stage
-        if (mButtonHovered[5]) {} // Map Tool
+        if (mButtonHovered[4]) {
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+
+        } // Custom Stage
+        if (mButtonHovered[5]) {
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+        } // Map Tool
     }
 }
 

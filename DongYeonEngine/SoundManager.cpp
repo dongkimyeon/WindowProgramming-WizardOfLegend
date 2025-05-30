@@ -17,14 +17,22 @@ void SoundManager::Initialize() {
     if (result != FMOD_OK) return;
 
     // Load SE sounds
+    // Archer
     mSystem->createSound("resources/Audio/SE/ArcherRelease.wav", FMOD_DEFAULT, 0, &mSE[0]);
     mSoundMap["ArcherRelease"] = mSE[0];
     mSystem->createSound("resources/Audio/SE/ArcherReload.wav", FMOD_DEFAULT, 0, &mSE[1]);
     mSoundMap["ArcherReload"] = mSE[1];
     mSystem->createSound("resources/Audio/SE/ArcherShoot.wav", FMOD_DEFAULT, 0, &mSE[2]);
     mSoundMap["ArcherShoot"] = mSE[2];
+
+    // SwordMan
     mSystem->createSound("resources/Audio/SE/SwordManAttack.wav", FMOD_DEFAULT, 0, &mSE[9]);
     mSoundMap["SwordManAttack"] = mSE[9];
+
+    // Wizard
+
+
+    // Player
     mSystem->createSound("resources/Audio/SE/PlayerFootstep.wav", FMOD_DEFAULT, 0, &mSE[8]);
     mSoundMap["PlayerFootstep"] = mSE[8];
     mSystem->createSound("resources/Audio/SE/Dash.wav", FMOD_DEFAULT, 0, &mSE[3]);
@@ -39,6 +47,8 @@ void SoundManager::Initialize() {
     mSoundMap["FireBlastStart"] = mSE[7];
     mSystem->createSound("resources/Audio/SE/StandardPlayerAttack.wav", FMOD_DEFAULT, 0, &mSE[10]);
     mSoundMap["PlayerAttack"] = mSE[10];
+
+    // Boss
     mSystem->createSound("resources/Audio/SE/BossBubbleRelease.wav", FMOD_DEFAULT, 0, &mSE[11]);
     mSoundMap["BossBubbleRelease"] = mSE[11];
     mSystem->createSound("resources/Audio/SE/BossDash.wav", FMOD_DEFAULT, 0, &mSE[12]);
@@ -49,6 +59,10 @@ void SoundManager::Initialize() {
     mSoundMap["BossAttackRelease"] = mSE[14];
     mSystem->createSound("resources/Audio/SE/BossAquaBallStart.wav", FMOD_DEFAULT, 0, &mSE[15]);
     mSoundMap["BossAquaBallStart"] = mSE[15];
+
+    //Menu
+    mSystem->createSound("resources/Audio/SE/MenuOpen.wav", FMOD_DEFAULT, 0, &mSE[16]);
+    mSoundMap["MenuOpen"] = mSE[16];
 
     // Load BGM sounds
     mSystem->createSound("resources/Audio/BGM/Tutorial_Jazz.wav", FMOD_LOOP_NORMAL, 0, &mBGM[0]);
