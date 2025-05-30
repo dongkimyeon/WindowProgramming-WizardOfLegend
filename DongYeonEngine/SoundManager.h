@@ -20,7 +20,7 @@ public:
 
 private:
     SoundManager() : mSystem(nullptr), mBGMChannel(nullptr), mSEGroup(nullptr), mBGMGroup(nullptr) {
-        for (int i = 0; i < 20; i++) mSE[i] = nullptr;
+        for (int i = 0; i < 30; i++) mSE[i] = nullptr;
         for (int i = 0; i < 10; i++) mBGM[i] = nullptr;
     }
     ~SoundManager() { Release(); }
@@ -29,7 +29,7 @@ private:
     FMOD::Channel* mBGMChannel;
     FMOD::ChannelGroup* mSEGroup;
     FMOD::ChannelGroup* mBGMGroup;
-    FMOD::Sound* mSE[20];
+    FMOD::Sound* mSE[30];
     FMOD::Sound* mBGM[10];
     std::map<std::string, FMOD::Sound*> mSoundMap;
     std::vector<FMOD::Channel*> mSEChannels;

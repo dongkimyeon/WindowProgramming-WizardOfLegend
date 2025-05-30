@@ -143,6 +143,8 @@ void TitleScene::Update()
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
         } // Map Tool
     }
+
+    SoundManager::GetInstance()->Update();
 }
 
 void TitleScene::LateUpdate()

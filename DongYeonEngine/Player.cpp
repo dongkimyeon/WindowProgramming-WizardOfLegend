@@ -229,6 +229,8 @@ void Player::Update(Scene* stage)
 
             if (mCurrentTeleportFrame >= 8) // 8프레임 후 종료
             {
+                if (mCurrentTeleportFrame == 1) SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
+
                 mIsTeleporting = false; // 애니메이션 종료
                 mCurrentTeleportFrame = 0;
             }

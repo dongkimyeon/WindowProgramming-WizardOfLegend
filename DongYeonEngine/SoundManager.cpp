@@ -60,6 +60,10 @@ void SoundManager::Initialize() {
     mSystem->createSound("resources/Audio/SE/BossAquaBallStart.wav", FMOD_DEFAULT, 0, &mSE[15]);
     mSoundMap["BossAquaBallStart"] = mSE[15];
 
+    // Portal
+    mSystem->createSound("resources/Audio/SE/ExitPortal.wav", FMOD_DEFAULT, 0, &mSE[17]);
+    mSoundMap["ExitPortal"] = mSE[17];
+
     //Menu
     mSystem->createSound("resources/Audio/SE/MenuOpen.wav", FMOD_DEFAULT, 0, &mSE[16]);
     mSoundMap["MenuOpen"] = mSE[16];
