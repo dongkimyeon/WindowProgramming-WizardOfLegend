@@ -28,20 +28,29 @@ void TutorialStage::Initialize()
 	dummies.back()->SetPosition(1000, 760);
 
     //튜토리얼 메세지큐
+    //시작안내
     tutorialQue.push(L"시작안내");
-
+    tutorialQue.push(L"완료 메시지");
+    //움직이기
     tutorialQue.push(L"움직이기");
-
+    tutorialQue.push(L"완료 메시지");
+    //대쉬
     tutorialQue.push(L"대쉬");
-    //아처소환
+    tutorialQue.push(L"잘하셨습니다.");
+    //기본공격
     tutorialQue.push(L"기본공격 연습");
-    //몬스터 소환
+    tutorialQue.push(L"완료 메시지");
+    //스킬1 파이어볼
     tutorialQue.push(L"스킬: 파이어볼 연습");
-    //몬스터 소환
+    tutorialQue.push(L"완료 메시지");
+    //스킬2 파이어 드래곤
     tutorialQue.push(L"스킬: 파이어드래곤 연습");
-    //몬스터소환
+    tutorialQue.push(L"완료 메시지");
+    //종료
     tutorialQue.push(L"종료 안내");
-
+    // 페이드 효과를 위한 변수 초기화
+    completionMessageTimer = 0.0f;
+    completionMessageAlpha = 255.0f;
 }
 
 void TutorialStage::LateUpdate()
@@ -458,14 +467,16 @@ void TutorialStage::Update()
 
 
     // 튜토리얼 로직
-    // 튜토리얼 중간 수정 결과
-    isStepCompleted = false;
-    currentTutorialStep = L"";
-
+    
     if (currentTutorialStep.empty() && !tutorialQue.empty())
     {
         currentTutorialStep = tutorialQue.front();
-        
+        if (currentTutorialStep == L"완료 메시지")
+        {
+            completionMessageTimer = 0.0f;
+            completionMessageAlpha = 255.0f;
+           
+        }
         isStepCompleted = false;
     }
 
@@ -473,41 +484,33 @@ void TutorialStage::Update()
     {
         if (currentTutorialStep == L"시작안내")
         {
-            // 플레이어에게 튜토리얼 시작 메시지 표시 (UI로 렌더링)
-            if (Input::GetKeyDown(eKeyCode::P)) // P키 입력확인
+            if (Input::GetKeyDown(eKeyCode::P))
             {
                 isStepCompleted = true;
-               
             }
         }
         else if (currentTutorialStep == L"움직이기")
         {
-            // WASD 키로 움직이는지 확인
             if (Input::GetKey(eKeyCode::W) || Input::GetKey(eKeyCode::A) ||
                 Input::GetKey(eKeyCode::S) || Input::GetKey(eKeyCode::D))
             {
                 isStepCompleted = true;
-              
             }
         }
         else if (currentTutorialStep == L"대쉬")
         {
-            // 대쉬 키 (예: Shift) 입력 확인
             if (Input::GetKeyDown(eKeyCode::SPACE))
             {
                 isStepCompleted = true;
-                
             }
         }
         else if (currentTutorialStep == L"기본공격 연습")
         {
-            // 아처 소환
             if (archers.empty())
             {
                 archers.push_back(new Archer());
                 archers.back()->SetPosition(1000, 600);
             }
-            // 기본 공격 (예: 마우스 왼쪽 클릭)으로 아처 공격 확인
             if (Input::GetKeyDown(eKeyCode::LButton))
             {
                 for (auto* archer : archers)
@@ -522,36 +525,31 @@ void TutorialStage::Update()
         }
         else if (currentTutorialStep == L"스킬: 파이어볼 연습")
         {
-            // 몬스터 소환
             if (swordmans.empty())
             {
                 swordmans.push_back(new SwordMan());
                 swordmans.back()->SetPosition(1000, 600);
             }
-            // 파이어볼 스킬 사용 확인
-            if (Input::GetKeyDown(eKeyCode::Q)) // 예: Q 키로 파이어볼
+            if (Input::GetKeyDown(eKeyCode::Q))
             {
-                for (auto* swordMan : swordmans)
+                for (auto* swordman : swordmans)
                 {
-                    if (swordMan->GetIsDead())
+                    if (swordman->GetIsDead())
                     {
                         isStepCompleted = true;
                         break;
                     }
                 }
-
             }
         }
         else if (currentTutorialStep == L"스킬: 파이어드래곤 연습")
         {
-            // 몬스터 소환
             if (wizards.empty())
             {
                 wizards.push_back(new Wizard());
                 wizards.back()->SetPosition(1000, 600);
             }
-            // 파이어드래곤 스킬 사용 확인
-            if (Input::GetKeyDown(eKeyCode::E)) // 예: E 키로 파이어드래곤
+            if (Input::GetKeyDown(eKeyCode::E))
             {
                 for (auto* wizard : wizards)
                 {
@@ -565,9 +563,7 @@ void TutorialStage::Update()
         }
         else if (currentTutorialStep == L"종료 안내")
         {
-            //포탈 위치 설정
             portal.SetPosition(1000, 330);
-            // 포탈 근처로 이동 후 F 키 입력 안내
             RECT playerRect = SceneManager::GetSharedPlayer()->GetRect();
             RECT portalRect = portal.GetRect();
             RECT temp;
@@ -580,19 +576,30 @@ void TutorialStage::Update()
                 isStepCompleted = true;
                 SceneManager::LoadScene(L"TitleScene");
             }
-
+        }
+        else if (currentTutorialStep == L"완료 메시지")
+        {
+            // 페이드 아웃 처리
+            completionMessageTimer += Time::DeltaTime();
+            completionMessageAlpha = 255.0f * (1.0f - completionMessageTimer / 1.0f);
+            if (completionMessageTimer >= 1.0f || completionMessageAlpha <= 0.0f)
+            {
+                isStepCompleted = true;
+                completionMessageAlpha = 0.0f; // 알파값을 0으로 고정
+            }
         }
 
         // 단계 완료 시 다음 단계로
         if (isStepCompleted && !tutorialQue.empty())
         {
-            currentTutorialStep = tutorialQue.front();
             tutorialQue.pop();
+            if (currentTutorialStep == L"완료 메시지")
+            {
+                completionMessageTimer = 0.0f;
+                completionMessageAlpha = 255.0f;
+            }
+           
             isStepCompleted = false;
-        }
-        else if (isStepCompleted && tutorialQue.empty())
-        {
-            currentTutorialStep = L"";
         }
     }
 
@@ -800,13 +807,14 @@ void TutorialStage::Render(HDC hdc)
         static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
     }
 
+    // 튜토리얼 텍스트 렌더링
     if (!currentTutorialStep.empty())
     {
         Gdiplus::Graphics graphics(hdc);
         graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
         Gdiplus::FontFamily fontFamily(L"EXO 2");
         Gdiplus::Font font(&fontFamily, 50, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
-        Gdiplus::SolidBrush brush(Gdiplus::Color(255, 255, 255, 255)); // 알파 값 조정 가능
+        Gdiplus::SolidBrush brush(Gdiplus::Color(static_cast<BYTE>(currentTutorialStep == L"완료 메시지" ? completionMessageAlpha : 255), 255, 255, 255));
 
         // 카메라 변환 행렬 적용
         Gdiplus::Matrix transform;
@@ -815,7 +823,7 @@ void TutorialStage::Render(HDC hdc)
 
         // 플레이어 위치 기준으로 텍스트 위치 설정
         float baseTextX = player->GetPositionX();
-        float textY = player->GetRect().top - 209.0f; // 플레이어 위로 50픽셀
+        float textY = player->GetRect().top - 209.0f;
 
         // 텍스트 길이 측정을 위한 함수
         auto renderTextWithOffset = [&](const wchar_t* text) {
@@ -823,43 +831,45 @@ void TutorialStage::Render(HDC hdc)
             Gdiplus::RectF boundingBox;
             graphics.MeasureString(text, -1, &font, layoutRect, &boundingBox);
             float textWidth = boundingBox.Width;
-            float textX = baseTextX - (textWidth / 2.0f); // 텍스트 길이의 절반만큼 왼쪽으로 이동
+            float textX = baseTextX - (textWidth / 2.0f);
             graphics.DrawString(text, -1, &font, Gdiplus::PointF(textX, textY), &brush);
             };
 
         if (currentTutorialStep == L"시작안내")
         {
-            renderTextWithOffset(L"Press P to Start");
+            renderTextWithOffset(L"P키를 눌러 튜토리얼을 시작하세요.");
         }
         else if (currentTutorialStep == L"움직이기")
         {
-            renderTextWithOffset(L"Use WASD to Move");
+            renderTextWithOffset(L"WASD를 사용해 움직일 수 있습니다.");
         }
         else if (currentTutorialStep == L"대쉬")
         {
-            renderTextWithOffset(L"Press Space to Dash");
+            renderTextWithOffset(L"스페이스바를 눌러 대쉬할 수 있습니다.");
         }
         else if (currentTutorialStep == L"기본공격 연습")
         {
-            renderTextWithOffset(L"Click LMB to Attack");
+            renderTextWithOffset(L"좌클릭으로 기본공격을 할 수 있습니다.");
         }
         else if (currentTutorialStep == L"스킬: 파이어볼 연습")
         {
-            renderTextWithOffset(L"Press Q for Fireball");
+            renderTextWithOffset(L"Q키를 눌러 파이어볼을 사용할 수 있습니다.");
         }
         else if (currentTutorialStep == L"스킬: 파이어드래곤 연습")
         {
-            renderTextWithOffset(L"Press E for FireDragon");
+            renderTextWithOffset(L"E키를 눌러 파이어드래곤을 사용할 수 있습니다.");
         }
         else if (currentTutorialStep == L"종료 안내")
         {
-            renderTextWithOffset(L"Press F at Portal");
+            renderTextWithOffset(L"F키를 눌러 포탈을 타세요.");
+        }
+        else if (currentTutorialStep == L"완료 메시지")
+        {
+            renderTextWithOffset(L"잘하셨습니다.");
         }
 
-        // 변환 행렬 초기화
         graphics.ResetTransform();
     }
-     
     
 }
 
