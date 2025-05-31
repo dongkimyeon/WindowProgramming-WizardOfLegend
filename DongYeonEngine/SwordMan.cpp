@@ -124,6 +124,34 @@ SwordMan::SwordMan()
 
 SwordMan::~SwordMan()
 {
+    // Destroy single CImage objects
+    mRightIdleAnimation.Destroy();
+    mLeftIdleAnimation.Destroy();
+
+    // Destroy CImage arrays
+    for (int i = 0; i < 3; ++i)
+    {
+        mRightAttackAnimation[i].Destroy();
+        mLeftAttackAnimation[i].Destroy();
+    }
+    for (int i = 0; i < 6; ++i)
+    {
+        mRightDieAnimaion[i].Destroy();
+        mLeftDieAnimaion[i].Destroy();
+        mRightWalkAnimation[i].Destroy();
+        mLeftWalkAnimation[i].Destroy();
+    }
+    for (int i = 0; i < 2; ++i)
+    {
+        mRightHitAnimation[i].Destroy();
+        mLeftHitAnimation[i].Destroy();
+    }
+    for (int i = 0; i < 4; ++i)
+    {
+        mAttackEffectAnimation[i].Destroy();
+        mHitEffectAnimation[i].Destroy();
+    }
+
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
@@ -131,7 +159,7 @@ void SwordMan::Update(Player& p)
 {
     // rect 업데이트
     int imageWidth = mRightIdleAnimation.GetWidth();
-    int imageHeight = mRightIdleAnimation.GetHeight();
+    int imageHeight = mRightIdleAnimation.GetHeight(); 
     rect.left = static_cast<int>(mX - imageWidth / 2.0f) + 45;
     rect.top = static_cast<int>(mY - imageHeight / 2.0f) + 45;
     rect.right = static_cast<int>(mX + imageWidth / 2.0f) - 45;

@@ -19,6 +19,11 @@ void Stage2::Initialize()
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
   
+   
+}
+
+void Stage2::ObjectInitialize()
+{
     //몬스터 추가
     archers.push_back(new Archer());
     archers.back()->SetPosition(1650, 1750);

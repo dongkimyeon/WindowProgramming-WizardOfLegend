@@ -26,6 +26,10 @@ void BossStage::LateUpdate()
 
 }
 
+void BossStage::ObjectInitialize()
+{
+    iceBoss.Init();
+}
 void BossStage::Update()
 {
     Player* player = SceneManager::GetSharedPlayer();

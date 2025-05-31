@@ -17,6 +17,7 @@ class Stage2 : public Scene
 public:
   
     void Initialize() override;
+    void ObjectInitialize() override;
     void Update() override;
     void LateUpdate() override;
     void Render(HDC hdc) override;

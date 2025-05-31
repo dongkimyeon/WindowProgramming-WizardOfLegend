@@ -23,6 +23,7 @@ Arrow::Arrow(float x, float y, float dirX, float dirY)
 Arrow::~Arrow()
 {
     SoundManager::GetInstance()->mPlaySound("ArcherRelease", false);
+    mArrowImage.Destroy();
 }
 
 void Arrow::Update(Player& player)

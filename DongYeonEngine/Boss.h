@@ -9,6 +9,7 @@ class Boss : public GameObject
 public:
     Boss();
     ~Boss();
+    void Init();
     static Boss* GetInstance()
     {
         static Boss instance;

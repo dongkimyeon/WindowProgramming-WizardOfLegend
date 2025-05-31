@@ -46,6 +46,7 @@ Scene* SceneManager::LoadScene(const std::wstring& name)
         return nullptr;
 
     mActiveScene = iter->second;
+    mActiveScene->ObjectInitialize();
     return iter->second;
 }
 

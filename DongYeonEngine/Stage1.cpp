@@ -17,8 +17,11 @@
 void Stage1::Initialize()
 {
     UI::Initialize();
-    camera.Update();
     camera.SetTarget(SceneManager::GetSharedPlayer());
+  
+}
+void Stage1::ObjectInitialize()
+{
     //몬스터 추가
     archers.push_back(new Archer());
     archers.back()->SetPosition(200, 270);
@@ -30,7 +33,6 @@ void Stage1::Initialize()
     // portal room
     portal.SetPosition(1830, 1720);
 }
-
 void Stage1::Update()
 {
     Player* player = SceneManager::GetSharedPlayer();

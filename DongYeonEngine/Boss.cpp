@@ -71,7 +71,32 @@ Boss::Boss()
 }
 
 Boss::~Boss() {}
+void Boss::Init()
+{
+    mX = 1025.0f;
+    mY = 600.0f;
+    hp = 100;
+    damage = 20;
+    speed = 100.0f;
+    mScale = 1.6f;
+    mSwordX = mX + 50.0f * mScale;
+    mSwordY = mY;
+    mHitTimer = 0.0f;
+    mHasEffectHitbox = false;
+    mHasAttackedPlayer = false;
+    mHasBeenHit = false;
 
+    mDamageTaken = 0;
+    mDamageTextY = mY;
+    mDamageTextSpeed = 50.0f;
+
+    mIsDead = false;
+    mIsHit = false;
+    mIsAttack = false;
+    mShowDamage = false;
+    rect = { (int)(mX - 20), (int)(mY - 35), (int)(mX + 20), (int)(mY + 40) };
+
+}
 void Boss::Update(Player& p, Scene* stage)
 {
     if (mIsDead) {

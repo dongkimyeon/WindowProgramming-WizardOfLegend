@@ -114,6 +114,34 @@ Archer::Archer()
 
 Archer::~Archer()
 {
+    // Destroy single CImage objects
+    mRightIdleAnimation.Destroy();
+    mLeftIdleAnimation.Destroy();
+
+    // Destroy CImage arrays
+    for (int i = 0; i < 4; ++i)
+    {
+        mRightAttackAnimation[i].Destroy();
+        mLeftAttackAnimation[i].Destroy();
+        mBowAttackAnimation[i].Destroy();
+        mHitEffectAnimation[i].Destroy();
+    }
+    for (int i = 0; i < 6; ++i)
+    {
+        mRightDieAnimaion[i].Destroy();
+        mLeftDieAnimaion[i].Destroy();
+    }
+    for (int i = 0; i < 2; ++i)
+    {
+        mRightHitAnimation[i].Destroy();
+        mLeftHitAnimation[i].Destroy();
+    }
+    for (int i = 0; i < 5; ++i)
+    {
+        mRightWalkAnimation[i].Destroy();
+        mLeftWalkAnimation[i].Destroy();
+    }
+
     Gdiplus::GdiplusShutdown(gdiplusToken);
 }
 
