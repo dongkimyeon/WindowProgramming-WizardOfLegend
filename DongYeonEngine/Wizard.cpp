@@ -13,7 +13,7 @@ Wizard::Wizard()
     rect = { (int)(mX - 22), (int)(mY - 38), (int)(mX + 20), (int)(mY + 38) };
     speed = 100.0f;
     state = EnemyState::RIGHT;
-    hp = 100;
+    hp = 150;
     damage = 10;
     mIsMoving = false;
     mCurrentWalkFrame = 0;

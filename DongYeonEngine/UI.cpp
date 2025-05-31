@@ -117,7 +117,7 @@ void UI::Render(HDC hdc)
             DeleteObject(hFont);
 
             
-            float bossHpRatio = static_cast<float>(boss->GetHp()) / 1000;
+            float bossHpRatio = static_cast<float>(boss->GetHp()) / 500;
             int bossHpBarWidth = static_cast<int>(UI_BOSS_HPBAR.GetWidth() * bossHpRatio);
             if (bossHpBarWidth > 0) {
                 int srcX = UI_BOSS_HPBAR.GetWidth() - bossHpBarWidth; // Start from right
@@ -133,7 +133,7 @@ void UI::Render(HDC hdc)
 
     UI_PLAYERBAR.Draw(hdc, 0, 0);
     // HP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
-    float hpRatio = static_cast<float>(player->GetHp()) / 100;
+    float hpRatio = static_cast<float>(player->GetHp()) / 300;
     int hpBarWidth = static_cast<int>(UI_HPBAR.GetWidth() * hpRatio);
     if (hpBarWidth > 0) {
         int srcX = UI_HPBAR.GetWidth() - hpBarWidth; // 오른쪽에서 시작

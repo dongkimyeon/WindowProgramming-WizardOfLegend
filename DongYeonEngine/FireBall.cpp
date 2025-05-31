@@ -4,7 +4,7 @@
 #include <cmath>
 
 FireBall::FireBall(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(400.0f), mIsActive(true), damage(10),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(400.0f), mIsActive(true), damage(25),
 	mCurrentFrame(0), mAnimationTimer(0.0f)
 {
     for (int i = 0; i < 6; ++i)

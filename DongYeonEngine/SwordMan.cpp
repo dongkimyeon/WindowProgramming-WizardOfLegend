@@ -29,8 +29,8 @@ SwordMan::SwordMan()
     mAttackDirectionY = 0.0f;
     mHasEffectHitbox = false;
     mHasAttackedPlayer = false;
-    hp = 100;
-    damage = 20;
+    hp = 200;
+    damage = 25;
     for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
 
     // 데미지 표시 변수 초기화

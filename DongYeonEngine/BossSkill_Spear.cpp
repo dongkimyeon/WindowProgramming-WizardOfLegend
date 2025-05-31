@@ -5,7 +5,7 @@
 #include "SoundManager.h"
 
 BossSkill_Spear::BossSkill_Spear(float x, float y, float dirX, float dirY)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(600.0f), mIsActive(true), damage(0)
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(600.0f), mIsActive(true), damage(25)
 {
 
     float offsetDistance = 20.0f;

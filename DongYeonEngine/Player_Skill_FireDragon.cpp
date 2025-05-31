@@ -7,7 +7,7 @@
 #include "SoundManager.h"
 
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(10),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(8),
     mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
     mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.05f),
     mFrameDuration(0.1f)

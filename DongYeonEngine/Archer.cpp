@@ -13,7 +13,7 @@ Archer::Archer()
     rect = { (int)(mX - 20), (int)(mY + 200), (int)(mX + 20), (int)(mY + 20) };
     speed = 100.0f;
     state = EnemyState::RIGHT;
-    hp = 100;
+    hp = 125;
     mIsMoving = false;
     mCurrentWalkFrame = 0;
     mIsAttack = false;
