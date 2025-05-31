@@ -452,6 +452,7 @@ void TutorialStage::Update()
     RECT portalRect = portal.GetRect();
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
+        SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
         SceneManager::LoadScene(L"TitleScene");
         SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
 		

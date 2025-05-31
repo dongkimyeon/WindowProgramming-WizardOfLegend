@@ -437,6 +437,7 @@ void Archer::TakeDamage(int d)
     mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
 
     if (hp <= 0) {
+        SoundManager::GetInstance()->mPlaySound("EnemyDead", false);
         hp = 0;
         mIsDead = true;
         mIsHit = false;
@@ -447,6 +448,7 @@ void Archer::TakeDamage(int d)
         SceneManager::GetSharedPlayer()->PlusKillCount();
     }
     else {
+        SoundManager::GetInstance()->mPlaySound("Hit", false);
         mIsHit = true;
         mHitTimer = 0.2f; // 피격 애니메이션 0.2초
         mCurrentHitFrame = 0;

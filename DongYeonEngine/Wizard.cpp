@@ -2,6 +2,8 @@
 #include "Time.h"
 #include "FireBall.h"
 #include "SceneManager.h"
+#include "SoundManager.h"
+
 Wizard::Wizard()
 {
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
@@ -188,6 +190,7 @@ void Wizard::Update(Player& p, Scene* stage)
             mCurrenAttackFrame++;
             if (mCurrenAttackFrame >= 4)
             {
+                SoundManager::GetInstance()->mPlaySound("EnemyFireBall", false);
                 mIsAttack = false;
                 mCurrenAttackFrame = 0;
                 mAttackCooldown = 3.0f;
@@ -397,6 +400,7 @@ void Wizard::TakeDamage(int d)
     mDamageTextY = mY - 50; // 초기 텍스트 위치 (캐릭터 위쪽)
     mHitEffectAngle = static_cast<float>(rand()) / RAND_MAX * 2.0f * 3.14159f;
     if (hp <= 0) {
+        SoundManager::GetInstance()->mPlaySound("EnemyDead", false);
         hp = 0;
         mIsDead = true;
         mIsHit = false;
@@ -407,6 +411,7 @@ void Wizard::TakeDamage(int d)
         SceneManager::GetSharedPlayer()->PlusKillCount();
     }
     else {
+        SoundManager::GetInstance()->mPlaySound("Hit", false);
         mIsHit = true;
         mHitTimer = 0.2f; // 피격 애니메이션 0.2초
         mCurrentHitFrame = 0;

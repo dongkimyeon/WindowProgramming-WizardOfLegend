@@ -183,6 +183,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Stage2.h" />
+    <ClInclude Include="StageCustom.h" />
     <ClInclude Include="SwordMan.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Time.h" />
@@ -220,6 +221,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Stage2.cpp" />
+    <ClCompile Include="StageCustom.cpp" />
     <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Time.cpp" />

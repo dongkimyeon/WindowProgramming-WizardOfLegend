@@ -1,5 +1,6 @@
 #include "Dummy.h"
 #include "Time.h"
+#include "SoundManager.h"
 
 Dummy::Dummy()
 {
@@ -64,6 +65,7 @@ void Dummy::Render(HDC hdc, Player& p)
 
 void Dummy::TakeDamage(int d)
 {
+    SoundManager::GetInstance()->mPlaySound("Hit", false);
     mDamageTaken = d; // 데미지 값 저장
     mShowDamage = true; // 데미지 텍스트 표시 활성화
     mDamageTextY = mY - 50; // 텍스트 초기 위치 (더미 위쪽)

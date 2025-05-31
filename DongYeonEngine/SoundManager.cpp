@@ -17,6 +17,12 @@ void SoundManager::Initialize() {
     if (result != FMOD_OK) return;
 
     // Load SE sounds
+    // Enemy
+    mSystem->createSound("resources/Audio/SE/Hit.wav", FMOD_DEFAULT, 0, &mSE[19]);
+    mSoundMap["Hit"] = mSE[19];
+    mSystem->createSound("resources/Audio/SE/EnemyDead.wav", FMOD_DEFAULT, 0, &mSE[20]);
+    mSoundMap["EnemyDead"] = mSE[20];
+
     // Archer
     mSystem->createSound("resources/Audio/SE/ArcherRelease.wav", FMOD_DEFAULT, 0, &mSE[0]);
     mSoundMap["ArcherRelease"] = mSE[0];
@@ -30,7 +36,8 @@ void SoundManager::Initialize() {
     mSoundMap["SwordManAttack"] = mSE[9];
 
     // Wizard
-
+    mSystem->createSound("resources/Audio/SE/EnemyFireBall.wav", FMOD_DEFAULT, 0, &mSE[18]);
+    mSoundMap["EnemyFireBall"] = mSE[18];
 
     // Player
     mSystem->createSound("resources/Audio/SE/PlayerFootstep.wav", FMOD_DEFAULT, 0, &mSE[8]);
@@ -77,6 +84,11 @@ void SoundManager::Initialize() {
     mSoundMap["Earth"] = mBGM[2];
     mSystem->createSound("resources/Audio/BGM/TitleScreen.wav", FMOD_LOOP_NORMAL, 0, &mBGM[3]);
     mSoundMap["TitleScreen"] = mBGM[3];
+    mSystem->createSound("resources/Audio/BGM/EndScene.wav", FMOD_LOOP_NORMAL, 0, &mBGM[4]);
+    mSoundMap["EndScene"] = mBGM[4];
+    mSystem->createSound("resources/Audio/BGM/GameOver.wav", FMOD_LOOP_NORMAL, 0, &mBGM[5]);
+    mSoundMap["GameOver"] = mBGM[5];
+
 
     // Set default volumes
     if (mSEGroup) mSEGroup->setVolume(0.1f);

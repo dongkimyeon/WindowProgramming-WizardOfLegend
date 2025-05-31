@@ -229,8 +229,6 @@ void Player::Update(Scene* stage)
 
             if (mCurrentTeleportFrame >= 8) // 8프레임 후 종료
             {
-                if (mCurrentTeleportFrame == 1) SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
-
                 mIsTeleporting = false; // 애니메이션 종료
                 mCurrentTeleportFrame = 0;
             }
@@ -745,6 +743,7 @@ void Player::TakeDamage(int d)
         mCurrentDieFrame = 0;
     }
     else {
+        SoundManager::GetInstance()->mPlaySound("Hit", false);
         mIsHit = true;
         mHitTimer = 0.2f;
         mCurrentHitFrame = 0;
