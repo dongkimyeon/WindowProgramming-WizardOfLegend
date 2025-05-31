@@ -15,42 +15,31 @@
 
 void TutorialStage::Initialize()
 {
-    //카메라 설정
+    // 카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
 
-    //플레이어 위치 초기화
+    // 플레이어 위치 초기화
     SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
 
-   
+    // 몬스터 추가
+    dummies.push_back(new Dummy());
+    dummies.back()->SetPosition(1000, 760);
 
-    //몬스터 추가
-	dummies.push_back(new Dummy());
-	dummies.back()->SetPosition(1000, 760);
-
-    //튜토리얼 메세지큐
-    //시작안내
+    // 튜토리얼 메세지 큐 (완료 메시지 제외)
     tutorialQue.push(L"시작안내");
-    tutorialQue.push(L"완료 메시지");
-    //움직이기
     tutorialQue.push(L"움직이기");
-    tutorialQue.push(L"완료 메시지");
-    //대쉬
     tutorialQue.push(L"대쉬");
-    tutorialQue.push(L"잘하셨습니다.");
-    //기본공격
     tutorialQue.push(L"기본공격 연습");
-    tutorialQue.push(L"완료 메시지");
-    //스킬1 파이어볼
     tutorialQue.push(L"스킬: 파이어볼 연습");
-    tutorialQue.push(L"완료 메시지");
-    //스킬2 파이어 드래곤
     tutorialQue.push(L"스킬: 파이어드래곤 연습");
-    tutorialQue.push(L"완료 메시지");
-    //종료
     tutorialQue.push(L"종료 안내");
-    // 페이드 효과를 위한 변수 초기화
+
+    // 초기화
+    isStepCompleted = false;
+    isShowingCompletion = false;
     completionMessageTimer = 0.0f;
     completionMessageAlpha = 255.0f;
+    currentTutorialStep = L"";
 }
 
 void TutorialStage::LateUpdate()
@@ -468,22 +457,36 @@ void TutorialStage::Update()
 
 
     // 튜토리얼 로직
-    
     if (currentTutorialStep.empty() && !tutorialQue.empty())
     {
         currentTutorialStep = tutorialQue.front();
-        if (currentTutorialStep == L"완료 메시지")
-        {
-            completionMessageTimer = 0.0f;
-            completionMessageAlpha = 255.0f;
-           
-        }
+        tutorialQue.pop();
         isStepCompleted = false;
+        isShowingCompletion = false;
+        completionMessageTimer = 0.0f;
+        completionMessageAlpha = 255.0f;
     }
 
     if (!currentTutorialStep.empty())
     {
-        if (currentTutorialStep == L"시작안내")
+        // 완료 메시지 표시 중일 때
+        if (isShowingCompletion)
+        {
+            completionMessageTimer += Time::DeltaTime();
+            completionMessageAlpha = 255.0f * (1.0f - completionMessageTimer / 1.0f); // 1초간 페이드 아웃
+            if (completionMessageAlpha <= 0.0f)
+            {
+                completionMessageAlpha = 0.0f;
+                isShowingCompletion = false;
+                currentTutorialStep = tutorialQue.empty() ? L"" : tutorialQue.front();
+                if (!tutorialQue.empty()) tutorialQue.pop();
+                isStepCompleted = false;
+                completionMessageTimer = 0.0f;
+                completionMessageAlpha = 255.0f;
+            }
+        }
+        // 튜토리얼 단계 처리
+        else if (currentTutorialStep == L"시작안내")
         {
             if (Input::GetKeyDown(eKeyCode::P))
             {
@@ -492,11 +495,14 @@ void TutorialStage::Update()
         }
         else if (currentTutorialStep == L"움직이기")
         {
-            if (Input::GetKey(eKeyCode::W) || Input::GetKey(eKeyCode::A) ||
-                Input::GetKey(eKeyCode::S) || Input::GetKey(eKeyCode::D))
+            TutorialMoveTimer += Time::DeltaTime();
+            if (TutorialMoveTimer >= 5.0f)
             {
                 isStepCompleted = true;
+                TutorialMoveTimer = 0;
             }
+         
+            
         }
         else if (currentTutorialStep == L"대쉬")
         {
@@ -512,17 +518,16 @@ void TutorialStage::Update()
                 archers.push_back(new Archer());
                 archers.back()->SetPosition(1000, 600);
             }
-            if (Input::GetKeyDown(eKeyCode::LButton))
+           
+            for (auto* archer : archers)
             {
-                for (auto* archer : archers)
+                if (archer->GetIsDead())
                 {
-                    if (archer->GetIsDead())
-                    {
-                        isStepCompleted = true;
-                        break;
-                    }
+                    isStepCompleted = true;
+                    break;
                 }
             }
+            
         }
         else if (currentTutorialStep == L"스킬: 파이어볼 연습")
         {
@@ -531,17 +536,16 @@ void TutorialStage::Update()
                 swordmans.push_back(new SwordMan());
                 swordmans.back()->SetPosition(1000, 600);
             }
-            if (Input::GetKeyDown(eKeyCode::Q))
+
+            for (auto* swordman : swordmans)
             {
-                for (auto* swordman : swordmans)
+                if (swordman->GetIsDead())
                 {
-                    if (swordman->GetIsDead())
-                    {
-                        isStepCompleted = true;
-                        break;
-                    }
+                    isStepCompleted = true;
+                    break;
                 }
             }
+            
         }
         else if (currentTutorialStep == L"스킬: 파이어드래곤 연습")
         {
@@ -550,17 +554,16 @@ void TutorialStage::Update()
                 wizards.push_back(new Wizard());
                 wizards.back()->SetPosition(1000, 600);
             }
-            if (Input::GetKeyDown(eKeyCode::E))
+           
+            for (auto* wizard : wizards)
             {
-                for (auto* wizard : wizards)
+                if (wizard->GetIsDead())
                 {
-                    if (wizard->GetIsDead())
-                    {
-                        isStepCompleted = true;
-                        break;
-                    }
+                    isStepCompleted = true;
+                    break;
                 }
             }
+            
         }
         else if (currentTutorialStep == L"종료 안내")
         {
@@ -575,32 +578,15 @@ void TutorialStage::Update()
             if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
             {
                 isStepCompleted = true;
-                SceneManager::LoadScene(L"TitleScene");
-            }
-        }
-        else if (currentTutorialStep == L"완료 메시지")
-        {
-            // 페이드 아웃 처리
-            completionMessageTimer += Time::DeltaTime();
-            completionMessageAlpha = 255.0f * (1.0f - completionMessageTimer / 1.0f);
-            if (completionMessageTimer >= 1.0f || completionMessageAlpha <= 0.0f)
-            {
-                isStepCompleted = true;
-                completionMessageAlpha = 0.0f; // 알파값을 0으로 고정
             }
         }
 
-        // 단계 완료 시 다음 단계로
-        if (isStepCompleted && !tutorialQue.empty())
+        // 단계 완료 시 완료 메시지 표시
+        if (isStepCompleted && !isShowingCompletion)
         {
-            tutorialQue.pop();
-            if (currentTutorialStep == L"완료 메시지")
-            {
-                completionMessageTimer = 0.0f;
-                completionMessageAlpha = 255.0f;
-            }
-           
-            isStepCompleted = false;
+            isShowingCompletion = true;
+            completionMessageTimer = 0.0f;
+            completionMessageAlpha = 255.0f;
         }
     }
 
@@ -809,13 +795,13 @@ void TutorialStage::Render(HDC hdc)
     }
 
     // 튜토리얼 텍스트 렌더링
-    if (!currentTutorialStep.empty())
+    if (!currentTutorialStep.empty() || isShowingCompletion)
     {
         Gdiplus::Graphics graphics(hdc);
         graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
         Gdiplus::FontFamily fontFamily(L"EXO 2");
         Gdiplus::Font font(&fontFamily, 50, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
-        Gdiplus::SolidBrush brush(Gdiplus::Color(static_cast<BYTE>(currentTutorialStep == L"완료 메시지" ? completionMessageAlpha : 255), 255, 255, 255));
+        Gdiplus::SolidBrush brush(Gdiplus::Color(static_cast<BYTE>(isShowingCompletion ? completionMessageAlpha : 255), 255, 255, 255));
 
         // 카메라 변환 행렬 적용
         Gdiplus::Matrix transform;
@@ -826,7 +812,7 @@ void TutorialStage::Render(HDC hdc)
         float baseTextX = player->GetPositionX();
         float textY = player->GetRect().top - 209.0f;
 
-        // 텍스트 길이 측정을 위한 함수
+        // 텍스트 길이 측정 및 렌더링 함수
         auto renderTextWithOffset = [&](const wchar_t* text) {
             Gdiplus::RectF layoutRect(0, 0, 0, 0);
             Gdiplus::RectF boundingBox;
@@ -836,7 +822,13 @@ void TutorialStage::Render(HDC hdc)
             graphics.DrawString(text, -1, &font, Gdiplus::PointF(textX, textY), &brush);
             };
 
-        if (currentTutorialStep == L"시작안내")
+        // 완료 메시지 표시
+        if (isShowingCompletion)
+        {
+            renderTextWithOffset(L"잘하셨습니다.");
+        }
+        // 튜토리얼 단계별 안내 메시지
+        else if (currentTutorialStep == L"시작안내")
         {
             renderTextWithOffset(L"P키를 눌러 튜토리얼을 시작하세요.");
         }
@@ -863,10 +855,6 @@ void TutorialStage::Render(HDC hdc)
         else if (currentTutorialStep == L"종료 안내")
         {
             renderTextWithOffset(L"F키를 눌러 포탈을 타세요.");
-        }
-        else if (currentTutorialStep == L"완료 메시지")
-        {
-            renderTextWithOffset(L"잘하셨습니다.");
         }
 
         graphics.ResetTransform();

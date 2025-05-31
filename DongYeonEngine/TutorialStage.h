@@ -58,5 +58,7 @@ private:
     // 페이드 효과를 위한 변수 초기화
     float completionMessageTimer = 0.0f;
     float completionMessageAlpha = 255.0f;
+    float TutorialMoveTimer;
+    bool isShowingCompletion;
 };
 
