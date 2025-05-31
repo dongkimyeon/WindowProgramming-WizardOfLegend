@@ -92,7 +92,7 @@ void SoundManager::Initialize() {
 
     // Set default volumes
     if (mSEGroup) mSEGroup->setVolume(0.1f);
-    if (mBGMGroup) mBGMGroup->setVolume(0.05f);
+    if (mBGMGroup) mBGMGroup->setVolume(0.1f);
 }
 
 void SoundManager::mPlaySound(const std::string& SoundName, bool loop) {
