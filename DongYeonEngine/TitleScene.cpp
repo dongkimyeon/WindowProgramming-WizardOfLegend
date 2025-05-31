@@ -22,11 +22,11 @@ void TitleScene::Initialize()
     mFontCollection.AddFontFile(L"resources/Font/NotoSans-ExtraBold.ttf");
 
     float scaleStart = 1.0f;
-    float scaleQuit = 1.0f;
-    float scaleSetting = 1.0f;
     float scaleTutorial = 1.0f;
     float scaleCustom = 1.0f;
     float scaleMapTool = 1.0f;
+    float scaleSetting = 1.0f;
+    float scaleQuit = 1.0f;
 
     int baseHeight = 50;
     int spacing = 1;
@@ -59,11 +59,11 @@ void TitleScene::Initialize()
         };
 
     startY += setButtonRect(mStartButtonRect, startY, L"Start", scaleStart);
-    startY += setButtonRect(mQuitButtonRect, startY, L"quit", scaleQuit);
-    startY += setButtonRect(mSettingButtonRect, startY, L"Settings", scaleSetting);
     startY += setButtonRect(mTutorialButtonRect, startY, L"Tutorial", scaleTutorial);
     startY += setButtonRect(mCustomStageButtonRect, startY, L"Custom Stage", scaleCustom);
     startY += setButtonRect(mMapToolButtonRect, startY, L"Map Tool", scaleMapTool);
+    startY += setButtonRect(mSettingButtonRect, startY, L"Settings", scaleSetting);
+    startY += setButtonRect(mQuitButtonRect, startY, L"quit", scaleQuit);
 
     // GitHub 버튼 사각형 초기화 (좌측 하단)
     int githubIconSize = 150; // 아이콘 크기 축소 (정사각형)
@@ -86,11 +86,11 @@ void TitleScene::Update()
     ScreenToClient(GetActiveWindow(), &mousePos);
 
     mButtonHovered[0] = PtInRect(&mStartButtonRect, mousePos);
-    mButtonHovered[1] = PtInRect(&mQuitButtonRect, mousePos);
-    mButtonHovered[2] = PtInRect(&mSettingButtonRect, mousePos);
-    mButtonHovered[3] = PtInRect(&mTutorialButtonRect, mousePos);
-    mButtonHovered[4] = PtInRect(&mCustomStageButtonRect, mousePos);
-    mButtonHovered[5] = PtInRect(&mMapToolButtonRect, mousePos);
+    mButtonHovered[1] = PtInRect(&mTutorialButtonRect, mousePos);
+    mButtonHovered[2] = PtInRect(&mCustomStageButtonRect, mousePos);
+    mButtonHovered[3] = PtInRect(&mMapToolButtonRect, mousePos);
+    mButtonHovered[4] = PtInRect(&mSettingButtonRect, mousePos);
+    mButtonHovered[5] = PtInRect(&mQuitButtonRect, mousePos);
     mButtonHovered[6] = PtInRect(&mGithubButtonRect, mousePos);
 
     if (Input::GetKeyDown(eKeyCode::LButton))
@@ -107,7 +107,12 @@ void TitleScene::Update()
         }
         if (mButtonHovered[1])
         {
-            PostQuitMessage(0);
+            SceneManager::StartFadeIn();
+            SceneManager::LoadScene(L"TutorialStage");
+            MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
+            SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+            SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
         }
         if (mButtonHovered[2])
         {
@@ -115,11 +120,7 @@ void TitleScene::Update()
         }
         if (mButtonHovered[3])
         {
-            SceneManager::LoadScene(L"TutorialStage");
-            MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
-            SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-            SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
         }
         if (mButtonHovered[4])
         {
@@ -127,7 +128,7 @@ void TitleScene::Update()
         }
         if (mButtonHovered[5])
         {
-            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+            PostQuitMessage(0);
         }
         if (mButtonHovered[6])
         {
@@ -180,16 +181,15 @@ void TitleScene::Render(HDC hdc)
             };
 
         renderButton(mStartButtonRect, L"START", mButtonHovered[0]);
-        renderButton(mQuitButtonRect, L"EXIT", mButtonHovered[1]);
-        renderButton(mSettingButtonRect, L"SETTING", mButtonHovered[2]);
-        renderButton(mTutorialButtonRect, L"TUTORIAL", mButtonHovered[3]);
-        renderButton(mCustomStageButtonRect, L"CUSTOM STAGE", mButtonHovered[4]);
-        renderButton(mMapToolButtonRect, L"MAP TOOL", mButtonHovered[5]);
+        renderButton(mTutorialButtonRect, L"TUTORIAL", mButtonHovered[1]);
+        renderButton(mCustomStageButtonRect, L"CUSTOM STAGE", mButtonHovered[2]);
+        renderButton(mMapToolButtonRect, L"MAP TOOL", mButtonHovered[3]);
+        renderButton(mSettingButtonRect, L"SETTING", mButtonHovered[4]);
+        renderButton(mQuitButtonRect, L"EXIT", mButtonHovered[5]);
 
         delete[] fontFamilies;
     }
 
-    // GitHub 아이콘 렌더링 (원본 비율 유지)
     if (!mGithubIconImage.IsNull())
     {
         int maxIconSize = mGithubButtonRect.right - mGithubButtonRect.left; // 100
