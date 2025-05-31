@@ -250,8 +250,11 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
     static float savedMX = 0.0f;
     static float savedMY = 0.0f;
     static float savedAngle = 0.0f;
-    const int numDragons = 10;
+
+    // 마나에 따라 드래곤 수와 발사 패턴 조정
+    int numDragons = (player != nullptr && player->GetMp() >= 100.0f) ? 15 : 10; // 마나 100 이상 시 15개, 아니면 10개
     const float spawnInterval = 0.07f;
+    const float angleSpread = 0.5f; // 부채꼴 각도 범위 (라디안, 약 28.6도)
 
     if (triggerFire && !isFiring)
     {
@@ -269,13 +272,22 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
 
         if (dragonsSpawned < numDragons && accumulatedTime >= spawnInterval)
         {
-            float dirX = cos(savedAngle);
-            float dirY = sin(savedAngle);
-            float phaseOffset = (dragonsSpawned % 2 == 0) ? 0.0f : 3.1415926535f;
+            // 부채꼴 패턴으로 여러 갈래 발사
+            int dragonsPerWave = (player != nullptr && player->GetMp() >= 100.0f) ? 3 : 1; // 마나 100 이상 시 한 번에 3개 발사
+            for (int i = 0; i < dragonsPerWave; ++i)
+            {
+                // 각 드래곤의 발사 각도 계산
+                float spreadOffset = (dragonsPerWave > 1) ? (i - (dragonsPerWave - 1) / 2.0f) * (angleSpread / (dragonsPerWave - 1)) : 0.0f;
+                float currentAngle = savedAngle + spreadOffset;
 
-            stage->AddPlayerSkillFireDragon(new Player_Skill_FireDragon(savedMX, savedMY, dirX, dirY, phaseOffset));
+                float dirX = cos(currentAngle);
+                float dirY = sin(currentAngle);
+                float phaseOffset = (dragonsSpawned % 2 == 0) ? 0.0f : 3.1415926535f;
 
-            dragonsSpawned++;
+                stage->AddPlayerSkillFireDragon(new Player_Skill_FireDragon(savedMX, savedMY, dirX, dirY, phaseOffset));
+            }
+
+            dragonsSpawned += dragonsPerWave;
             accumulatedTime = 0.0f;
         }
 
@@ -287,6 +299,11 @@ void Player_Skill_FireDragon::Active(float mX, float mY, float angle, Scene* sta
             if (player != nullptr)
             {
                 player->ResetFireDragonTriggered();
+                // 마나 소모 (예: 마나 100일 때 추가 소모)
+                if (player->GetMp() >= 100.0f)
+                {
+                    player->ConsumeMana(100); // 마나 소모량은 게임 밸런스에 맞게 조정
+                }
             }
         }
     }
