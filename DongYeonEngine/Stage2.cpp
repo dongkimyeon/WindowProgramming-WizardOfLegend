@@ -394,7 +394,7 @@ void Stage2::Update()
         SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"BossStage");
 		MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
-
+        SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
         SoundManager::GetInstance()->mPlaySound("Boss", true);
         
         SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);

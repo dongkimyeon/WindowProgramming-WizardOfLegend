@@ -1,5 +1,6 @@
 #include "UI.h"
 #include "SceneManager.h"	
+#include "SoundManager.h"
 #include "Boss.h"
 #include "Time.h"
 #include "Input.h"
@@ -88,6 +89,7 @@ void UI::Render(HDC hdc)
         {
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"GameOverScene");
+            SoundManager::GetInstance()->mPlaySound("GameOver", true);
         }
         return; // 더 이상 UI를 렌더링하지 않음
     }

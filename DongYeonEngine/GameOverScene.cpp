@@ -1,5 +1,6 @@
 #include "GameOverScene.h"
 #include "SceneManager.h"
+#include "SoundManager.h"
 #include "MapManager.h"
 #include "Time.h"
 #include "Input.h"
@@ -31,6 +32,7 @@ void GameOverScene::Update()
     if (Input::GetKeyDown(eKeyCode::SPACE))
     {
         SceneManager::LoadScene(L"TitleScene");
+        SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
         SceneManager::GetSharedPlayer()->SetHp(100);
         SceneManager::GetSharedPlayer()->Setrevive();
         SceneManager::ResetPlayTime();

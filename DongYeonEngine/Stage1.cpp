@@ -394,6 +394,7 @@ void Stage1::Update()
         SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"Stage2");
         MapManager::GetInstance()->LoadMap(L"Stage2.txt");
+        SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
         wizards.clear();
         archers.clear();
         swordmans.clear();

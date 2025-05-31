@@ -528,6 +528,7 @@ void BossStage::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         SceneManager::LoadScene(L"GameClearScene");
+        SoundManager::GetInstance()->mPlaySound("EndScene", true);
         SceneManager::StartFadeIn();
     }
     //객체간에 충돌처리 밀어내는거
