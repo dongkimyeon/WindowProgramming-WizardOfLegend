@@ -120,7 +120,7 @@ void UI::Render(HDC hdc)
         }
     }
 
-    //플레이어 UI
+    // 플레이어 UI
     {
         Player* player = SceneManager::GetSharedPlayer();
 
@@ -129,7 +129,7 @@ void UI::Render(HDC hdc)
         float hpRatio = static_cast<float>(player->GetHp()) / 300;
         int hpBarWidth = static_cast<int>(UI_HPBAR.GetWidth() * hpRatio);
         if (hpBarWidth > 0) {
-            int srcX = UI_HPBAR.GetWidth() - hpBarWidth; // 오른쪽에서 시작
+            int srcX = UI_HPBAR.GetWidth() - hpBarWidth;
             UI_HPBAR.Draw(hdc, 75, 13, hpBarWidth, UI_HPBAR.GetHeight(), srcX, 0, hpBarWidth, UI_HPBAR.GetHeight());
         }
 
@@ -137,9 +137,10 @@ void UI::Render(HDC hdc)
         float mpRatio = static_cast<float>(player->GetMp()) / 100;
         int mpBarWidth = static_cast<int>(UI_MPBAR.GetWidth() * mpRatio);
         if (mpBarWidth > 0) {
-            int srcX = UI_MPBAR.GetWidth() - mpBarWidth; // 오른쪽에서 시작
+            int srcX = UI_MPBAR.GetWidth() - mpBarWidth;
             UI_MPBAR.Draw(hdc, 75, 53, mpBarWidth, UI_MPBAR.GetHeight(), srcX, 0, mpBarWidth, UI_MPBAR.GetHeight());
         }
+
         int originalWidth = UI_SKILLBAR.GetWidth();
         int originalHeight = UI_SKILLBAR.GetHeight();
         int scaledWidth = static_cast<int>(originalWidth * 0.2f);
@@ -152,7 +153,6 @@ void UI::Render(HDC hdc)
         HFONT hFont = CreateFont(25, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
             DEFAULT_PITCH | FF_DONTCARE, L"PixelMplus10");
-       
         HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
         // 플레이어 체력 텍스트 (현재체력/최대체력)
@@ -160,6 +160,12 @@ void UI::Render(HDC hdc)
         swprintf_s(hpText, L"%d / %d", player->GetHp(), 300);
         SetTextColor(hdc, RGB(255, 255, 255));
         TextOut(hdc, 150, 16, hpText, wcslen(hpText));
+
+        // 쿨타임 폰트 설정
+        HFONT coolDownFont = CreateFont(25, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+        HFONT coolDownOldFont = (HFONT)SelectObject(hdc, coolDownFont);
 
         float fireBallCooldown = player->GetFireBallCooldown();
         float fireDragonCooldown = player->GetFireDragonCooldown();
@@ -169,7 +175,7 @@ void UI::Render(HDC hdc)
         wchar_t fireDragonText[32];
         swprintf_s(fireBallText, L"%d", static_cast<int>(fireBallCooldown));
         swprintf_s(fireDragonText, L"%d", static_cast<int>(fireDragonCooldown));
-
+        SetTextColor(hdc, RGB(0, 0, 0));
         // 쿨타임이 0이 아닐 때만 텍스트 출력
         if (fireBallCooldown > 0) {
             TextOut(hdc, 163, yPos + 80, fireBallText, wcslen(fireBallText));
@@ -178,6 +184,9 @@ void UI::Render(HDC hdc)
             TextOut(hdc, 233, yPos + 80, fireDragonText, wcslen(fireDragonText));
         }
 
+        // 폰트 복원 및 삭제
+        SelectObject(hdc, coolDownOldFont);
+        DeleteObject(coolDownFont);
         SelectObject(hdc, hOldFont);
         DeleteObject(hFont);
     }

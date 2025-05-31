@@ -70,6 +70,7 @@ private:
     bool fireDragonReady;     // 파이어드래곤 쿨타임 준비 여부
     bool isUsingSkill;        // 스킬 사용 여부 플래그
 
+    CImage mShadowImage;
     // 애니메이션 이미지들
     CImage mFrontIdleAnimation;
     CImage mFrontAttackAnimation[16];

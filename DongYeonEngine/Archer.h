@@ -32,7 +32,7 @@ private:
     float mY;
     Vector2 position;
     int hp;
-
+    CImage mShadowImage;
     CImage mRightIdleAnimation;
     CImage mRightAttackAnimation[4];
     CImage mRightDieAnimaion[6];

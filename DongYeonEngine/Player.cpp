@@ -46,6 +46,8 @@ Player::Player()
     mHitEffectAngle = 0.0f; // 초기화
     for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
 
+
+    mShadowImage.Load(L"resources/Shadow.png");
     // 애니메이션 로드 (기존 코드 유지)
     mFrontIdleAnimation.Load(L"resources/Player/Front/Idle/FRONT_COMPLETE_00.png");
     if (mFrontIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Player/Front/Idle/FRONT_COMPLETE_00.png\n");
@@ -536,18 +538,37 @@ void Player::LateUpdate()
 
 void Player::Render(HDC hdc)
 {
+    //그림자 렌더
+    int shadowWidth = mShadowImage.GetWidth() - 60;
+    int shadowHeight = mShadowImage.GetHeight();
+    int shadowOffsetX = 5;
+    int shadowOffsetY = 35;
+    int shadowX = static_cast<int>(mX - shadowWidth / 2.0f + shadowOffsetX);
+    int shadowY = static_cast<int>(mY - shadowHeight / 2.0f + shadowOffsetY);
 
-    /*Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
-    if (mHasEffectHitbox) {
-        HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-        HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-        Polygon(hdc, mEffectHitboxPoints, 4);
-        SelectObject(hdc, oldPen);
-        SelectObject(hdc, oldBrush);
-        DeleteObject(hitboxPen);
-    }*/
+    BLENDFUNCTION blend = { 0 };
+    blend.BlendOp = AC_SRC_OVER;
+    blend.BlendFlags = 0;
+    blend.SourceConstantAlpha = 128; 
+    blend.AlphaFormat = AC_SRC_ALPHA; 
+    HDC shadowDC = mShadowImage.GetDC();
 
+    // AlphaBlend로 그림자 렌더링
+    AlphaBlend(
+        hdc,                        // 대상 DC
+        shadowX, shadowY,           // 렌더링 위치
+        shadowWidth, shadowHeight,  // 렌더링 크기
+        shadowDC,                   // 소스 DC
+        0, 0,                       // 소스 이미지 시작점
+        mShadowImage.GetWidth(), mShadowImage.GetHeight(), // 소스 이미지 크기
+        blend                       // 알파 블렌딩 설정
+    );
+
+    mShadowImage.ReleaseDC();
+   
+
+      
+    
     CImage* currentImage = nullptr;
     int imageWidth = 0;
     int imageHeight = 0;

@@ -233,6 +233,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
   <ItemGroup>
     <Image Include="..\성준이형리소스\Boss\Boss\Boss_Name\BOSS_NAMEBAR.png" />
     <Image Include="DongYeonEngine.ico" />
+    <Image Include="resources\Player\Right\Idle\RIGHT_COMPLETE_00.png" />
     <Image Include="resources\TitleSceneUI\StartButton.png" />
     <Image Include="resources\TitleSceneUI\TutorialButton.png" />
     <Image Include="small.ico" />

@@ -43,6 +43,7 @@ private:
     int damage;
     Vector2 position;
 
+    CImage mShadowImage;
     CImage mRightIdleAnimation;
     CImage mRightAttackAnimation[3];
     CImage mRightDieAnimaion[6];

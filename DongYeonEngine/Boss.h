@@ -47,7 +47,7 @@ private:
     static int hp;
     int damage;
     float mScale = 1.0f;
-
+    CImage mShadowImage;
     CImage mIdleAnimation[6];
     CImage mDieImage;
     CImage mDownDashImage;
