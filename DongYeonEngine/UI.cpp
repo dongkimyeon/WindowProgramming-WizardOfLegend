@@ -11,7 +11,6 @@ ATL::CImage UI::UI_SKILLBAR;
 ATL::CImage UI::UI_BOSSBAR;
 ATL::CImage UI::UI_BOSS_HPBAR;
 
-
 UI::UI()
 {
     UI_HPBAR.Load(L"resources/Ui/UI_HPBAR.png");
@@ -24,34 +23,32 @@ UI::UI()
 
 UI::~UI()
 {
-	// 자원 해제
-	UI_HPBAR.Destroy();
-	UI_MPBAR.Destroy();
-	UI_PLAYERBAR.Destroy();
-	UI_SKILLBAR.Destroy();
+    // 자원 해제
+    UI_HPBAR.Destroy();
+    UI_MPBAR.Destroy();
+    UI_PLAYERBAR.Destroy();
+    UI_SKILLBAR.Destroy();
     UI_BOSSBAR.Destroy();
     UI_BOSS_HPBAR.Destroy();
 }
 
 void UI::Initialize()
 {
-	UI_HPBAR.Load(L"resources/Ui/UI_HPBAR.png");
-	UI_MPBAR.Load(L"resources/Ui/UI_MPBAR.png");
-	UI_PLAYERBAR.Load(L"resources/Ui/UI_PLAYERBAR.png");
-	UI_SKILLBAR.Load(L"resources/Ui/UI_SKILLBAR.png");
+    UI_HPBAR.Load(L"resources/Ui/UI_HPBAR.png");
+    UI_MPBAR.Load(L"resources/Ui/UI_MPBAR.png");
+    UI_PLAYERBAR.Load(L"resources/Ui/UI_PLAYERBAR.png");
+    UI_SKILLBAR.Load(L"resources/Ui/UI_SKILLBAR.png");
     UI_BOSSBAR.Load(L"resources/Ui/UI_BOSS_BAR.png");
     UI_BOSS_HPBAR.Load(L"resources/Ui/UI_BOSS_HPBAR.png");
-  
 }
 
 void UI::Update()
 {
-   
+
 }
 
 void UI::Render(HDC hdc)
 {
-
     static float alpha = 0.0f;
     static float alphaTimer = 0.0f;
     const float fadeDuration = 2.5f;
@@ -82,10 +79,8 @@ void UI::Render(HDC hdc)
         SelectObject(hdc, hOldFont);
         DeleteObject(hFont);
 
-
-
         // 알파값이 1.0에 도달하면 씬 전환
-        if (alpha >= 1.0f )
+        if (alpha >= 1.0f)
         {
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"GameOverScene");
@@ -99,7 +94,6 @@ void UI::Render(HDC hdc)
         Boss* boss = Boss::GetInstance();
         if (boss)
         {
-            
             int screenWidth = 1280;
             int bossBarX = (screenWidth - UI_BOSSBAR.GetWidth()) / 2;
             int bossBarY = 40; // Adjust vertical position as needed
@@ -116,8 +110,7 @@ void UI::Render(HDC hdc)
             SelectObject(hdc, hOldFont);
             DeleteObject(hFont);
 
-            
-            float bossHpRatio = static_cast<float>(boss->GetHp()) / 1000;
+            float bossHpRatio = static_cast<float>(boss->GetHp()) / 500;
             int bossHpBarWidth = static_cast<int>(UI_BOSS_HPBAR.GetWidth() * bossHpRatio);
             if (bossHpBarWidth > 0) {
                 int srcX = UI_BOSS_HPBAR.GetWidth() - bossHpBarWidth; // Start from right
@@ -127,63 +120,74 @@ void UI::Render(HDC hdc)
         }
     }
 
-    //플레이어 UI
+    // 플레이어 UI
     {
-    Player* player = SceneManager::GetSharedPlayer();
+        Player* player = SceneManager::GetSharedPlayer();
 
-    UI_PLAYERBAR.Draw(hdc, 0, 0);
-    // HP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
-    float hpRatio = static_cast<float>(player->GetHp()) / 100;
-    int hpBarWidth = static_cast<int>(UI_HPBAR.GetWidth() * hpRatio);
-    if (hpBarWidth > 0) {
-        int srcX = UI_HPBAR.GetWidth() - hpBarWidth; // 오른쪽에서 시작
-        UI_HPBAR.Draw(hdc, 75, 13, hpBarWidth, UI_HPBAR.GetHeight(), srcX, 0, hpBarWidth, UI_HPBAR.GetHeight());
+        UI_PLAYERBAR.Draw(hdc, 0, 0);
+        // HP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
+        float hpRatio = static_cast<float>(player->GetHp()) / 300;
+        int hpBarWidth = static_cast<int>(UI_HPBAR.GetWidth() * hpRatio);
+        if (hpBarWidth > 0) {
+            int srcX = UI_HPBAR.GetWidth() - hpBarWidth;
+            UI_HPBAR.Draw(hdc, 75, 13, hpBarWidth, UI_HPBAR.GetHeight(), srcX, 0, hpBarWidth, UI_HPBAR.GetHeight());
+        }
+
+        // MP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
+        float mpRatio = static_cast<float>(player->GetMp()) / 100;
+        int mpBarWidth = static_cast<int>(UI_MPBAR.GetWidth() * mpRatio);
+        if (mpBarWidth > 0) {
+            int srcX = UI_MPBAR.GetWidth() - mpBarWidth;
+            UI_MPBAR.Draw(hdc, 75, 53, mpBarWidth, UI_MPBAR.GetHeight(), srcX, 0, mpBarWidth, UI_MPBAR.GetHeight());
+        }
+
+        int originalWidth = UI_SKILLBAR.GetWidth();
+        int originalHeight = UI_SKILLBAR.GetHeight();
+        int scaledWidth = static_cast<int>(originalWidth * 0.2f);
+        int scaledHeight = static_cast<int>(originalHeight * 0.2f);
+        int yPos = 720 - scaledHeight;
+        UI_SKILLBAR.Draw(hdc, 0, yPos, scaledWidth, scaledHeight);
+
+        SetBkMode(hdc, TRANSPARENT);
+        SetTextColor(hdc, RGB(0, 0, 0));
+        HFONT hFont = CreateFont(25, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"PixelMplus10");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+
+        // 플레이어 체력 텍스트 (현재체력/최대체력)
+        wchar_t hpText[32];
+        swprintf_s(hpText, L"%d / %d", player->GetHp(), 300);
+        SetTextColor(hdc, RGB(255, 255, 255));
+        TextOut(hdc, 150, 16, hpText, wcslen(hpText));
+
+        // 쿨타임 폰트 설정
+        HFONT coolDownFont = CreateFont(25, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+        HFONT coolDownOldFont = (HFONT)SelectObject(hdc, coolDownFont);
+
+        float fireBallCooldown = player->GetFireBallCooldown();
+        float fireDragonCooldown = player->GetFireDragonCooldown();
+        fireBallCooldown = (fireBallCooldown <= 0) ? 0 : fireBallCooldown;
+        fireDragonCooldown = (fireDragonCooldown <= 0) ? 0 : fireDragonCooldown;
+        wchar_t fireBallText[32];
+        wchar_t fireDragonText[32];
+        swprintf_s(fireBallText, L"%d", static_cast<int>(fireBallCooldown));
+        swprintf_s(fireDragonText, L"%d", static_cast<int>(fireDragonCooldown));
+        SetTextColor(hdc, RGB(0, 0, 0));
+        // 쿨타임이 0이 아닐 때만 텍스트 출력
+        if (fireBallCooldown > 0) {
+            TextOut(hdc, 163, yPos + 80, fireBallText, wcslen(fireBallText));
+        }
+        if (fireDragonCooldown > 0) {
+            TextOut(hdc, 233, yPos + 80, fireDragonText, wcslen(fireDragonText));
+        }
+
+        // 폰트 복원 및 삭제
+        SelectObject(hdc, coolDownOldFont);
+        DeleteObject(coolDownFont);
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
     }
-
-    // MP 바 렌더링 (오른쪽에서 왼쪽으로 줄어듦)
-    float mpRatio = static_cast<float>(player->GetMp()) / 100;
-    int mpBarWidth = static_cast<int>(UI_MPBAR.GetWidth() * mpRatio);
-    if (mpBarWidth > 0) {
-        int srcX = UI_MPBAR.GetWidth() - mpBarWidth; // 오른쪽에서 시작
-        UI_MPBAR.Draw(hdc, 75, 53, mpBarWidth, UI_MPBAR.GetHeight(), srcX, 0, mpBarWidth, UI_MPBAR.GetHeight());
-    }
-    int originalWidth = UI_SKILLBAR.GetWidth();
-    int originalHeight = UI_SKILLBAR.GetHeight();
-    int scaledWidth = static_cast<int>(originalWidth * 0.2f);
-    int scaledHeight = static_cast<int>(originalHeight * 0.2f);
-    int yPos = 720 - scaledHeight;
-    UI_SKILLBAR.Draw(hdc, 0, yPos, scaledWidth, scaledHeight);
-
-    SetBkMode(hdc, TRANSPARENT);
-    SetTextColor(hdc, RGB(0, 0, 0));
-    HFONT hFont = CreateFont(25, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-        DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
-    if (!hFont) {
-        OutputDebugString(L"Failed to create 8BIT WONDER font\n");
-    }
-    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
-
-    float fireBallCooldown = player->GetFireBallCooldown();
-    float fireDragonCooldown = player->GetFireDragonCooldown();
-    fireBallCooldown = (fireBallCooldown <= 0) ? 0 : fireBallCooldown;
-    fireDragonCooldown = (fireDragonCooldown <= 0) ? 0 : fireDragonCooldown;
-    wchar_t fireBallText[32];
-    wchar_t fireDragonText[32];
-    swprintf_s(fireBallText, L"%d", static_cast<int>(fireBallCooldown));
-    swprintf_s(fireDragonText, L"%d", static_cast<int>(fireDragonCooldown));
-
-    // 쿨타임이 0이 아닐 때만 텍스트 출력
-    if (fireBallCooldown > 0) {
-        TextOut(hdc, 163, yPos + 80, fireBallText, wcslen(fireBallText));
-    }
-    if (fireDragonCooldown > 0) {
-        TextOut(hdc, 233, yPos + 80, fireDragonText, wcslen(fireDragonText));
-    }
-
-    SelectObject(hdc, hOldFont);
-    DeleteObject(hFont);
-    }
-
-
 }

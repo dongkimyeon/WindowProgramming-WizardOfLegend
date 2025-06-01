@@ -6,7 +6,7 @@
 
 BossSkill_AquaBall::BossSkill_AquaBall(float x, float y, float targetX, float targetY)
     : mX(x), mY(y), mTargetX(targetX), mTargetY(targetY + 50.0f), mInitialX(x), mInitialY(y),
-    speed(700.0f), mIsActive(true), damage(10), mTime(0.0f), mHeight(200.0f),
+    speed(700.0f), mIsActive(true), damage(35), mTime(0.0f), mHeight(200.0f),
     mTargetIndicatorFrame(0), mAquaBallFrame(0), mExplosionFrame(0),
     mAnimationTimer(0.0f), mIsTargetIndicating(true), mIsFalling(true), mIsExploding(false), mHasEffectHitbox(false)
 {

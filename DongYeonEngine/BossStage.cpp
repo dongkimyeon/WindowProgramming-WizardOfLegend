@@ -12,29 +12,63 @@
 #define MAP_ROWS 40
 #define TILE_SIZE 50
 
-
 void BossStage::Initialize()
 {
     //카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
     portalCreate = false;
- 
+    // 파티클 이미지 로드
+    for (int i = 0; i < 20; ++i)
+    {
+        wchar_t path[256];
+        swprintf_s(path, L"resources/Player/FireEffect/FIRE_PARTICLE_%02d.png", i);
+        if (mFireParticleImage[i].Load(path) != S_OK) {
+            std::cout << "Failed to load particle image: " << i << std::endl;
+        }
+    }
+    // 파티클 관련 변수 초기화
+    mParticleTimer = 0.0f;
+    mParticleSpawnInterval = 0.1f;
+}
+
+void BossStage::CreateFireParticles(std::vector<Particle>& particles, float x, float y)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * 3.14159f); // 360도 랜덤 각도
+    std::uniform_real_distribution<float> speedDist(100.0f, 150.0f); // 속도 범위
+    std::uniform_real_distribution<float> lifeDist(0.3f, 0.5f);
+
+    for (int i = 0; i < 20; ++i) {
+        Particle p;
+        p.x = x;
+        p.y = y;
+        float angle = angleDist(gen);
+        float speed = speedDist(gen);
+        p.velX = cosf(angle) * speed;
+        p.velY = sinf(angle) * speed;
+        p.lifetime = lifeDist(gen);
+        p.initialLifetime = p.lifetime;
+        p.frame = 0;
+        particles.push_back(p);
+    }
 }
 
 void BossStage::LateUpdate()
 {
-
+    Scene::LateUpdate();
 }
 
 void BossStage::ObjectInitialize()
 {
     iceBoss.Init();
 }
+
 void BossStage::Update()
 {
     Player* player = SceneManager::GetSharedPlayer();
     player->Update(this);
-	iceBoss.Update(*player, this);
+    iceBoss.Update(*player, this);
     SoundManager::GetInstance()->Update();
     camera.Update();
     player->SetCameraX(camera.GetPositionX());
@@ -53,6 +87,22 @@ void BossStage::Update()
     {
         if (fireball->IsActive())
             fireball->Move();
+    }
+
+    // 파티클 업데이트
+    for (auto it = mParticles.begin(); it != mParticles.end();)
+    {
+        it->lifetime -= Time::DeltaTime();
+        if (it->lifetime <= 0) {
+            it = mParticles.erase(it);
+        }
+        else {
+            it->x += it->velX * Time::DeltaTime();
+            it->y += it->velY * Time::DeltaTime();
+            it->frame = static_cast<int>((1.0f - it->lifetime / it->initialLifetime) * 20);
+            if (it->frame >= 20) it->frame = 19;
+            ++it;
+        }
     }
 
     // 발사체 벽 충돌 체크
@@ -91,7 +141,6 @@ void BossStage::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -147,7 +196,6 @@ void BossStage::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -202,7 +250,6 @@ void BossStage::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -257,7 +304,6 @@ void BossStage::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -313,6 +359,7 @@ void BossStage::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -328,6 +375,7 @@ void BossStage::Update()
                     {
                         if ((*it)->CheckCollision(*swordman))
                         {
+                            CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                             enemyCollided = true;
                             break;
                         }
@@ -338,6 +386,7 @@ void BossStage::Update()
                         {
                             if ((*it)->CheckCollision(*wizard))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -349,6 +398,7 @@ void BossStage::Update()
                         {
                             if ((*it)->CheckCollision(*archer))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -357,6 +407,7 @@ void BossStage::Update()
                     if (!enemyCollided) {
                         if ((*it)->CheckCollision(iceBoss))
                         {
+                            CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                             enemyCollided = true;
                             break;
                         }
@@ -408,7 +459,7 @@ void BossStage::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -424,6 +475,7 @@ void BossStage::Update()
                     {
                         if ((*it)->CheckCollision(*swordman))
                         {
+                            CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                             enemyCollided = true;
                             break;
                         }
@@ -434,6 +486,7 @@ void BossStage::Update()
                         {
                             if ((*it)->CheckCollision(*wizard))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -445,6 +498,7 @@ void BossStage::Update()
                         {
                             if ((*it)->CheckCollision(*archer))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -453,6 +507,7 @@ void BossStage::Update()
                     if (!enemyCollided) {
                         if ((*it)->CheckCollision(iceBoss))
                         {
+                            CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                             enemyCollided = true;
                             break;
                         }
@@ -504,13 +559,11 @@ void BossStage::Update()
                 archer->SetHitFlag(true);
             }
         }
-      
-            RECT BossRect = iceBoss.GetRect();
-            if (player->CheckCollisionWithRect(BossRect) && !iceBoss.HasBeenHit())
-            {
-                iceBoss.TakeDamage(player->GetDamage());
-                iceBoss.SetHitFlag(true);
-            
+        RECT BossRect = iceBoss.GetRect();
+        if (player->CheckCollisionWithRect(BossRect) && !iceBoss.HasBeenHit())
+        {
+            iceBoss.TakeDamage(player->GetDamage());
+            iceBoss.SetHitFlag(true);
         }
     }
     else
@@ -561,7 +614,6 @@ void BossStage::Render(HDC hdc)
     OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
     portal.Render(portalDC);
     RestoreDC(portalDC, savedPortalDC);
-
 
     for (auto* wizard : wizards)
     {
@@ -742,6 +794,23 @@ void BossStage::Render(HDC hdc)
     iceBoss.Render(bossDC, *player);
     RestoreDC(bossDC, savedBossDC);
 
+    // 파티클 렌더링
+    for (const auto& particle : mParticles)
+    {
+        if (particle.x >= cameraX && particle.x <= cameraX + viewWidth &&
+            particle.y >= cameraY && particle.y <= cameraY + viewHeight)
+        {
+            HDC particleDC = hdc;
+            int savedParticleDC = SaveDC(particleDC);
+            OffsetViewportOrgEx(particleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            mFireParticleImage[particle.frame].Draw(particleDC,
+                static_cast<int>(particle.x - 25),
+                static_cast<int>(particle.y - 25),
+                50, 50);
+            RestoreDC(particleDC, savedParticleDC);
+        }
+    }
+
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
     OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
@@ -749,9 +818,7 @@ void BossStage::Render(HDC hdc)
     RestoreDC(playerDC, savedPlayerDC);
 
     RestoreDC(hdc, savedDC);
-
     UI::Render(hdc);
-
 
     //몇 스테이지인지 텍스트 출력
     SetBkMode(hdc, TRANSPARENT);
@@ -764,7 +831,6 @@ void BossStage::Render(HDC hdc)
     wchar_t StageIdText[20];
     swprintf_s(StageIdText, L"BossStage");
 
-
     SIZE textSize;
     GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
 
@@ -776,7 +842,6 @@ void BossStage::Render(HDC hdc)
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
 
-
     WCHAR mousePosText[100];
     float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
     float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
@@ -785,7 +850,6 @@ void BossStage::Render(HDC hdc)
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
         static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
 }
-
 
 void BossStage::HandleCollision()
 {
@@ -866,7 +930,6 @@ void BossStage::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 RECT intersect;
                 if (IntersectRect(&intersect, &wallRect, &playerRect))
                 {
-
                     ResolveCollisionMap(wallRect, *player);
                 }
                 for (auto* swordman : swordmans)
@@ -874,7 +937,6 @@ void BossStage::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = swordman->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-
                         ResolveCollisionMap(wallRect, *swordman);
                     }
                 }
@@ -883,7 +945,6 @@ void BossStage::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = wizard->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-
                         ResolveCollisionMap(wallRect, *wizard);
                     }
                 }
@@ -892,14 +953,12 @@ void BossStage::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = archer->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-
                         ResolveCollisionMap(wallRect, *archer);
                     }
                 }
                 RECT iceBossRect = iceBoss.GetRect();
                 if (IntersectRect(&intersect, &wallRect, &iceBossRect))
                 {
-
                     ResolveCollisionMap(wallRect, iceBoss);
                 }
             }

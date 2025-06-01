@@ -7,32 +7,68 @@
 #include "MapManager.h"
 #include "SoundManager.h"
 #include "UI.h"
+#include <random>
 
 
 #define MAP_COLS 40
 #define MAP_ROWS 40
 #define TILE_SIZE 50
 
-
 void Stage1::Initialize()
 {
     UI::Initialize();
     camera.SetTarget(SceneManager::GetSharedPlayer());
-  
+    // 파티클 이미지 로드
+    for (int i = 0; i < 20; ++i)
+    {
+        wchar_t path[256];
+        swprintf_s(path, L"resources/Player/FireEffect/FIRE_PARTICLE_%02d.png", i);
+        if (mFireParticleImage[i].Load(path) != S_OK) {
+            std::cout << "Failed to load particle image: " << i << std::endl;
+        }
+    }
+    // 파티클 관련 변수 초기화
+    mParticleTimer = 0.0f;
+    mParticleSpawnInterval = 0.1f;
 }
+
 void Stage1::ObjectInitialize()
 {
-    //몬스터 추가
+    // 몬스터 추가
     archers.push_back(new Archer());
     archers.back()->SetPosition(200, 270);
 
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(230, 270);
 
-
-    // portal room
+    // 포털 룸
     portal.SetPosition(1830, 1720);
 }
+
+// 파티클 생성 함수
+void Stage1::CreateFireParticles(std::vector<Particle>& particles, float x, float y)
+{
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * 3.14159f); // 360도 랜덤 각도
+    std::uniform_real_distribution<float> speedDist(100.0f, 150.0f); // 속도 범위
+    std::uniform_real_distribution<float> lifeDist(0.3f, 0.5f); 
+
+    for (int i = 0; i < 20; ++i) {
+        Particle p;
+        p.x = x;
+        p.y = y;
+        float angle = angleDist(gen);
+        float speed = speedDist(gen);
+        p.velX = cosf(angle) * speed;
+        p.velY = sinf(angle) * speed;
+        p.lifetime = lifeDist(gen);
+        p.initialLifetime = p.lifetime;
+        p.frame = 0;
+        particles.push_back(p);
+    }
+}
+
 void Stage1::Update()
 {
     Player* player = SceneManager::GetSharedPlayer();
@@ -56,6 +92,22 @@ void Stage1::Update()
             fireball->Move();
     }
 
+    // 파티클 업데이트
+    for (auto it = mParticles.begin(); it != mParticles.end();)
+    {
+        it->lifetime -= Time::DeltaTime();
+        if (it->lifetime <= 0) {
+            it = mParticles.erase(it);
+        }
+        else {
+            it->x += it->velX * Time::DeltaTime();
+            it->y += it->velY * Time::DeltaTime();
+            it->frame = static_cast<int>((1.0f - it->lifetime / it->initialLifetime) * 20);
+            if (it->frame >= 20) it->frame = 19;
+            ++it;
+        }
+    }
+
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
     {
@@ -65,7 +117,6 @@ void Stage1::Update()
             if ((*it)->IsActive())
             {
                 POINT* points = (*it)->GetHitboxPoints();
-
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
                 {
@@ -91,7 +142,6 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                            
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -146,7 +196,6 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                              
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -202,7 +251,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                               
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -218,6 +267,7 @@ void Stage1::Update()
                     {
                         if ((*it)->CheckCollision(*swordman))
                         {
+                            CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                             enemyCollided = true;
                             break;
                         }
@@ -228,6 +278,7 @@ void Stage1::Update()
                         {
                             if ((*it)->CheckCollision(*wizard))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -239,6 +290,7 @@ void Stage1::Update()
                         {
                             if ((*it)->CheckCollision(*archer))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -291,7 +343,7 @@ void Stage1::Update()
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
-                            
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
@@ -307,6 +359,7 @@ void Stage1::Update()
                     {
                         if ((*it)->CheckCollision(*swordman))
                         {
+                            CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                             enemyCollided = true;
                             break;
                         }
@@ -317,6 +370,7 @@ void Stage1::Update()
                         {
                             if ((*it)->CheckCollision(*wizard))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -328,6 +382,7 @@ void Stage1::Update()
                         {
                             if ((*it)->CheckCollision(*archer))
                             {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
                                 break;
                             }
@@ -347,8 +402,8 @@ void Stage1::Update()
                 it = playerFireDragon.erase(it);
             }
         }
-
     }
+
     POINT effectHitboxPoints[4];
     bool hasEffectHitbox = player->GetEffectHitbox(effectHitboxPoints);
     if (hasEffectHitbox)
@@ -401,20 +456,16 @@ void Stage1::Update()
         archers.clear();
         swordmans.clear();
         SceneManager::GetSharedPlayer()->SetPosition(180, 270);
-		SceneManager::GetSharedPlayer()->SetTelporting(true);
-     
+        SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
 
     HandleCollision();
-
 
     if (map)
     {
         HandleCollisionMap(map, *player);
     }
 }
-   
-   
 
 void Stage1::LateUpdate()
 {
@@ -437,7 +488,6 @@ void Stage1::Render(HDC hdc)
     OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
     portal.Render(portalDC);
     RestoreDC(portalDC, savedPortalDC);
-
 
     for (auto* wizard : wizards)
     {
@@ -568,6 +618,23 @@ void Stage1::Render(HDC hdc)
         }
     }
 
+    // 파티클 렌더링
+    for (const auto& particle : mParticles)
+    {
+        if (particle.x >= cameraX && particle.x <= cameraX + viewWidth &&
+            particle.y >= cameraY && particle.y <= cameraY + viewHeight)
+        {
+            HDC particleDC = hdc;
+            int savedParticleDC = SaveDC(particleDC);
+            OffsetViewportOrgEx(particleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            mFireParticleImage[particle.frame].Draw(particleDC,
+                static_cast<int>(particle.x - 25),
+                static_cast<int>(particle.y - 25),
+                50, 50);
+            RestoreDC(particleDC, savedParticleDC);
+        }
+    }
+
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
     OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
@@ -578,9 +645,7 @@ void Stage1::Render(HDC hdc)
 
     UI::Render(hdc);
 
-
-
-    //몇 스테이지인지 텍스트 출력
+    // 몇 스테이지인지 텍스트 출력
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, RGB(255, 255, 255));
     HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
@@ -601,12 +666,7 @@ void Stage1::Render(HDC hdc)
 
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
-
-   
-
 }
-
-
 
 void Stage1::HandleCollision()
 {
@@ -686,7 +746,6 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                 RECT intersect;
                 if (IntersectRect(&intersect, &wallRect, &playerRect))
                 {
-                   
                     ResolveCollisionMap(wallRect, *player);
                 }
                 for (auto* swordman : swordmans)
@@ -694,7 +753,6 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = swordman->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-                       
                         ResolveCollisionMap(wallRect, *swordman);
                     }
                 }
@@ -703,7 +761,6 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = wizard->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-                       
                         ResolveCollisionMap(wallRect, *wizard);
                     }
                 }
@@ -712,11 +769,9 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
                     RECT enemyRect = archer->GetRect();
                     if (IntersectRect(&intersect, &wallRect, &enemyRect))
                     {
-                      
                         ResolveCollisionMap(wallRect, *archer);
                     }
                 }
-
             }
         }
     }

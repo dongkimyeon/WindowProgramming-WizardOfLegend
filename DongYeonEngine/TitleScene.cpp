@@ -4,6 +4,7 @@
 #include "Time.h"
 #include "Input.h"
 #include "SoundManager.h"
+#include <shellapi.h>
 
 extern const UINT width;
 extern const UINT height;
@@ -16,26 +17,24 @@ void TitleScene::Initialize()
 
     mBackGroundImage.Load(L"resources/Maintitle.png");
     mLogoImage.Load(L"resources/TitileLogo.png");
+    mGithubIconImage.Load(L"resources/GitHub-Logo.png");
 
-    // 폰트 파일 로드
     mFontCollection.AddFontFile(L"resources/Font/NotoSans-ExtraBold.ttf");
 
-    // 버튼 사각형 초기화 (세로 배치, 중앙 정렬, 텍스트 크기에 맞춘 너비)
     float scaleStart = 1.0f;
-    float scaleQuit = 1.0f;
-    float scaleSetting = 1.0f;
     float scaleTutorial = 1.0f;
     float scaleCustom = 1.0f;
     float scaleMapTool = 1.0f;
+    float scaleSetting = 1.0f;
+    float scaleQuit = 1.0f;
 
     int baseHeight = 50;
     int spacing = 1;
     int centerX = width / 2;
     int startY = height / 2 + 50;
 
-    // 폰트 설정 (텍스트 너비 측정용)
     INT fontCount = mFontCollection.GetFamilyCount();
-    if (fontCount == 0) return; // 폰트 로드 실패 시 종료
+    if (fontCount == 0) return;
     Gdiplus::FontFamily* fontFamilies = new Gdiplus::FontFamily[fontCount];
     INT foundCount;
     mFontCollection.GetFamilies(fontCount, fontFamilies, &foundCount);
@@ -45,17 +44,14 @@ void TitleScene::Initialize()
     format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
     format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
 
-    // 임시 그래픽스 컨텍스트 (텍스트 측정용)
     HDC hdc = GetDC(GetActiveWindow());
     Gdiplus::Graphics graphics(hdc);
 
-    // 버튼별 텍스트와 RECT 설정
     auto setButtonRect = [&](RECT& rect, int y, const wchar_t* text, float scale) {
-        // 텍스트 크기 측정
         Gdiplus::RectF layoutRect(0, 0, 0, 0);
         Gdiplus::RectF boundRect;
         graphics.MeasureString(text, -1, &font, layoutRect, &format, &boundRect);
-        int buttonWidth = (int)(boundRect.Width * scale) + 70; 
+        int buttonWidth = (int)(boundRect.Width * scale) + 70;
         int buttonHeight = (int)(baseHeight * scale);
         int left = centerX - buttonWidth / 2;
         rect = { left, y, left + buttonWidth, y + buttonHeight };
@@ -63,18 +59,21 @@ void TitleScene::Initialize()
         };
 
     startY += setButtonRect(mStartButtonRect, startY, L"Start", scaleStart);
-    startY += setButtonRect(mQuitButtonRect, startY, L"quit", scaleQuit);
-    startY += setButtonRect(mSettingButtonRect, startY, L"Settings", scaleSetting);
     startY += setButtonRect(mTutorialButtonRect, startY, L"Tutorial", scaleTutorial);
     startY += setButtonRect(mCustomStageButtonRect, startY, L"Custom Stage", scaleCustom);
     startY += setButtonRect(mMapToolButtonRect, startY, L"Map Tool", scaleMapTool);
+    startY += setButtonRect(mSettingButtonRect, startY, L"Settings", scaleSetting);
+    startY += setButtonRect(mQuitButtonRect, startY, L"quit", scaleQuit);
 
-    // 리소스 정리
+    // GitHub 버튼 사각형 초기화 (좌측 하단)
+    int githubIconSize = 150; // 아이콘 크기 축소 (정사각형)
+    int margin = 10; // 화면 경계로부터의 여백
+    mGithubButtonRect = { margin, (INT)height - githubIconSize - margin, margin + githubIconSize, (INT)height - margin };
+
     delete[] fontFamilies;
     ReleaseDC(GetActiveWindow(), hdc);
 
-    // 호버 상태 초기화
-    for (int i = 0; i < 6; i++)
+    for (int i = 0; i < 7; i++)
         mButtonHovered[i] = false;
 }
 
@@ -82,66 +81,60 @@ void TitleScene::Update()
 {
     Scene::Update();
 
-    // 마우스 위치 가져오기
     POINT mousePos;
     GetCursorPos(&mousePos);
     ScreenToClient(GetActiveWindow(), &mousePos);
 
-    // 버튼 호버 상태 업데이트
-
     mButtonHovered[0] = PtInRect(&mStartButtonRect, mousePos);
-    mButtonHovered[1] = PtInRect(&mQuitButtonRect, mousePos);
-    mButtonHovered[2] = PtInRect(&mSettingButtonRect, mousePos);
-    mButtonHovered[3] = PtInRect(&mTutorialButtonRect, mousePos);
-    mButtonHovered[4] = PtInRect(&mCustomStageButtonRect, mousePos);
-    mButtonHovered[5] = PtInRect(&mMapToolButtonRect, mousePos);
+    mButtonHovered[1] = PtInRect(&mTutorialButtonRect, mousePos);
+    mButtonHovered[2] = PtInRect(&mCustomStageButtonRect, mousePos);
+    mButtonHovered[3] = PtInRect(&mMapToolButtonRect, mousePos);
+    mButtonHovered[4] = PtInRect(&mSettingButtonRect, mousePos);
+    mButtonHovered[5] = PtInRect(&mQuitButtonRect, mousePos);
+    mButtonHovered[6] = PtInRect(&mGithubButtonRect, mousePos);
 
-
-
-    // 버튼 클릭 처리
     if (Input::GetKeyDown(eKeyCode::LButton))
     {
-        if (mButtonHovered[0]) 
+        if (mButtonHovered[0])
         {
-            
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"Stage1");
             SoundManager::GetInstance()->mPlaySound("Earth", true);
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-
-
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
             SceneManager::GetSharedPlayer()->SetPosition(180, 270);
             SceneManager::SetmIsGameStart(true);
-			
-
-
-        } // Start
-        if (mButtonHovered[1]) 
+        }
+        if (mButtonHovered[1])
         {
-            PostQuitMessage(0); // Quit
-			
-        } // Quit
-        if (mButtonHovered[2]) {
-            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-
-        } // Settings
-        if (mButtonHovered[3]) 
-        {
+            SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"TutorialStage");
             MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
             SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-			SceneManager::GetSharedPlayer()->SetPosition(1000, 1000);
-            
-        } // Tutorial
-        if (mButtonHovered[4]) {
+            SceneManager::GetSharedPlayer()->SetPosition(1250, 1250);
+        }
+        if (mButtonHovered[2])
+        {
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-
-        } // Custom Stage
-        if (mButtonHovered[5]) {
+        }
+        if (mButtonHovered[3])
+        {
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-        } // Map Tool
+        }
+        if (mButtonHovered[4])
+        {
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+        }
+        if (mButtonHovered[5])
+        {
+            PostQuitMessage(0);
+        }
+        if (mButtonHovered[6])
+        {
+            ShellExecute(NULL, L"open", L"https://github.com/dongkimyeon/WizardofLegned", NULL, NULL, SW_SHOWNORMAL);
+            SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+        }
     }
 
     SoundManager::GetInstance()->Update();
@@ -154,19 +147,16 @@ void TitleScene::LateUpdate()
 
 void TitleScene::Render(HDC hdc)
 {
-    // 배경 렌더링
     if (!mBackGroundImage.IsNull())
     {
         mBackGroundImage.Draw(hdc, 0, 0, width, height);
     }
 
-    // 로고 렌더링
     if (!mLogoImage.IsNull())
     {
         mLogoImage.Draw(hdc, 0, 0, width, height);
     }
 
-    // 폰트 설정 (PrivateFontCollection에서 폰트 패밀리 가져오기)
     INT fontCount = mFontCollection.GetFamilyCount();
     if (fontCount > 0)
     {
@@ -174,41 +164,64 @@ void TitleScene::Render(HDC hdc)
         INT foundCount;
         mFontCollection.GetFamilies(fontCount, fontFamilies, &foundCount);
 
-        // 첫 번째 폰트 패밀리 사용
         Gdiplus::Font font(&fontFamilies[0], 30, Gdiplus::FontStyleRegular, Gdiplus::UnitPixel);
-        Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0, 0)); // 기본 검정
+        Gdiplus::SolidBrush brush(Gdiplus::Color(255, 0, 0, 0));
         Gdiplus::StringFormat format;
         format.SetAlignment(Gdiplus::StringAlignmentCenter);
         format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
-        format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap); // 자동 줄넘김 해제
+        format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
 
-        // GDI+ 그래픽스 객체 (텍스트 렌더링용)
         Gdiplus::Graphics graphics(hdc);
 
-        // 버튼 텍스트 렌더링
         auto renderButton = [&](RECT& rect, const wchar_t* text, bool isHovered) {
-            // 호버 여부에 따라 투명도 설정
             brush.SetColor(isHovered ? Gdiplus::Color(255, 0, 0, 0) : Gdiplus::Color(100, 0, 0, 0));
-
-            // 텍스트 위치 계산
             Gdiplus::RectF textRect((float)rect.left, (float)rect.top,
                 (float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
             graphics.DrawString(text, -1, &font, textRect, &format, &brush);
             };
 
         renderButton(mStartButtonRect, L"START", mButtonHovered[0]);
-        renderButton(mQuitButtonRect, L"EXIT", mButtonHovered[1]);
-        renderButton(mSettingButtonRect, L"SETTING", mButtonHovered[2]);
-        renderButton(mTutorialButtonRect, L"TUTORIAL", mButtonHovered[3]);
-        renderButton(mCustomStageButtonRect, L"CUSTOM STAGE", mButtonHovered[4]);
-        renderButton(mMapToolButtonRect, L"MAP TOOL", mButtonHovered[5]);
+        renderButton(mTutorialButtonRect, L"TUTORIAL", mButtonHovered[1]);
+        renderButton(mCustomStageButtonRect, L"CUSTOM STAGE", mButtonHovered[2]);
+        renderButton(mMapToolButtonRect, L"MAP TOOL", mButtonHovered[3]);
+        renderButton(mSettingButtonRect, L"SETTING", mButtonHovered[4]);
+        renderButton(mQuitButtonRect, L"EXIT", mButtonHovered[5]);
 
-        // 동적 할당 해제
         delete[] fontFamilies;
     }
 
+    if (!mGithubIconImage.IsNull())
+    {
+        int maxIconSize = mGithubButtonRect.right - mGithubButtonRect.left; // 100
+        int originalWidth = mGithubIconImage.GetWidth();
+        int originalHeight = mGithubIconImage.GetHeight();
+        float aspectRatio = (float)originalWidth / originalHeight;
 
-    
+        int renderWidth, renderHeight;
+        if (aspectRatio > 1.0f) // 이미지가 더 넓은 경우
+        {
+            renderWidth = maxIconSize;
+            renderHeight = (int)(maxIconSize / aspectRatio);
+        }
+        else // 이미지가 더 높은 경우 또는 정사각형
+        {
+            renderHeight = maxIconSize;
+            renderWidth = (int)(maxIconSize * aspectRatio);
+        }
+
+        // 버튼 영역 중앙에 아이콘 배치
+        int offsetX = mGithubButtonRect.left + (maxIconSize - renderWidth) / 2;
+        int offsetY = mGithubButtonRect.top + (maxIconSize - renderHeight) / 2;
+
+        mGithubIconImage.Draw(hdc, offsetX, offsetY, renderWidth, renderHeight);
+        if (mButtonHovered[6])
+        {
+            Gdiplus::Graphics graphics(hdc);
+            Gdiplus::SolidBrush brush(Gdiplus::Color(100, 255, 255, 255)); // 호버 시 반투명 하이라이트
+            graphics.FillRectangle(&brush, mGithubButtonRect.left, mGithubButtonRect.top, maxIconSize, maxIconSize);
+        }
+    }
+
     HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
         OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
         DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");

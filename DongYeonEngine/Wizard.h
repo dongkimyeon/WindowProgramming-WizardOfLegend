@@ -35,6 +35,8 @@ private:
     Vector2 position;
     int hp;
     int damage;
+
+    CImage mShadowImage;
     // Right 애니메이션
     CImage mRightIdleAnimation;
     CImage mRightAttackAnimation[4];

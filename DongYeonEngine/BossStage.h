@@ -17,6 +17,34 @@
 
 class BossStage : public Scene
 {
+private:
+    std::vector<Wizard*> wizards;
+    std::vector<SwordMan*> swordmans;
+    std::vector<Archer*> archers;
+    std::vector<Arrow*> arrows;
+    std::vector<FireBall*> fireballs;
+    std::vector<Player_Skill_FireBall*> playerFireballs;
+    std::vector<Player_Skill_FireDragon*> playerFireDragon;
+    std::vector<BossSkill_Spear*> spears;
+    std::vector<BossSkill_AquaBall*> aquaBalls;
+    bool portalCreate;
+    Boss iceBoss;
+    Portal portal;
+    Camera camera;
+    // 파티클 구조체
+    struct Particle {
+        float x, y;           // 파티클 위치
+        float velX, velY;     // 파티클 속도
+        float lifetime;       // 파티클 수명
+        int frame;            // 애니메이션 프레임
+        float initialLifetime; // 초기 수명
+    };
+
+    std::vector<Particle> mParticles; // 파티클 리스트
+    float mParticleTimer;             // 파티클 생성 타이머
+    float mParticleSpawnInterval;     // 파티클 생성 간격
+    CImage mFireParticleImage[20];    // 파티클 이미지 배열
+
 public:
 
     void Initialize() override;
@@ -50,20 +78,7 @@ public:
     void ResolveCollision(GameObject& obj1, GameObject& obj2);
     void HandleCollisionMap(int (*map)[40], GameObject& obj); // 수정: Tile** -> int (*)[40]
     void ResolveCollisionMap(RECT wallRect, GameObject& obj); // 수정: Tile& -> REC
-private:
-    std::vector<Wizard*> wizards;
-    std::vector<SwordMan*> swordmans;
-    std::vector<Archer*> archers;
-    std::vector<Arrow*> arrows;
-    std::vector<FireBall*> fireballs;
-    std::vector<Player_Skill_FireBall*> playerFireballs;
-    std::vector<Player_Skill_FireDragon*> playerFireDragon;
-    std::vector<BossSkill_Spear*> spears;
-    std::vector<BossSkill_AquaBall*> aquaBalls;
-    bool portalCreate;
-    Boss iceBoss;
-    Portal portal;
-    Camera camera;
 
+    void CreateFireParticles(std::vector<Particle>& particles, float x, float y);
 };
 

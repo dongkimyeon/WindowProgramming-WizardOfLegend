@@ -12,7 +12,7 @@ Boss::Boss()
 {
     mX = 1025.0f;
     mY = 600.0f;
-    hp = 100;
+    hp = 500;
     damage = 20;
     speed = 100.0f;
     mScale = 1.6f;
@@ -30,6 +30,8 @@ Boss::Boss()
 
     rect = { (int)(mX - 20), (int)(mY - 35), (int)(mX + 20), (int)(mY + 40) };
 
+
+    mShadowImage.Load(L"resources/Shadow.png");
     for (int i = 0; i < 6; ++i) {
         wchar_t path[256];
         swprintf_s(path, L"resources/Boss/Idle/IceQueenIdle%d.png", i);
@@ -75,8 +77,8 @@ void Boss::Init()
 {
     mX = 1025.0f;
     mY = 600.0f;
-    hp = 100;
-    damage = 20;
+    hp = 500;
+    damage = 43;
     speed = 100.0f;
     mScale = 1.6f;
     mSwordX = mX + 50.0f * mScale;
@@ -354,7 +356,7 @@ void Boss::LateUpdate()
 void Boss::Render(HDC hdc, Player& p)
 {
 
-    Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+   
     // 히트박스 디버그 그리기
     if (mHasEffectHitbox)
     {
@@ -366,6 +368,37 @@ void Boss::Render(HDC hdc, Player& p)
         SelectObject(hdc, oldBrush);
         DeleteObject(hitboxPen);
     }
+
+    if (!mIsDead)
+    {
+        int shadowWidth = mShadowImage.GetWidth() - 60;
+        int shadowHeight = mShadowImage.GetHeight();
+        int shadowOffsetX = 0;
+        int shadowOffsetY = 35;
+        int shadowX = static_cast<int>(mX - shadowWidth / 2.0f + shadowOffsetX);
+        int shadowY = static_cast<int>(mY - shadowHeight / 2.0f + shadowOffsetY);
+
+        BLENDFUNCTION blend = { 0 };
+        blend.BlendOp = AC_SRC_OVER;
+        blend.BlendFlags = 0;
+        blend.SourceConstantAlpha = 128;
+        blend.AlphaFormat = AC_SRC_ALPHA;
+        HDC shadowDC = mShadowImage.GetDC();
+
+        // AlphaBlend로 그림자 렌더링
+        AlphaBlend(
+            hdc,                        // 대상 DC
+            shadowX, shadowY,           // 렌더링 위치
+            shadowWidth, shadowHeight,  // 렌더링 크기
+            shadowDC,                   // 소스 DC
+            0, 0,                       // 소스 이미지 시작점
+            mShadowImage.GetWidth(), mShadowImage.GetHeight(), // 소스 이미지 크기
+            blend                       // 알파 블렌딩 설정
+        );
+
+        mShadowImage.ReleaseDC();
+    }
+
 
     if (mIsDead) {
         int width = static_cast<int>(mDieImage.GetWidth() * mScale);

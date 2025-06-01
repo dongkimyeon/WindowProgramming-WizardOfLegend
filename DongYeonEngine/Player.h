@@ -16,11 +16,13 @@ public:
     void SetPosition(float x, float y) override;
     void SetHp(int i) { hp = i; }
     void Setrevive() { mIsDead = false; }
+    void ConsumeMana(int i) { mp -= i; }
     void TakeDamage(int d);
 	void SetTelporting(bool isTeleporting) { mIsTeleporting = isTeleporting; }
     void PlusKillCount()
     {
         KillEnemyCnt++;
+        mp += 10.0f;
     }
     void SetDeadStageName(std::wstring playerDeadStage)
     {
@@ -54,7 +56,7 @@ private:
     float mY;
     Vector2 position;
     int hp;
-    int mp;
+    float mp;
     int damage;
 
     std::wstring deadStage;
@@ -70,6 +72,7 @@ private:
     bool fireDragonReady;     // 파이어드래곤 쿨타임 준비 여부
     bool isUsingSkill;        // 스킬 사용 여부 플래그
 
+    CImage mShadowImage;
     // 애니메이션 이미지들
     CImage mFrontIdleAnimation;
     CImage mFrontAttackAnimation[16];

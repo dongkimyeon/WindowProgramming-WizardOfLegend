@@ -29,8 +29,8 @@ SwordMan::SwordMan()
     mAttackDirectionY = 0.0f;
     mHasEffectHitbox = false;
     mHasAttackedPlayer = false;
-    hp = 100;
-    damage = 20;
+    hp = 250;
+    damage = 25;
     for (int i = 0; i < 4; ++i) mEffectHitboxPoints[i] = { 0, 0 };
 
     // 데미지 표시 변수 초기화
@@ -41,6 +41,7 @@ SwordMan::SwordMan()
     mHitEffectAngle = 0.0f; // 초기화
     rect = { (int)(mX - 20), (int)(mY - 20), (int)(mX + 20), (int)(mY + 20) };
 
+    mShadowImage.Load(L"resources/Shadow.png");
     // 이미지 로드 (기존 코드 유지)
     mRightIdleAnimation.Load(L"resources/Monster/SwordMan/SwordManRight/Idle/SWORDMAN_RIGHT_0.png");
     if (mRightIdleAnimation.IsNull()) wprintf(L"Failed to load: resources/Monster/SwordMan/SwordManRight/Idle/SWORDMAN_RIGHT_0.png\n");
@@ -371,7 +372,38 @@ void SwordMan::Render(HDC hdc, Player& p)
     DeleteObject(attackPen);
     DeleteObject(detectPen);
 
-    Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+    //Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+
+
+    if (!mIsDead)
+    {
+        int shadowWidth = mShadowImage.GetWidth() - 60;
+        int shadowHeight = mShadowImage.GetHeight();
+        int shadowOffsetX = 0;
+        int shadowOffsetY = 35;
+        int shadowX = static_cast<int>(mX - shadowWidth / 2.0f + shadowOffsetX);
+        int shadowY = static_cast<int>(mY - shadowHeight / 2.0f + shadowOffsetY);
+
+        BLENDFUNCTION blend = { 0 };
+        blend.BlendOp = AC_SRC_OVER;
+        blend.BlendFlags = 0;
+        blend.SourceConstantAlpha = 128;
+        blend.AlphaFormat = AC_SRC_ALPHA;
+        HDC shadowDC = mShadowImage.GetDC();
+
+        // AlphaBlend로 그림자 렌더링
+        AlphaBlend(
+            hdc,                        // 대상 DC
+            shadowX, shadowY,           // 렌더링 위치
+            shadowWidth, shadowHeight,  // 렌더링 크기
+            shadowDC,                   // 소스 DC
+            0, 0,                       // 소스 이미지 시작점
+            mShadowImage.GetWidth(), mShadowImage.GetHeight(), // 소스 이미지 크기
+            blend                       // 알파 블렌딩 설정
+        );
+
+        mShadowImage.ReleaseDC();
+    }
 
     // 히트박스 디버그 그리기
     if (mHasEffectHitbox)
