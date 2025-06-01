@@ -42,7 +42,7 @@ void Stage1::ObjectInitialize()
     swordmans.back()->SetPosition(230, 270);
 
     // 포털 룸
-    portal.SetPosition(1830, 1720);
+    portal.SetPosition(1370, 1800);
 }
 
 // 파티클 생성 함수

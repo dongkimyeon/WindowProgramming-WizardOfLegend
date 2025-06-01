@@ -48,6 +48,7 @@ Player_Skill_FireBall::~Player_Skill_FireBall()
     {
         mFireParticleImage[i].Destroy();
     }
+    SoundManager::GetInstance()->mPlaySound("FireBlastEnd", false);
 }
 
 void Player_Skill_FireBall::Move()
