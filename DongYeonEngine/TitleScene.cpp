@@ -102,7 +102,7 @@ void TitleScene::Update()
             SoundManager::GetInstance()->mPlaySound("Earth", true);
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
-            SceneManager::GetSharedPlayer()->SetPosition(180, 270);
+            SceneManager::GetSharedPlayer()->SetPosition(180, 300);
             SceneManager::SetmIsGameStart(true);
         }
         if (mButtonHovered[1])
