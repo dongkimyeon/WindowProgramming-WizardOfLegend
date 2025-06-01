@@ -14,6 +14,7 @@ public:
 
 private:
     int map[40][40];
-
+    char ObjectMap[40][40];
+    std::string ImageMap[40][40];
 };
 

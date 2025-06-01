@@ -17,7 +17,7 @@ public:
     Tile* (*GetTiles())[40];
     int (*GetMap())[40]; // map 배열 반환 추가
 
-	void LoadMap(const std::wstring& name);
+    void LoadMap(const std::wstring& name);
 
 private:
     static const int MAP_WIDTH = 2000;
@@ -25,9 +25,11 @@ private:
     static const int MAP_ROWS = 40;
     static const int MAP_COLS = 40;
     int map[MAP_ROWS][MAP_COLS];
+    std::string ImageMap[MAP_ROWS][MAP_COLS];
     Tile* tiles[MAP_ROWS][MAP_COLS];
-    CImage floorImage;
-    CImage wallImage;
+    CImage floorImage[4];
+    CImage wallImage[4]; // Array for wall tile variants
+    CImage wallCornerImage[10]; // Array for wall corner tile variants
     CImage emptyImage;
     CImage buffer;
 };
