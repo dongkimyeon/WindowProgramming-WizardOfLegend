@@ -116,6 +116,8 @@ void TitleScene::Update()
         }
         if (mButtonHovered[2])
         {
+            SceneManager::StartFadeIn();
+            SceneManager::LoadScene(L"MapTool");
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
         }
         if (mButtonHovered[3])
