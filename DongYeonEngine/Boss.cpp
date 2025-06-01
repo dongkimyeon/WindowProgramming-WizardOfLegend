@@ -529,6 +529,7 @@ void Boss::TakeDamage(int d)
     mDamageTextY = mY - 50;
     mHitEffectAngle = static_cast<float>(rand()) / RAND_MAX * 2.0f * 3.14159f;
     if (hp <= 0) {
+        SoundManager::GetInstance()->mPlaySound("BossDead", true);
         hp = 0;
         mIsDead = true;
         mIsHit = false;
@@ -536,6 +537,7 @@ void Boss::TakeDamage(int d)
         mShowDamage = false;
     }
     else {
+        SoundManager::GetInstance()->mPlaySound("Hit", false);
         mIsHit = true;
         mHitTimer = 0.2f;
         mCurrentHitFrame = 0;

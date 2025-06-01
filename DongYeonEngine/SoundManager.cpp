@@ -88,6 +88,8 @@ void SoundManager::Initialize() {
     mSoundMap["EndScene"] = mBGM[4];
     mSystem->createSound("resources/Audio/BGM/GameOver.wav", FMOD_LOOP_NORMAL, 0, &mBGM[5]);
     mSoundMap["GameOver"] = mBGM[5];
+    mSystem->createSound("resources/Audio/BGM/BossDead.wav", FMOD_LOOP_NORMAL, 0, &mBGM[6]);
+    mSoundMap["BossDead"] = mBGM[6];
 
 
     // Set default volumes
