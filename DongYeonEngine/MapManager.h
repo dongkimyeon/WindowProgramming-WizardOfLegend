@@ -2,6 +2,7 @@
 #include "CommonInclude.h"
 #include "Tile.h"
 
+
 class MapManager : public std::enable_shared_from_this<MapManager>
 {
 public:
@@ -28,6 +29,7 @@ private:
     std::string ImageMap[MAP_ROWS][MAP_COLS];
     Tile* tiles[MAP_ROWS][MAP_COLS];
     CImage floorImage[4];
+    CImage floorImageSet[25];
     CImage wallImage[4]; // Array for wall tile variants
     CImage wallCornerImage[10]; // Array for wall corner tile variants
     CImage emptyImage;

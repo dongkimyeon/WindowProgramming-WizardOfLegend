@@ -33,6 +33,15 @@ void MapManager::Initialize()
             MessageBox(NULL, path, L"Failed to load wall corner tile image", MB_OK | MB_ICONERROR);
         }
     }
+    for (int i = 0; i < 25; i++)
+    {
+        wchar_t path[64];
+        swprintf(path, 64, L"resources/Tile/floorTileSet/floorTileSet%d.png", i);
+        if (floorImageSet[i].Load(path) != S_OK)
+        {
+            MessageBox(NULL, path, L"Failed to load wall corner tile image", MB_OK | MB_ICONERROR);
+        }
+    }
     if (emptyImage.Load(L"resources/Tile/emptyTile.png") != S_OK)
     {
         MessageBox(NULL, L"resources/Tile/emptyTile.png", L"Failed to load empty tile image", MB_OK | MB_ICONERROR);
@@ -279,7 +288,8 @@ void MapManager::LoadMap(const std::wstring& name)
             std::string tileType = ImageMap[i][j];
             if (tileType == "f1")
             {
-                tiles[i][j]->SetImage(&floorImage[0]);
+                int n = rand() % 24 + 0;
+                tiles[i][j]->SetImage(&floorImageSet[n]);
                 tiles[i][j]->SetTileType(TileType::Floor);
                 map[i][j] = 0; // Floor
             }
