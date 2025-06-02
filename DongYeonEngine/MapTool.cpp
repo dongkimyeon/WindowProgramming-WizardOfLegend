@@ -4,9 +4,6 @@
 
 
 
-
-
-
 void MapTool::Initialize() {
 	Mapfp = fopen("StageCustom.txt", "r");
 	Imagefp = fopen("StageCustomImage.txt", "r");
