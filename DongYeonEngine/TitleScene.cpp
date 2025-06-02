@@ -102,7 +102,7 @@ void TitleScene::Update()
             SoundManager::GetInstance()->mPlaySound("Earth", true);
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
             MapManager::GetInstance()->LoadMap(L"Stage1.txt");
-            SceneManager::GetSharedPlayer()->SetPosition(180, 270);
+            SceneManager::GetSharedPlayer()->SetPosition(180, 300);
             SceneManager::SetmIsGameStart(true);
         }
         if (mButtonHovered[1])
@@ -117,11 +117,15 @@ void TitleScene::Update()
         if (mButtonHovered[2])
         {
             SceneManager::StartFadeIn();
-            SceneManager::LoadScene(L"MapTool");
+            //MapManager::GetInstance()->LoadMap(L"커스텀맵이름.txt");
+            //SceneManager::LoadScene(L"StageCustom");
+           
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
         }
         if (mButtonHovered[3])
         {
+            //맵툴
+            SceneManager::LoadScene(L"MapTool");
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
         }
         if (mButtonHovered[4])

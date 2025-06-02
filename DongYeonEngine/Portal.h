@@ -34,7 +34,7 @@ public:
     }
     void Render(HDC hdc) override
     {
-        Rectangle(hdc, mPortalRect.left, mPortalRect.top, mPortalRect.right, mPortalRect.bottom);
+        //Rectangle(hdc, mPortalRect.left, mPortalRect.top, mPortalRect.right, mPortalRect.bottom);
         int drawWidth = static_cast<int>(mPortalImage.GetWidth() * mScale);
         int drawHeight = static_cast<int>(mPortalImage.GetHeight() * mScale);
         int drawX = mX - drawWidth / 2;
