@@ -20,7 +20,7 @@ void TitleScene::Initialize()
     mGithubIconImage.Load(L"resources/GitHub-Logo.png");
 
     mFontCollection.AddFontFile(L"resources/Font/NotoSans-ExtraBold.ttf");
-
+   
     float scaleStart = 1.0f;
     float scaleTutorial = 1.0f;
     float scaleCustom = 1.0f;

@@ -177,6 +177,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClInclude Include="Player_Skill_FireBall.h" />
     <ClInclude Include="Player_Skill_FireDragon.h" />
     <ClInclude Include="Portal.h" />
+    <ClInclude Include="Snow.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Stage1.h" />
     <ClInclude Include="Resource.h" />
