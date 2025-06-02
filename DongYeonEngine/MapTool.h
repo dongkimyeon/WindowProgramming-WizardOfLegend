@@ -2,7 +2,7 @@
 #include "Scene.h"
 #include "MapManager.h"
 #include "CommonInclude.h"
-
+#include "Input.h"
 
 class MapTool :
     public Scene
@@ -16,7 +16,10 @@ public:
 private:
     int map[40][40];
     char ObjectMap[40][40];
+    bool drag;
+    RECT drawRect;
     std::string ImageMap[40][40];
+    std::string selectedTile;
     CImage wallTile[4];
     CImage wallConerTile[10]; // Increased to 10CImage buffer;
     CImage EmptyTile; 

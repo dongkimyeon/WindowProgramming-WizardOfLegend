@@ -6,7 +6,6 @@
 
 
 
-
 void MapTool::Initialize() {
 	Mapfp = fopen("StageCustom.txt", "r");
 	Imagefp = fopen("StageCustomImage.txt", "r");
@@ -63,6 +62,8 @@ void MapTool::Initialize() {
         swprintf(path, 32, L"WallCornerTile%d.png", i + 1);
         wallConerTile[i].Load(path);
     }
+
+    drag = false;
 }
 
 void MapTool::Render(HDC hdc) {
@@ -141,10 +142,101 @@ void MapTool::Render(HDC hdc) {
     if (!wallConerTile[7].IsNull()) wallConerTile[7].StretchBlt(hdc, 910, 400, 40, 40, SRCCOPY); // wc8
     if (!wallConerTile[8].IsNull()) wallConerTile[8].StretchBlt(hdc, 910, 450, 40, 40, SRCCOPY); // wc9
     if (!wallConerTile[9].IsNull()) wallConerTile[9].StretchBlt(hdc, 910, 500, 40, 40, SRCCOPY); // wc10
+
+
+    if (drag) {
+        int left = min(drawRect.left, drawRect.right) * 20;
+        int top = min(drawRect.top, drawRect.bottom) * 20;
+        int right = max(drawRect.left, drawRect.right) * 20;
+        int bottom = max(drawRect.top, drawRect.bottom) * 20;
+        Rectangle(hdc, left, top, right, bottom);
+    }
+
 }
 
 void MapTool::Update() {
-
+    if (Input::GetKeyDown(eKeyCode::LButton)) {
+        if (Input::GetMousePosition().x >= 850 && Input::GetMousePosition().x <= 890) { // Left column
+            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) { // Floor tile 1
+                selectedTile = "f1";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) { // Floor tile 2
+                selectedTile = "f2";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) { // Floor tile 3
+                selectedTile = "f3";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) { // Floor tile 4
+                selectedTile = "f4";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) { // Empty tile
+                selectedTile = "e";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) { // Wall tile 1
+                selectedTile = "w1";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) { // Wall tile 2
+                selectedTile = "w2";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) { // Wall tile 3
+                selectedTile = "w3";
+                drag = true;
+            }
+            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) { // Wall tile 4
+                selectedTile = "w4";
+                drag = true;
+            }
+        }
+        else if (mx >= 910 && mx <= 950) { // Right column
+            if (my >= 50 && my <= 90) { // Wall corner tile 1
+                selectedTile = "wc1";
+                drag = true;
+            }
+            else if (my >= 100 && my <= 140) { // Wall corner tile 2
+                selectedTile = "wc2";
+                drag = true;
+            }
+            else if (my >= 150 && my <= 190) { // Wall corner tile 3
+                selectedTile = "wc3";
+                drag = true;
+            }
+            else if (my >= 200 && my <= 240) { // Wall corner tile 4
+                selectedTile = "wc4";
+                drag = true;
+            }
+            else if (my >= 250 && my <= 290) { // Wall corner tile 5
+                selectedTile = "wc5";
+                drag = true;
+            }
+            else if (my >= 300 && my <= 340) { // Wall corner tile 6
+                selectedTile = "wc6";
+                drag = true;
+            }
+            else if (my >= 350 && my <= 390) { // Wall corner tile 7
+                selectedTile = "wc7";
+                drag = true;
+            }
+            else if (my >= 400 && my <= 440) { // Wall corner tile 8
+                selectedTile = "wc8";
+                drag = true;
+            }
+            else if (my >= 450 && my <= 490) { // Wall corner tile 9
+                selectedTile = "wc9";
+                drag = true;
+            }
+            else if (my >= 500 && my <= 540) { // Wall corner tile 10
+                selectedTile = "wc10";
+                drag = true;
+            }
+        }
+    }
 }
 
 void MapTool::LateUpdate() {
