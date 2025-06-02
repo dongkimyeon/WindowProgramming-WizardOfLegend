@@ -119,7 +119,7 @@ void TitleScene::Update()
             SceneManager::StartFadeIn();
             MapManager::GetInstance()->LoadMap(L"StageCustom.txt");
             SceneManager::LoadScene(L"StageCustom");
-           
+
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
         }
         if (mButtonHovered[3])

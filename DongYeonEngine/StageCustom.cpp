@@ -16,7 +16,6 @@
 
 void StageCustom::Initialize()
 {
-    
     camera.SetTarget(SceneManager::GetSharedPlayer());
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
@@ -43,7 +42,7 @@ void StageCustom::ObjectInitialize()
     swordmans.back()->SetPosition(230, 270);*/
 
     // 포털 룸
-    portal.SetPosition(1370, 1800);
+    //portal.SetPosition(1370, 1800);
 }
 
 // 파티클 생성 함수
