@@ -186,9 +186,6 @@
     <ClInclude Include="Statue.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="Snow.h">
-      <Filter>Object</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">

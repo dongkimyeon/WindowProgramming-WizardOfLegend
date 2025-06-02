@@ -13,7 +13,6 @@ Player* SceneManager::mSharedPlayer = nullptr;
 float SceneManager::playTime = 0.0f;
 bool SceneManager::mIsGameStart = false;
 bool SceneManager::mESCstate = false;
-Snow SceneManager::mSnows[30];
 
 // 페이드 관련 초기화
 SceneManager::eFadeState SceneManager::mFadeState = eFadeState::None;
@@ -28,8 +27,6 @@ static RECT titleButtonRect;
 
 void SceneManager::Initialize()
 {
-
-    
     mMouseCursorImage.Load(L"resources/MouseCursor.png");
     mSharedPlayer = new Player();
     playTime = 0.0f;
@@ -38,7 +35,6 @@ void SceneManager::Initialize()
     // GDI+ 초기화
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
-  
 }
 
 void SceneManager::StartFadeOut(const std::wstring& name)
@@ -69,10 +65,6 @@ Scene* SceneManager::LoadScene(const std::wstring& name)
 
 void SceneManager::Update()
 {
-    for (int i = 0; i < 30; ++i)
-    {
-        mSnows[i].Update();
-    }
     // 페이드 상태 처리
     if (mFadeState != eFadeState::None)
     {
@@ -159,7 +151,6 @@ void SceneManager::LateUpdate()
 
 void SceneManager::Render(HDC hdc)
 {
-    
     using namespace Gdiplus;
     Graphics graphics(hdc);
     graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
@@ -167,10 +158,6 @@ void SceneManager::Render(HDC hdc)
     if (mActiveScene)
         mActiveScene->Render(hdc);
 
-    for (int i = 0; i < 30; ++i)
-    {
-        mSnows[i].Render(hdc);
-    }
     // 플레이 타임 렌더링
     if (mIsGameStart && !SceneManager::GetSharedPlayer()->GetIsDead())
     {
@@ -236,8 +223,9 @@ void SceneManager::Render(HDC hdc)
         FontFamily fontFamily(L"Exo 2");
         Gdiplus::Font font(&fontFamily, 40, FontStyleBold, UnitPixel);
         StringFormat stringFormat;
-        stringFormat.SetAlignment(StringAlignmentCenter);
-        stringFormat.SetLineAlignment(StringAlignmentCenter);
+        stringFormat.SetAlignment(StringAlignmentCenter); // 중앙 정렬
+        stringFormat.SetLineAlignment(StringAlignmentCenter); // 수직 중앙 정렬
+
         // 텍스트 크기 계산
         RectF resumeTextBounds, titleTextBounds;
         graphics.MeasureString(L"GameContinue", -1, &font, PointF(0, 0), &stringFormat, &resumeTextBounds);
