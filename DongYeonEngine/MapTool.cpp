@@ -341,6 +341,41 @@ void MapTool::Update() {
         drawRect.right = mx + 1;
         drawRect.bottom = my + 1;
     }
+
+
+    if (Input::GetKeyDown(eKeyCode::S)) {
+        Mapfp = fopen("StageCustom.txt", "w");
+        Imagefp = fopen("StageCustomImage.txt", "w");
+        if (!Mapfp || !Imagefp) {
+            if (Mapfp) fclose(Mapfp);
+            if (Imagefp) fclose(Imagefp);
+            Mapfp = nullptr;
+            Imagefp = nullptr;
+        }
+
+        // Validate and save data
+        bool saveSuccess = true;
+        for (int i = 0; i < 40; i++) {
+            for (int j = 0; j < 40; j++) {
+                if (fprintf(Mapfp, "%d ", map[j][i]) < 0 ||
+                    fprintf(Imagefp, "%s ", ImageMap[j][i].c_str()) < 0) {
+                    saveSuccess = false;
+                    break;
+                }
+            }
+            fprintf(Mapfp, "\n");
+            fprintf(Imagefp, "\n");
+            if (!saveSuccess) break;
+        }
+
+        // Flush and close files
+        fflush(Mapfp);
+        fflush(Imagefp);
+        fclose(Mapfp);
+        fclose(Imagefp);
+        Mapfp = nullptr;
+        Imagefp = nullptr;
+    }
 }
 
 void MapTool::LateUpdate() {
