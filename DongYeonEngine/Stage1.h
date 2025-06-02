@@ -11,7 +11,7 @@
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
 #include "Player_Skill_FireDragon.h"
-
+#include "MapObjectInclude.h"
 class Stage1 : public Scene 
 {
 private:
@@ -39,7 +39,10 @@ private:
     std::vector<FireBall*> fireballs;
     std::vector<Player_Skill_FireBall*> playerFireballs;
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
-    
+    IceBigChunk mIceBigChunk;
+
+    Statue mStatue;
+
     Portal portal;
     Camera camera;
 

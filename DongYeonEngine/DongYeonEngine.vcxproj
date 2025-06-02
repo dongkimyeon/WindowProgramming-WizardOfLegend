@@ -161,6 +161,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClInclude Include="BossSkill_Spear.h" />
     <ClInclude Include="BossStage.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Candle.h" />
     <ClInclude Include="Dummy.h" />
     <ClInclude Include="Entity.h" />
     <ClInclude Include="FireBall.h" />
@@ -169,8 +170,14 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClInclude Include="GameClearScene.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameOverScene.h" />
+    <ClInclude Include="IceBigChunk.h" />
+    <ClInclude Include="IceFlag.h" />
+    <ClInclude Include="IceSmallChunk.h" />
+    <ClInclude Include="IceWindow.h" />
+    <ClInclude Include="Jar.h" />
     <ClInclude Include="LoadScenes.h" />
     <ClInclude Include="MapManager.h" />
+    <ClInclude Include="MapObjectInclude.h" />
     <ClInclude Include="MapTool.h" />
     <ClInclude Include="Math.h" />
     <ClInclude Include="Player.h" />

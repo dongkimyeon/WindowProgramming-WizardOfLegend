@@ -70,6 +70,9 @@
     <Filter Include="Scenes\Extra">
       <UniqueIdentifier>{f53fc0dd-6930-4951-8473-29963430ab24}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\MapObject">
+      <UniqueIdentifier>{77e6bfa5-a501-45ab-8998-b6fddee7287c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -153,9 +156,6 @@
     <ClInclude Include="TutorialStage.h">
       <Filter>Scenes\Stage</Filter>
     </ClInclude>
-    <ClInclude Include="Portal.h">
-      <Filter>Object</Filter>
-    </ClInclude>
     <ClInclude Include="Dummy.h">
       <Filter>Object\Dummy</Filter>
     </ClInclude>
@@ -183,8 +183,35 @@
     <ClInclude Include="GameOverScene.h">
       <Filter>Scenes\Extra</Filter>
     </ClInclude>
+    <ClInclude Include="Snow.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
     <ClInclude Include="Statue.h">
-      <Filter>Object</Filter>
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Portal.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Jar.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IceWindow.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IceSmallChunk.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IceFlag.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="IceBigChunk.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="MapObjectInclude.h">
+      <Filter>Object\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Candle.h">
+      <Filter>Object\MapObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

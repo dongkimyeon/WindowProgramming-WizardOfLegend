@@ -7,6 +7,7 @@
 #include "MapManager.h"
 #include "SoundManager.h"
 #include "UI.h"
+
 #include <random>
 
 
@@ -18,6 +19,9 @@ void Stage1::Initialize()
 {
     UI::Initialize();
     camera.SetTarget(SceneManager::GetSharedPlayer());
+    mStatue.Initialize();
+    mStatue.SetPosition(317, 234);
+   
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
     {
@@ -141,7 +145,13 @@ void Stage1::Update()
                                 (i + 1) * TILE_SIZE
                             };
                             RECT intersect;
+                            RECT statueRect = mStatue.GetRect();
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
                             {
                                 (*it)->SetActive(false);
                                 collided = true;
@@ -200,6 +210,13 @@ void Stage1::Update()
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
+                            RECT statueRect = mStatue.GetRect();
+                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
+                            {
+                               
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
                         }
                     }
                 }
@@ -251,6 +268,13 @@ void Stage1::Update()
                             };
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+                            RECT statueRect = mStatue.GetRect();                         
+                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
                             {
                                 CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 (*it)->SetActive(false);
@@ -343,6 +367,14 @@ void Stage1::Update()
                             };
                             RECT intersect;
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
+                            {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+                                (*it)->SetActive(false);
+                                collided = true;
+                            }
+
+                            RECT statueRect = mStatue.GetRect();
+                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
                             {
                                 CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 (*it)->SetActive(false);
@@ -485,6 +517,13 @@ void Stage1::Render(HDC hdc)
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
    
+
+    HDC MapObjectDC = hdc;
+    int savedMapObjectDC = SaveDC(MapObjectDC);
+    OffsetViewportOrgEx(MapObjectDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+    mStatue.Render(MapObjectDC);
+    RestoreDC(MapObjectDC, savedMapObjectDC);
+
     // 플레이어 스폰포인트 렌더링
     HDC spawnDC = hdc;
     int savedSpawnDC = SaveDC(spawnDC);
@@ -801,6 +840,15 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
             }
         }
     }
+
+    // 플레이어와 스테츄와의 충돌 처리
+    RECT playerRect = player->GetRect();
+    RECT statueRect = mStatue.GetRect(); // Statue 클래스에 GetRect() 메서드가 있다고 가정
+    RECT intersect;
+    if (IntersectRect(&intersect, &statueRect, &playerRect))
+    {
+        ResolveCollisionMap(statueRect, *player);
+    }
 }
 
 void Stage1::ResolveCollisionMap(RECT wallRect, GameObject& obj)
@@ -836,4 +884,6 @@ void Stage1::ResolveCollisionMap(RECT wallRect, GameObject& obj)
             }
         }
     }
+
+    
 }
