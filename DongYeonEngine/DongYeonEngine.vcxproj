@@ -184,6 +184,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Stage2.h" />
     <ClInclude Include="StageCustom.h" />
+    <ClInclude Include="Statue.h" />
     <ClInclude Include="SwordMan.h" />
     <ClInclude Include="Tile.h" />
     <ClInclude Include="Time.h" />
