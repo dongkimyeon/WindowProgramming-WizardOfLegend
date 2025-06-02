@@ -117,8 +117,8 @@ void TitleScene::Update()
         if (mButtonHovered[2])
         {
             SceneManager::StartFadeIn();
-            //MapManager::GetInstance()->LoadMap(L"커스텀맵이름.txt");
-            //SceneManager::LoadScene(L"StageCustom");
+            MapManager::GetInstance()->LoadMap(L"StageCustom.txt");
+            SceneManager::LoadScene(L"StageCustom");
            
             SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
         }

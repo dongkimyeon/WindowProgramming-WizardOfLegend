@@ -7,7 +7,7 @@
 #include "MapManager.h"
 #include "SoundManager.h"
 #include "UI.h"
-#include <random>
+
 
 
 #define MAP_COLS 40
@@ -16,7 +16,7 @@
 
 void StageCustom::Initialize()
 {
-    UI::Initialize();
+    
     camera.SetTarget(SceneManager::GetSharedPlayer());
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)

@@ -64,6 +64,12 @@
     <Filter Include="Sound">
       <UniqueIdentifier>{60d7eee7-9849-4db8-8ef2-4a78ecb6ab2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scenes\Custom">
+      <UniqueIdentifier>{757a5364-e657-4d09-9036-af31d72999bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes\Extra">
+      <UniqueIdentifier>{f53fc0dd-6930-4951-8473-29963430ab24}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Resource.h">
@@ -150,12 +156,6 @@
     <ClInclude Include="Portal.h">
       <Filter>Object</Filter>
     </ClInclude>
-    <ClInclude Include="GameClearScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="GameOverScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Dummy.h">
       <Filter>Object\Dummy</Filter>
     </ClInclude>
@@ -171,11 +171,17 @@
     <ClInclude Include="SoundManager.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="MapTool.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="StageCustom.h">
-      <Filter>Scenes\Stage</Filter>
+      <Filter>Scenes\Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="MapTool.h">
+      <Filter>Scenes\Custom</Filter>
+    </ClInclude>
+    <ClInclude Include="GameClearScene.h">
+      <Filter>Scenes\Extra</Filter>
+    </ClInclude>
+    <ClInclude Include="GameOverScene.h">
+      <Filter>Scenes\Extra</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -260,12 +266,6 @@
     <ClCompile Include="TutorialStage.cpp">
       <Filter>Scenes\Stage</Filter>
     </ClCompile>
-    <ClCompile Include="GameOverScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="GameClearScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="Dummy.cpp">
       <Filter>Object\Dummy</Filter>
     </ClCompile>
@@ -281,11 +281,17 @@
     <ClCompile Include="SoundManager.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="MapTool.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="StageCustom.cpp">
-      <Filter>Scenes\Stage</Filter>
+      <Filter>Scenes\Custom</Filter>
+    </ClCompile>
+    <ClCompile Include="MapTool.cpp">
+      <Filter>Scenes\Custom</Filter>
+    </ClCompile>
+    <ClCompile Include="GameOverScene.cpp">
+      <Filter>Scenes\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="GameClearScene.cpp">
+      <Filter>Scenes\Extra</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
