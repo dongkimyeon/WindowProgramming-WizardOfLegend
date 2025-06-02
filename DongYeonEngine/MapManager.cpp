@@ -4,46 +4,6 @@
 
 void MapManager::Initialize()
 {
-    // 맵 데이터 읽기
-    FILE* fp = fopen("StageTutorial.txt", "r");
-    FILE* imageFp = fopen("StageTutorialImage.txt", "r");
-    if (fp == nullptr)
-    {
-        for (int i = 0; i < MAP_ROWS; i++)
-            for (int j = 0; j < MAP_COLS; j++)
-                map[i][j] = 0;
-    }
-    else
-    {
-        for (int i = 0; i < MAP_ROWS; i++)
-        {
-            for (int j = 0; j < MAP_COLS; j++)
-            {
-                int value = 0;
-                char tile[10] = { 0 };
-                if (fscanf(fp, "%d", &value) == 1)
-                {
-                    if (value == 0 || value == 1 || value == 2)
-                        map[i][j] = value;
-                    else
-                        map[i][j] = 0;
-                }
-                else
-                    map[i][j] = 0;
-
-                if (imageFp && fscanf(imageFp, "%s", tile) == 1)
-                {
-                    ImageMap[i][j] = std::string(tile);
-                }
-                else
-                {
-                    ImageMap[i][j] = "f1"; // Default to floor tile
-                }
-            }
-        }
-        if (fp) fclose(fp);
-        if (imageFp) fclose(imageFp);
-    }
 
     // 이미지 로드
     for (int i = 0; i < 4; i++)

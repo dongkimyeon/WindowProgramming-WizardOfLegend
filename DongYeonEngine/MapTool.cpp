@@ -45,24 +45,29 @@ void MapTool::Initialize() {
     }
 
     for (int i = 0; i < 4; i++) {
-        wchar_t path[32];
-        swprintf(path, 32, L"floorTile%d.png", i + 1);
+        wchar_t path[64];
+        swprintf(path, 64, L"resources/Tile/floorTile%d.png", i + 1);
         floorTile[i].Load(path);
     }
 
-    EmptyTile.Load(L"emptyTile.png");
+    EmptyTile.Load(L"resources/Tile/emptyTile.png");
 
     for (int i = 0; i < 4; i++) {
-        wchar_t path[32];
-        swprintf(path, 32, L"wallTile%d.png", i + 1);
+        wchar_t path[64];
+        swprintf(path, 64, L"resources/Tile/wallTile%d.png", i + 1);
         wallTile[i].Load(path);
     }
     for (int i = 0; i < 10; i++) {
-        wchar_t path[32];
-        swprintf(path, 32, L"WallCornerTile%d.png", i + 1);
+        wchar_t path[64];
+        swprintf(path, 64, L"resources/Tile/WallCornerTile%d.png", i + 1);
         wallConerTile[i].Load(path);
     }
 
+    selectedTile = "f1";
+
+    floordrag = false;
+    walldrag = false;
+    emptydrag = false;
     drag = false;
 }
 
@@ -156,86 +161,185 @@ void MapTool::Render(HDC hdc) {
 
 void MapTool::Update() {
     if (Input::GetKeyDown(eKeyCode::LButton)) {
+
+        int mx = Input::GetMousePosition().x;
+        int my = Input::GetMousePosition().y;
+
         if (Input::GetMousePosition().x >= 850 && Input::GetMousePosition().x <= 890) { // Left column
             if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) { // Floor tile 1
                 selectedTile = "f1";
-                drag = true;
+                floordrag = true;
+                walldrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) { // Floor tile 2
                 selectedTile = "f2";
-                drag = true;
+                floordrag = true;
+                walldrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) { // Floor tile 3
                 selectedTile = "f3";
-                drag = true;
+                floordrag = true;
+                walldrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) { // Floor tile 4
                 selectedTile = "f4";
-                drag = true;
+                floordrag = true;
+                walldrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) { // Empty tile
                 selectedTile = "e";
-                drag = true;
+                emptydrag = true;
+                walldrag = false;
+                floordrag = false;
             }
             else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) { // Wall tile 1
                 selectedTile = "w1";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) { // Wall tile 2
                 selectedTile = "w2";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) { // Wall tile 3
                 selectedTile = "w3";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
             else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) { // Wall tile 4
                 selectedTile = "w4";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
         }
-        else if (mx >= 910 && mx <= 950) { // Right column
-            if (my >= 50 && my <= 90) { // Wall corner tile 1
+        else if (Input::GetMousePosition().x >= 910 && Input::GetMousePosition().x <= 950) { // Right column
+            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) { // Wall corner tile 1
                 selectedTile = "wc1";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 100 && my <= 140) { // Wall corner tile 2
+            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) { // Wall corner tile 2
                 selectedTile = "wc2";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 150 && my <= 190) { // Wall corner tile 3
+            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) { // Wall corner tile 3
                 selectedTile = "wc3";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 200 && my <= 240) { // Wall corner tile 4
+            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) { // Wall corner tile 4
                 selectedTile = "wc4";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 250 && my <= 290) { // Wall corner tile 5
+            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) { // Wall corner tile 5
                 selectedTile = "wc5";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 300 && my <= 340) { // Wall corner tile 6
+            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) { // Wall corner tile 6
                 selectedTile = "wc6";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 350 && my <= 390) { // Wall corner tile 7
+            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) { // Wall corner tile 7
                 selectedTile = "wc7";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 400 && my <= 440) { // Wall corner tile 8
+            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) { // Wall corner tile 8
                 selectedTile = "wc8";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 450 && my <= 490) { // Wall corner tile 9
+            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) { // Wall corner tile 9
                 selectedTile = "wc9";
-                drag = true;
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
             }
-            else if (my >= 500 && my <= 540) { // Wall corner tile 10
+            else if (Input::GetMousePosition().y >= 500 && Input::GetMousePosition().y <= 540) { // Wall corner tile 10
                 selectedTile = "wc10";
+                walldrag = true;
+                floordrag = false;
+                emptydrag = false;
+            }
+        }
+
+        if (walldrag || floordrag || emptydrag) {
+            if (!drag) {
+                mx = Input::GetMousePosition().x / 20;
+                my = Input::GetMousePosition().y / 20;
+
+                drawRect.left = mx;
+                drawRect.top = my;
+                drawRect.right = mx + 1;
+                drawRect.bottom = my + 1;
+
                 drag = true;
             }
         }
+    }
+    else if (Input::GetKeyUp(eKeyCode::LButton)) {
+        
+        int mx, my;
+
+        mx = Input::GetMousePosition().x / 20;
+        my = Input::GetMousePosition().y / 20;
+        
+        drawRect.right = mx + 1;
+        drawRect.bottom = my + 1;
+
+        int left = min(drawRect.left, drawRect.right);
+        int right = max(drawRect.left, drawRect.right);
+        int top = min(drawRect.top, drawRect.bottom);
+        int bottom = max(drawRect.top, drawRect.bottom);
+
+        for (int i = left; i < right; i++) {
+            for (int j = top; j < bottom; j++) {
+                if (i >= 0 && i < 40 && j >= 0 && j < 40) {
+                    if (walldrag) {
+                        map[i][j] = 1;
+                        ImageMap[i][j] = selectedTile; // Use selected tile
+                    }
+                    else if (floordrag) {
+                        map[i][j] = 0;
+                        ImageMap[i][j] = selectedTile; // Use selected tile
+                    }
+                    else if (emptydrag) {
+                        map[i][j] = 2;
+                        ImageMap[i][j] = selectedTile; // Use selected tile
+                    }
+                }
+            }
+        }
+
+        drag = false;
+    }
+    else if (Input::GetKey(eKeyCode::LButton)) {
+        int mx = Input::GetMousePosition().x / 20;
+        int my = Input::GetMousePosition().y / 20;
+
+        drawRect.right = mx + 1;
+        drawRect.bottom = my + 1;
     }
 }
 
