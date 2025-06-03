@@ -5,6 +5,9 @@
 
 void SoundManager::Initialize() {
     // Create FMOD system
+
+    mBGMVolume = 0.1f;
+    mSEVolume = 0.1f;
     FMOD_RESULT result = FMOD::System_Create(&mSystem);
     if (result != FMOD_OK) return;
     result = mSystem->init(128, FMOD_INIT_NORMAL, 0);
@@ -93,8 +96,8 @@ void SoundManager::Initialize() {
 
 
     // Set default volumes
-    if (mSEGroup) mSEGroup->setVolume(0.1f);
-    if (mBGMGroup) mBGMGroup->setVolume(0.1f);
+    if (mSEGroup) mSEGroup->setVolume(mBGMVolume);
+    if (mBGMGroup) mBGMGroup->setVolume(mSEVolume);
 }
 
 void SoundManager::mPlaySound(const std::string& SoundName, bool loop) {
@@ -132,6 +135,11 @@ void SoundManager::mPlaySound(const std::string& SoundName, bool loop) {
 }
 
 void SoundManager::Update() {
+
+    // Set default volumes
+    if (mSEGroup) mSEGroup->setVolume(mBGMVolume);
+    if (mBGMGroup) mBGMGroup->setVolume(mSEVolume);
+
     // Clean up finished SE channels
     for (auto it = mSEChannels.begin(); it != mSEChannels.end();) {
         bool isPlaying = false;

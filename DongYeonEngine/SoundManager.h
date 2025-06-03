@@ -17,7 +17,10 @@ public:
     }
 
     void mPlaySound(const std::string& SoundName, bool loop);
-
+    void SetBGMVolume(float v) { mBGMVolume = v; }
+    void SetSEVolume(float v) { mSEVolume = v; }
+    float GetBGMVolume() { return mBGMVolume; }
+    float GetSEVolume() { return mBGMVolume; }
 private:
     SoundManager() : mSystem(nullptr), mBGMChannel(nullptr), mSEGroup(nullptr), mBGMGroup(nullptr) {
         for (int i = 0; i < 30; i++) mSE[i] = nullptr;
@@ -33,4 +36,6 @@ private:
     FMOD::Sound* mBGM[10];
     std::map<std::string, FMOD::Sound*> mSoundMap;
     std::vector<FMOD::Channel*> mSEChannels;
+    float mBGMVolume;
+    float mSEVolume;
 };

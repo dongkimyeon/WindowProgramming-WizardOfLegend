@@ -46,8 +46,8 @@ void Stage1::ObjectInitialize()
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(230, 270);*/
 
-    // 포털 룸
-    portal.SetPosition(1370, 1800);
+
+    portal.SetPosition(1350, 1875);
 }
 
 // 파티클 생성 함수
