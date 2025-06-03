@@ -42,6 +42,7 @@ private:
     IceBigChunk mIceBigChunk;
 
     Statue mStatue;
+    Candle mCandle;
 
     Portal portal;
     Camera camera;
