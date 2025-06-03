@@ -40,7 +40,7 @@ private:
     std::vector<Player_Skill_FireBall*> playerFireballs;
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
     IceBigChunk mIceBigChunk;
-
+    IceSmallChunk mIceSmallChunk;
     Statue mStatue;
     Candle mCandle;
 

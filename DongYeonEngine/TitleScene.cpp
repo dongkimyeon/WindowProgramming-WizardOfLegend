@@ -176,7 +176,7 @@ void TitleScene::Update()
                 MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
                 SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-                SceneManager::GetSharedPlayer()->SetPosition(1250, 1250);
+                SceneManager::GetSharedPlayer()->SetPosition(949, 1124);
             }
             else if (mButtonHovered[2])
             {

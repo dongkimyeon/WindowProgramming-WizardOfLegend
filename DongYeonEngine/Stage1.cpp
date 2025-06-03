@@ -21,6 +21,9 @@ void Stage1::Initialize()
     camera.SetTarget(SceneManager::GetSharedPlayer());
     mCandle.Initialize();
     mCandle.SetPosition(317, 234);
+
+    mIceSmallChunk.Initialize();
+    mIceSmallChunk.SetPosition(1178, 325);
    
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
@@ -522,6 +525,7 @@ void Stage1::Render(HDC hdc)
     int savedMapObjectDC = SaveDC(MapObjectDC);
     OffsetViewportOrgEx(MapObjectDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
     mCandle.Render(MapObjectDC);
+    mIceSmallChunk.Render(MapObjectDC);
     RestoreDC(MapObjectDC, savedMapObjectDC);
 
     // 플레이어 스폰포인트 렌더링

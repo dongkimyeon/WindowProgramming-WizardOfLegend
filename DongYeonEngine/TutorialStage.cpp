@@ -46,13 +46,13 @@ void TutorialStage::Initialize()
 
     // 몬스터 추가
     dummies.push_back(new Dummy());
-    dummies.back()->SetPosition(1000, 1000);
+    dummies.back()->SetPosition(736, 942);
     dummies.push_back(new Dummy());
-    dummies.back()->SetPosition(1500, 1500);
+    dummies.back()->SetPosition(1136, 942);
     dummies.push_back(new Dummy());
-    dummies.back()->SetPosition(1500, 1000);
+    dummies.back()->SetPosition(1136, 1342);
     dummies.push_back(new Dummy());
-    dummies.back()->SetPosition(1000, 1500);
+    dummies.back()->SetPosition(736, 1342);
 
     // 튜토리얼 메세지 큐 (완료 메시지 제외)
     tutorialQue.push(L"시작안내");
@@ -580,7 +580,7 @@ void TutorialStage::Update()
             if (archers.empty())
             {
                 archers.push_back(new Archer());
-                archers.back()->SetPosition(1250, 1000);
+                archers.back()->SetPosition(949, 1024-50);
             }
            
             for (auto* archer : archers)
@@ -598,7 +598,7 @@ void TutorialStage::Update()
             if (swordmans.empty())
             {
                 swordmans.push_back(new SwordMan());
-                swordmans.back()->SetPosition(1250, 1000);
+                swordmans.back()->SetPosition(949, 1024 - 50);
             }
 
             for (auto* swordman : swordmans)
@@ -616,7 +616,7 @@ void TutorialStage::Update()
             if (wizards.empty())
             {
                 wizards.push_back(new Wizard());
-                wizards.back()->SetPosition(1250, 1000);
+                wizards.back()->SetPosition(949, 1024 - 50);
             }
            
             for (auto* wizard : wizards)
