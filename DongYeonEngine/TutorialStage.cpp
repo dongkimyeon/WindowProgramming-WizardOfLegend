@@ -631,7 +631,7 @@ void TutorialStage::Update()
         }
         else if (currentTutorialStep == L"종료 안내")
         {
-            portal.SetPosition(1250, 1000);
+            portal.SetPosition(949, 483);
             RECT playerRect = SceneManager::GetSharedPlayer()->GetRect();
             RECT portalRect = portal.GetRect();
             RECT temp;
