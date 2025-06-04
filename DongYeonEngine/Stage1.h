@@ -43,6 +43,7 @@ private:
     IceSmallChunk mIceSmallChunk;
     Statue mStatue;
     Candle mCandle;
+    IceFlag mIceFlag;
 
     Portal portal;
     Camera camera;

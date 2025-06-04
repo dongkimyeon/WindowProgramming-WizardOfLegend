@@ -1,17 +1,19 @@
 #include "CommonInclude.h"
-
-class IceFlag
+#include "GameObject.h"
+class IceFlag : public GameObject
 {
 private:
 	CImage mIceFlag;
 	int mX;
 	int mY;
+	float mScale;
 public:
 	void Initialize()
 	{
 		mIceFlag.Load(L"resources/MapObject/IceFlag.png");
 		mX = 0;
 		mY = 0;
+		mScale = 2.0f;
 	}
 	void SetPosition(int x, int y)
 	{
@@ -19,10 +21,16 @@ public:
 		mY = y;
 
 	}
+	void TakeDamage(int d);
+
 	void Render(HDC hdc)
 	{
 		int width = mIceFlag.GetWidth();
 		int height = mIceFlag.GetHeight();
-		mIceFlag.Draw(hdc, mX - width / 2, mY - height / 2, width, height);
+		// Apply scale to width and height
+		int scaledWidth = static_cast<int>(width * mScale);
+		int scaledHeight = static_cast<int>(height * mScale);
+		// Adjust position to keep the image centered
+		mIceFlag.Draw(hdc, mX - scaledWidth / 2, mY - scaledHeight / 2, scaledWidth, scaledHeight);
 	}
 };

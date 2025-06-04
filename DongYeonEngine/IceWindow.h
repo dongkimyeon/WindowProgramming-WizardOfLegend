@@ -1,5 +1,6 @@
 #include "CommonInclude.h"
-class IceWindow
+#include "GameObject.h"
+class IceWindow : public GameObject
 {
 private:
 	CImage mIceWindow0;
@@ -18,6 +19,9 @@ public:
 		mX = 0;
 		mY = 0;
 	}
+
+	void TakeDamage(int d);
+
 	void SetPosition(int x, int y)
 	{
 		mX = x;

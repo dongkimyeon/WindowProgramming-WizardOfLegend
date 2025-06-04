@@ -1,5 +1,6 @@
 #include "CommonInclude.h"
-class Jar
+#include "GameObject.h"
+class Jar : public GameObject
 {
 private:
 	CImage mJarImage;
@@ -12,6 +13,7 @@ public:
 		mX = 0;
 		mY = 0;
 	}
+	void TakeDamage(int d);
 	void SetPosition(int x, int y)
 	{
 		mX = x;

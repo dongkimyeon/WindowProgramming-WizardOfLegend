@@ -1,7 +1,7 @@
 #include "CommonInclude.h"
+#include "GameObject.h"
 
-
-class Statue 
+class Statue : public GameObject
 {
 private:
 	CImage mStatueImage;
@@ -16,6 +16,7 @@ public:
 		mY = 0;
 
 	}
+	void TakeDamage(int d);
 	void SetPosition(int x, int y)
 	{
 		mX = x;

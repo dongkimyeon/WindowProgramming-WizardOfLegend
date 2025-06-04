@@ -28,7 +28,7 @@ public:
 	{
 		mImageNum = a;
 	}
-	void TakeDamege(int d);
+	void TakeDamage(int d);
 	void Render(HDC hdc)
 	{
 		if (mImageNum == 0)

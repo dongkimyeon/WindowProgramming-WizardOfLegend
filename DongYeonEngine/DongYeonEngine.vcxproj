@@ -217,8 +217,13 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClCompile Include="GameClearScene.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameOverScene.cpp" />
+    <ClCompile Include="IceBigChunk.cpp" />
+    <ClCompile Include="IceFlag.cpp" />
+    <ClCompile Include="IceSmallChunk.cpp" />
+    <ClCompile Include="IceWindow.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Input.h" />
+    <ClCompile Include="Jar.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapManager.cpp" />
     <ClCompile Include="MapTool.cpp" />
@@ -232,6 +237,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Stage2.cpp" />
     <ClCompile Include="StageCustom.cpp" />
+    <ClCompile Include="Statue.cpp" />
     <ClCompile Include="SwordMan.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="Time.cpp" />

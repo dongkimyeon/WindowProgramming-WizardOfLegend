@@ -1,6 +1,6 @@
 #include "CommonInclude.h"
-
-class IceSmallChunk
+#include "GameObject.h"
+class IceSmallChunk : public GameObject
 {
 private:
     CImage mIceSmallChunkImage;
@@ -15,6 +15,8 @@ public:
         mY = 0;
         mScale = 3.0f; // Default scale is 1.0 (original size)
     }
+
+    void TakeDamage(int d);
 
     void SetPosition(int x, int y)
     {

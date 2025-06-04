@@ -1,5 +1,5 @@
 #include "IceBigChunk.h"
 
-void IceBigChunk::TakeDamege(int d)
+void IceBigChunk::TakeDamage(int d)
 {
 }

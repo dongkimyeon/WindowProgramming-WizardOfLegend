@@ -324,7 +324,25 @@
       <Filter>Scenes\Extra</Filter>
     </ClCompile>
     <ClCompile Include="Candle.cpp">
-      <Filter>소스 파일</Filter>
+      <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="IceBigChunk.cpp">
+      <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Statue.cpp">
+      <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Jar.cpp">
+      <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="IceWindow.cpp">
+      <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="IceSmallChunk.cpp">
+      <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="IceFlag.cpp">
+      <Filter>Object\MapObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
