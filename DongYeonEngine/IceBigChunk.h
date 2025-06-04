@@ -1,6 +1,7 @@
 #include "CommonInclude.h"
+#include "GameObject.h"
 
-class IceBigChunk
+class IceBigChunk : public GameObject
 {
 private:
 	CImage mIceBigChunkImage0;
@@ -27,6 +28,7 @@ public:
 	{
 		mImageNum = a;
 	}
+	void TakeDamege(int d);
 	void Render(HDC hdc)
 	{
 		if (mImageNum == 0)

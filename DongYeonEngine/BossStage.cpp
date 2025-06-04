@@ -26,6 +26,7 @@ void BossStage::Initialize()
             std::cout << "Failed to load particle image: " << i << std::endl;
         }
     }
+    mBossEntrance.Load(L"resources/MapObject/BossEntrance.png");
     // 파티클 관련 변수 초기화
     mParticleTimer = 0.0f;
     mParticleSpawnInterval = 0.1f;
@@ -609,10 +610,18 @@ void BossStage::Render(HDC hdc)
 
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
+    
+    // mBossEntrance 그리기 수정
+    float scale = 0.5f; // 스케일 값 (예: 0.5로 50% 크기)
+    int scaledWidth = static_cast<int>(mBossEntrance.GetWidth() * scale);
+    int scaledHeight = static_cast<int>(mBossEntrance.GetHeight() * scale);
+    
+
     HDC portalDC = hdc;
     int savedPortalDC = SaveDC(portalDC);
     OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
     portal.Render(portalDC);
+    mBossEntrance.Draw(portalDC, 1028, 1263, 1028 + scaledWidth, 1263 + scaledHeight);
     RestoreDC(portalDC, savedPortalDC);
 
     for (auto* wizard : wizards)
@@ -654,7 +663,6 @@ void BossStage::Render(HDC hdc)
             RestoreDC(swordmanDC, savedSwordmanDC);
         }
     }
-
     for (auto* arrow : arrows)
     {
         POINT* points = arrow->GetHitboxPoints();
@@ -743,7 +751,6 @@ void BossStage::Render(HDC hdc)
             RestoreDC(FireDragonDC, saveFireDragonDC);
         }
     }
-
     for (auto* spear : spears)
     {
         POINT* points = spear->GetHitboxPoints();

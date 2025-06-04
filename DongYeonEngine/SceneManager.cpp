@@ -169,7 +169,11 @@ void SceneManager::Render(HDC hdc)
 
     for (int i = 0; i < 30; ++i)
     {
-        mSnows[i].Render(hdc);
+        if (SceneManager::GetActiveScene()->GetName() != L"MapTool")
+        {
+            mSnows[i].Render(hdc);
+        }
+        
     }
     // 플레이 타임 렌더링
     if (mIsGameStart && !SceneManager::GetSharedPlayer()->GetIsDead())

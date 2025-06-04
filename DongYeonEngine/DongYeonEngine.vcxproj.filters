@@ -16,9 +16,6 @@
     <Filter Include="Scenes">
       <UniqueIdentifier>{85e3eba3-c9f2-44b2-a82c-23df2251d052}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{40902605-91e2-44aa-922f-6bc3f6fbcc4a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Common">
       <UniqueIdentifier>{ba812d5a-0c28-4fee-b387-c9b548d76d08}</UniqueIdentifier>
     </Filter>
@@ -72,6 +69,9 @@
     </Filter>
     <Filter Include="Object\MapObject">
       <UniqueIdentifier>{77e6bfa5-a501-45ab-8998-b6fddee7287c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{40902605-91e2-44aa-922f-6bc3f6fbcc4a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -322,6 +322,9 @@
     </ClCompile>
     <ClCompile Include="GameClearScene.cpp">
       <Filter>Scenes\Extra</Filter>
+    </ClCompile>
+    <ClCompile Include="Candle.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

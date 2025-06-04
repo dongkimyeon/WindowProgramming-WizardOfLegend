@@ -209,6 +209,7 @@ xcopy /y /d "$(SolutionDir)DongYeonEngine\FMOD_API\studio\lib\x64\*.dll" "$(OutD
     <ClCompile Include="BossSkill_Spear.cpp" />
     <ClCompile Include="BossStage.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Candle.cpp" />
     <ClCompile Include="Dummy.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="FireBall.cpp" />

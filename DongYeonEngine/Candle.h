@@ -1,7 +1,7 @@
 #include "CommonInclude.h"
-#include <gdiplus.h>
+#include "GameObject.h"
 
-class Candle
+class Candle : public GameObject
 {
 private:
     CImage mCandleImage;
@@ -29,6 +29,8 @@ public:
         mScale = scale; // 스케일 값 설정
     }
 
+    void TakeDamage(int d);
+   
     void Render(HDC hdc)
     {
         int width = mCandleImage.GetWidth();

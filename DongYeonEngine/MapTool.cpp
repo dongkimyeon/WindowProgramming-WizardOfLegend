@@ -1,11 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "MapTool.h"
 
-
-
-
-
-
 void MapTool::Initialize() {
 	Mapfp = fopen("StageCustom.txt", "r");
 	Imagefp = fopen("StageCustomImage.txt", "r");

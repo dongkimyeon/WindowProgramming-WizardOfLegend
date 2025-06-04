@@ -24,8 +24,8 @@ void LoadScenes()
 	SceneManager::CreateScene<StageCustom>(L"StageCustom");
 	SceneManager::CreateScene<MapTool>(L"MapTool");
 
-	//MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
-	SceneManager::LoadScene(L"TitleScene");
+	MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
+	SceneManager::LoadScene(L"BossStage");
 	SceneManager::GetSharedPlayer()->SetPosition(1025, 1850);
 	SoundManager::GetInstance()->Initialize();
 	SoundManager::GetInstance()->mPlaySound("TitleScreen", true);

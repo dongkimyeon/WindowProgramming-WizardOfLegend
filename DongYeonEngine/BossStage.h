@@ -45,6 +45,8 @@ private:
     float mParticleSpawnInterval;     // 파티클 생성 간격
     CImage mFireParticleImage[20];    // 파티클 이미지 배열
 
+    CImage mBossEntrance;
+
 public:
 
     void Initialize() override;

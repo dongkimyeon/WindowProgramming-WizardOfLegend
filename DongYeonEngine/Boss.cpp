@@ -571,11 +571,14 @@ void Boss::TakeDamage(int d)
     }
     else {
         SoundManager::GetInstance()->mPlaySound("Hit", false);
-        mIsHit = true;
-        mHitTimer = 0.2f;
-        mCurrentHitFrame = 0;
-        mIsAttack = false;
-        mHasBeenHit = true;
+        if (currentState == 0 || currentState == 4)
+        {
+            mIsHit = true;
+            mHitTimer = 0.2f;
+            mCurrentHitFrame = 0;
+            mIsAttack = false;
+            mHasBeenHit = true;
+        } 
     }
 }
 
