@@ -4,7 +4,7 @@
 void MapTool::Initialize() {
     Mapfp = fopen("StageCustom.txt", "r");
     Imagefp = fopen("StageCustomImage.txt", "r");
-    Objectfp = fopen("StageCustomObejct.txt", "r");
+    Objectfp = fopen("StageCustomObject.txt", "r");
 
     for (int i = 0; i < 40; i++) {
         for (int j = 0; j < 40; j++) {
@@ -517,7 +517,7 @@ void MapTool::Update() {
     if (Input::GetKeyDown(eKeyCode::S)) {
         Mapfp = fopen("StageCustom.txt", "w");
         Imagefp = fopen("StageCustomImage.txt", "w");
-        Objectfp = fopen("StageCustomObejct.txt", "w");
+        Objectfp = fopen("StageCustomObject.txt", "w");
 
         if (!Mapfp || !Imagefp || !Objectfp) {
             if (Mapfp) fclose(Mapfp);
