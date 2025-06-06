@@ -2,13 +2,15 @@
 #include "MapTool.h"
 
 void MapTool::Initialize() {
-	Mapfp = fopen("StageCustom.txt", "r");
-	Imagefp = fopen("StageCustomImage.txt", "r");
+    Mapfp = fopen("StageCustom.txt", "r");
+    Imagefp = fopen("StageCustomImage.txt", "r");
+    Objectfp = fopen("StageCustomObejct.txt", "r");
 
     for (int i = 0; i < 40; i++) {
         for (int j = 0; j < 40; j++) {
             map[i][j] = 0;
-            ImageMap[i][j] = "f1"; // Default to floor tile 1
+            ImageMap[i][j] = "f1";
+            ObjectMap[i][j] = "empty";
         }
     }
 
@@ -25,7 +27,6 @@ void MapTool::Initialize() {
         Mapfp = nullptr;
     }
 
-    // Read Stage1Image.txt
     if (Imagefp) {
         for (int i = 0; i < 40; i++) {
             for (int j = 0; j < 40; j++) {
@@ -37,6 +38,19 @@ void MapTool::Initialize() {
         }
         fclose(Imagefp);
         Imagefp = nullptr;
+    }
+
+    if (Objectfp) {
+        for (int i = 0; i < 40; i++) {
+            for (int j = 0; j < 40; j++) {
+                char tile[15] = { 0 };
+                if (fscanf(Objectfp, "%s", tile) == 1) {
+                    ObjectMap[j][i] = std::string(tile);
+                }
+            }
+        }
+        fclose(Objectfp);
+        Objectfp = nullptr;
     }
 
     for (int i = 0; i < 4; i++) {
@@ -58,11 +72,26 @@ void MapTool::Initialize() {
         wallConerTile[i].Load(path);
     }
 
-    selectedTile = "f1";
+    Objects[0].Load(L"resources/MapToolObjectIcon/ArcherIcon.png");
+    Objects[1].Load(L"resources/MapToolObjectIcon/SWORDMAN_RIGHT_0.png");
+    Objects[2].Load(L"resources/MapToolObjectIcon/WizardIcon.png");
+    Objects[3].Load(L"resources/MapToolObjectIcon/Candle.png");
+    Objects[4].Load(L"resources/MapToolObjectIcon/IceChunk0.png");
+    Objects[5].Load(L"resources/MapToolObjectIcon/IceChunk1.png");
+    Objects[6].Load(L"resources/MapToolObjectIcon/IceFlag.png");
+    Objects[7].Load(L"resources/MapToolObjectIcon/IceSmallChunk.png");
+    Objects[8].Load(L"resources/MapToolObjectIcon/IceWindow0.png");
+    Objects[9].Load(L"resources/MapToolObjectIcon/IceWindow1.png");
+    Objects[10].Load(L"resources/MapToolObjectIcon/IceWindow2.png");
+    Objects[11].Load(L"resources/MapToolObjectIcon/Jar.png");
+    Objects[12].Load(L"resources/MapToolObjectIcon/Statue.png");
 
+    selectedTile = "f1";
+    selectedObject = "empty";
     floordrag = false;
     walldrag = false;
     emptydrag = false;
+    ObjectCLK = false;
     drag = false;
 }
 
@@ -80,7 +109,7 @@ void MapTool::Render(HDC hdc) {
                 else if (ImageMap[i][j] == "f2" && !floorTile[1].IsNull()) floorTile[1].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "f3" && !floorTile[2].IsNull()) floorTile[2].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "f4" && !floorTile[3].IsNull()) floorTile[3].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
-                else if (!floorTile[0].IsNull()) floorTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY); // Fallback to f1
+                else if (!floorTile[0].IsNull()) floorTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
             }
             else if (map[i][j] == 1) {
                 if (ImageMap[i][j] == "w1" && !wallTile[0].IsNull()) wallTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
@@ -88,7 +117,7 @@ void MapTool::Render(HDC hdc) {
                 else if (ImageMap[i][j] == "w3" && !wallTile[2].IsNull()) wallTile[2].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "w4" && !wallTile[3].IsNull()) wallTile[3].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc1" && !wallConerTile[0].IsNull()) wallConerTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
-                else if (ImageMap[i][j] == "wc2" && !wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ImageMap[i][j] == "wc2" && !wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, left, top, right - left, top - bottom, SRCCOPY);
                 else if (ImageMap[i][j] == "wc3" && !wallConerTile[2].IsNull()) wallConerTile[2].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc4" && !wallConerTile[3].IsNull()) wallConerTile[3].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc5" && !wallConerTile[4].IsNull()) wallConerTile[4].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
@@ -97,17 +126,32 @@ void MapTool::Render(HDC hdc) {
                 else if (ImageMap[i][j] == "wc8" && !wallConerTile[7].IsNull()) wallConerTile[7].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc9" && !wallConerTile[8].IsNull()) wallConerTile[8].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc10" && !wallConerTile[9].IsNull()) wallConerTile[9].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
-                else if (!wallTile[0].IsNull()) wallTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY); // Fallback to w1
+                else if (!wallTile[0].IsNull()) wallTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
             }
             else if (map[i][j] == 2) {
                 if (!EmptyTile.IsNull()) {
                     EmptyTile.StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 }
             }
+
+            if (ObjectMap[i][j] != "empty") {
+                if (ObjectMap[i][j] == "Archer" && !Objects[0].IsNull()) Objects[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "SwordMan" && !Objects[1].IsNull()) Objects[1].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "Wizard" && !Objects[2].IsNull()) Objects[2].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "Candle" && !Objects[3].IsNull()) Objects[3].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceChunk0" && !Objects[4].IsNull()) Objects[4].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceChunk1" && !Objects[5].IsNull()) Objects[5].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceFlag" && !Objects[6].IsNull()) Objects[6].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceSmallChunk" && !Objects[7].IsNull()) Objects[7].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceWindow0" && !Objects[8].IsNull()) Objects[8].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceWindow1" && !Objects[9].IsNull()) Objects[9].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "IceWindow2" && !Objects[10].IsNull()) Objects[10].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "Jar" && !Objects[11].IsNull()) Objects[11].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+                else if (ObjectMap[i][j] == "Statue" && !Objects[12].IsNull()) Objects[12].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
+            }
         }
     }
 
-    // Draw grid lines for tile map
     hPen = CreatePen(PS_SOLID, 1, RGB(128, 128, 128));
     hOldPen = (HPEN)SelectObject(hdc, hPen);
     for (int i = 0; i <= 40; i++) {
@@ -119,30 +163,40 @@ void MapTool::Render(HDC hdc) {
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
 
-    // Draw tile palette in two columns (x: 850 and 910, y: 50+, 40x40 tiles)
-        // Left column (9 tiles)
-    if (!floorTile[0].IsNull()) floorTile[0].StretchBlt(hdc, 850, 50, 40, 40, SRCCOPY); // f1
-    if (!floorTile[1].IsNull()) floorTile[1].StretchBlt(hdc, 850, 100, 40, 40, SRCCOPY); // f2
-    if (!floorTile[2].IsNull()) floorTile[2].StretchBlt(hdc, 850, 150, 40, 40, SRCCOPY); // f3
-    if (!floorTile[3].IsNull()) floorTile[3].StretchBlt(hdc, 850, 200, 40, 40, SRCCOPY); // f4
-    if (!EmptyTile.IsNull()) EmptyTile.StretchBlt(hdc, 850, 250, 40, 40, SRCCOPY); // e
-    if (!wallTile[0].IsNull()) wallTile[0].StretchBlt(hdc, 850, 300, 40, 40, SRCCOPY); // w1
-    if (!wallTile[1].IsNull()) wallTile[1].StretchBlt(hdc, 850, 350, 40, 40, SRCCOPY); // w2
-    if (!wallTile[2].IsNull()) wallTile[2].StretchBlt(hdc, 850, 400, 40, 40, SRCCOPY); // w3
-    if (!wallTile[3].IsNull()) wallTile[3].StretchBlt(hdc, 850, 450, 40, 40, SRCCOPY); // w4
+    if (!floorTile[0].IsNull()) floorTile[0].StretchBlt(hdc, 850, 50, 40, 40, SRCCOPY);
+    if (!floorTile[1].IsNull()) floorTile[1].StretchBlt(hdc, 850, 100, 40, 40, SRCCOPY);
+    if (!floorTile[2].IsNull()) floorTile[2].StretchBlt(hdc, 850, 150, 40, 40, SRCCOPY);
+    if (!floorTile[3].IsNull()) floorTile[3].StretchBlt(hdc, 850, 200, 40, 40, SRCCOPY);
+    if (!EmptyTile.IsNull()) EmptyTile.StretchBlt(hdc, 850, 250, 40, 40, SRCCOPY);
+    if (!wallTile[0].IsNull()) wallTile[0].StretchBlt(hdc, 850, 300, 40, 40, SRCCOPY);
+    if (!wallTile[1].IsNull()) wallTile[1].StretchBlt(hdc, 850, 350, 40, 40, SRCCOPY);
+    if (!wallTile[2].IsNull()) wallTile[2].StretchBlt(hdc, 850, 400, 40, 40, SRCCOPY);
+    if (!wallTile[3].IsNull()) wallTile[3].StretchBlt(hdc, 850, 450, 40, 40, SRCCOPY);
 
-    // Right column (9 tiles)
-    if (!wallConerTile[0].IsNull()) wallConerTile[0].StretchBlt(hdc, 910, 50, 40, 40, SRCCOPY); // wc1
-    if (!wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, 910, 100, 40, 40, SRCCOPY); // wc2
-    if (!wallConerTile[2].IsNull()) wallConerTile[2].StretchBlt(hdc, 910, 150, 40, 40, SRCCOPY); // wc3
-    if (!wallConerTile[3].IsNull()) wallConerTile[3].StretchBlt(hdc, 910, 200, 40, 40, SRCCOPY); // wc4
-    if (!wallConerTile[4].IsNull()) wallConerTile[4].StretchBlt(hdc, 910, 250, 40, 40, SRCCOPY); // wc5
-    if (!wallConerTile[5].IsNull()) wallConerTile[5].StretchBlt(hdc, 910, 300, 40, 40, SRCCOPY); // wc6
-    if (!wallConerTile[6].IsNull()) wallConerTile[6].StretchBlt(hdc, 910, 350, 40, 40, SRCCOPY); // wc7
-    if (!wallConerTile[7].IsNull()) wallConerTile[7].StretchBlt(hdc, 910, 400, 40, 40, SRCCOPY); // wc8
-    if (!wallConerTile[8].IsNull()) wallConerTile[8].StretchBlt(hdc, 910, 450, 40, 40, SRCCOPY); // wc9
-    if (!wallConerTile[9].IsNull()) wallConerTile[9].StretchBlt(hdc, 910, 500, 40, 40, SRCCOPY); // wc10
+    if (!wallConerTile[0].IsNull()) wallConerTile[0].StretchBlt(hdc, 910, 50, 40, 40, SRCCOPY);
+    if (!wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, 910, 100, 40, 40, SRCCOPY);
+    if (!wallConerTile[2].IsNull()) wallConerTile[2].StretchBlt(hdc, 910, 150, 40, 40, SRCCOPY);
+    if (!wallConerTile[3].IsNull()) wallConerTile[3].StretchBlt(hdc, 910, 200, 40, 40, SRCCOPY);
+    if (!wallConerTile[4].IsNull()) wallConerTile[4].StretchBlt(hdc, 910, 250, 40, 40, SRCCOPY);
+    if (!wallConerTile[5].IsNull()) wallConerTile[5].StretchBlt(hdc, 910, 300, 40, 40, SRCCOPY);
+    if (!wallConerTile[6].IsNull()) wallConerTile[6].StretchBlt(hdc, 910, 350, 40, 40, SRCCOPY);
+    if (!wallConerTile[7].IsNull()) wallConerTile[7].StretchBlt(hdc, 910, 400, 40, 40, SRCCOPY);
+    if (!wallConerTile[8].IsNull()) wallConerTile[8].StretchBlt(hdc, 910, 450, 40, 40, SRCCOPY);
+    if (!wallConerTile[9].IsNull()) wallConerTile[9].StretchBlt(hdc, 910, 500, 40, 40, SRCCOPY);
 
+    if (!Objects[0].IsNull()) Objects[0].StretchBlt(hdc, 960, 50, 40, 40, SRCCOPY);
+    if (!Objects[1].IsNull()) Objects[1].StretchBlt(hdc, 960, 100, 40, 40, SRCCOPY);
+    if (!Objects[2].IsNull()) Objects[2].StretchBlt(hdc, 960, 150, 40, 40, SRCCOPY);
+    if (!Objects[3].IsNull()) Objects[3].StretchBlt(hdc, 960, 200, 40, 40, SRCCOPY);
+    if (!Objects[4].IsNull()) Objects[4].StretchBlt(hdc, 960, 250, 40, 40, SRCCOPY);
+    if (!Objects[5].IsNull()) Objects[5].StretchBlt(hdc, 960, 300, 40, 40, SRCCOPY);
+    if (!Objects[6].IsNull()) Objects[6].StretchBlt(hdc, 960, 350, 40, 40, SRCCOPY);
+    if (!Objects[7].IsNull()) Objects[7].StretchBlt(hdc, 960, 400, 40, 40, SRCCOPY);
+    if (!Objects[8].IsNull()) Objects[8].StretchBlt(hdc, 960, 450, 40, 40, SRCCOPY);
+    if (!Objects[9].IsNull()) Objects[9].StretchBlt(hdc, 960, 500, 40, 40, SRCCOPY);
+    if (!Objects[10].IsNull()) Objects[10].StretchBlt(hdc, 960, 550, 40, 40, SRCCOPY);
+    if (!Objects[11].IsNull()) Objects[11].StretchBlt(hdc, 960, 600, 40, 40, SRCCOPY);
+    if (!Objects[12].IsNull()) Objects[12].StretchBlt(hdc, 960, 650, 40, 40, SRCCOPY);
 
     if (drag) {
         int left = min(drawRect.left, drawRect.right) * 20;
@@ -151,131 +205,241 @@ void MapTool::Render(HDC hdc) {
         int bottom = max(drawRect.top, drawRect.bottom) * 20;
         Rectangle(hdc, left, top, right, bottom);
     }
-
 }
 
 void MapTool::Update() {
     if (Input::GetKeyDown(eKeyCode::LButton)) {
-
         int mx = Input::GetMousePosition().x;
         int my = Input::GetMousePosition().y;
 
-        if (Input::GetMousePosition().x >= 850 && Input::GetMousePosition().x <= 890) { // Left column
-            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) { // Floor tile 1
+        if (Input::GetMousePosition().x >= 850 && Input::GetMousePosition().x <= 890) {
+            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) {
                 selectedTile = "f1";
                 floordrag = true;
                 walldrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) { // Floor tile 2
+            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) {
                 selectedTile = "f2";
                 floordrag = true;
                 walldrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) { // Floor tile 3
+            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) {
                 selectedTile = "f3";
                 floordrag = true;
                 walldrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) { // Floor tile 4
+            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) {
                 selectedTile = "f4";
                 floordrag = true;
                 walldrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) { // Empty tile
+            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) {
                 selectedTile = "e";
                 emptydrag = true;
                 walldrag = false;
                 floordrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) { // Wall tile 1
+            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) {
                 selectedTile = "w1";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) { // Wall tile 2
+            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) {
                 selectedTile = "w2";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) { // Wall tile 3
+            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) {
                 selectedTile = "w3";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) { // Wall tile 4
+            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) {
                 selectedTile = "w4";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
         }
-        else if (Input::GetMousePosition().x >= 910 && Input::GetMousePosition().x <= 950) { // Right column
-            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) { // Wall corner tile 1
+        else if (Input::GetMousePosition().x >= 910 && Input::GetMousePosition().x <= 950) {
+            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) {
                 selectedTile = "wc1";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) { // Wall corner tile 2
+            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) {
                 selectedTile = "wc2";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) { // Wall corner tile 3
+            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) {
                 selectedTile = "wc3";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) { // Wall corner tile 4
+            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) {
                 selectedTile = "wc4";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) { // Wall corner tile 5
+            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) {
                 selectedTile = "wc5";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) { // Wall corner tile 6
+            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) {
                 selectedTile = "wc6";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) { // Wall corner tile 7
+            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) {
                 selectedTile = "wc7";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) { // Wall corner tile 8
+            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) {
                 selectedTile = "wc8";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) { // Wall corner tile 9
+            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) {
                 selectedTile = "wc9";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 500 && Input::GetMousePosition().y <= 540) { // Wall corner tile 10
+            else if (Input::GetMousePosition().y >= 500 && Input::GetMousePosition().y <= 540) {
                 selectedTile = "wc10";
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
+                ObjectCLK = false;
+            }
+        }
+        else if (Input::GetMousePosition().x >= 960 && Input::GetMousePosition().x <= 1000) {
+            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) {
+                selectedObject = "Archer";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) {
+                selectedObject = "SwordMan";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) {
+                selectedObject = "Wizard";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) {
+                selectedObject = "Candle";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) {
+                selectedObject = "IceChunk0";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) {
+                selectedObject = "IceChunk1";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) {
+                selectedObject = "IceFlag";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) {
+                selectedObject = "IceSmallChunk";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) {
+                selectedObject = "IceWindow0";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 500 && Input::GetMousePosition().y <= 540) {
+                selectedObject = "IceWindow1";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 550 && Input::GetMousePosition().y <= 590) {
+                selectedObject = "IceWindow2";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 600 && Input::GetMousePosition().y <= 640) {
+                selectedObject = "Jar";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
+            }
+            else if (Input::GetMousePosition().y >= 650 && Input::GetMousePosition().y <= 690) {
+                selectedObject = "Statue";
+                walldrag = false;
+                floordrag = false;
+                emptydrag = false;
+                ObjectCLK = true;
             }
         }
 
@@ -284,95 +448,113 @@ void MapTool::Update() {
                 mx = Input::GetMousePosition().x / 20;
                 my = Input::GetMousePosition().y / 20;
 
-                drawRect.left = mx;
-                drawRect.top = my;
-                drawRect.right = mx + 1;
-                drawRect.bottom = my + 1;
-
-                drag = true;
+                if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+                    drawRect.left = mx;
+                    drawRect.top = my;
+                    drawRect.right = mx + 1;
+                    drawRect.bottom = my + 1;
+                    drag = true;
+                }
             }
         }
     }
     else if (Input::GetKeyUp(eKeyCode::LButton)) {
-        
-        int mx, my;
+        if (drag) {
+            int mx = Input::GetMousePosition().x / 20;
+            int my = Input::GetMousePosition().y / 20;
 
-        mx = Input::GetMousePosition().x / 20;
-        my = Input::GetMousePosition().y / 20;
-        
-        drawRect.right = mx + 1;
-        drawRect.bottom = my + 1;
+            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+                drawRect.right = mx + 1;
+                drawRect.bottom = my + 1;
 
-        int left = min(drawRect.left, drawRect.right);
-        int right = max(drawRect.left, drawRect.right);
-        int top = min(drawRect.top, drawRect.bottom);
-        int bottom = max(drawRect.top, drawRect.bottom);
+                int left = min(drawRect.left, drawRect.right);
+                int right = max(drawRect.left, drawRect.right);
+                int top = min(drawRect.top, drawRect.bottom);
+                int bottom = max(drawRect.top, drawRect.bottom);
 
-        for (int i = left; i < right; i++) {
-            for (int j = top; j < bottom; j++) {
-                if (i >= 0 && i < 40 && j >= 0 && j < 40) {
-                    if (walldrag) {
-                        map[i][j] = 1;
-                        ImageMap[i][j] = selectedTile; // Use selected tile
-                    }
-                    else if (floordrag) {
-                        map[i][j] = 0;
-                        ImageMap[i][j] = selectedTile; // Use selected tile
-                    }
-                    else if (emptydrag) {
-                        map[i][j] = 2;
-                        ImageMap[i][j] = selectedTile; // Use selected tile
+                for (int i = left; i < right; i++) {
+                    for (int j = top; j < bottom; j++) {
+                        if (i >= 0 && i < 40 && j >= 0 && j < 40) {
+                            if (walldrag) {
+                                map[i][j] = 1;
+                                ImageMap[i][j] = selectedTile;
+                            }
+                            else if (floordrag) {
+                                map[i][j] = 0;
+                                ImageMap[i][j] = selectedTile;
+                            }
+                            else if (emptydrag) {
+                                map[i][j] = 2;
+                                ImageMap[i][j] = selectedTile;
+                            }
+                        }
                     }
                 }
             }
+            drag = false;
         }
+        else if (ObjectCLK) {
+            int mx = Input::GetMousePosition().x / 20;
+            int my = Input::GetMousePosition().y / 20;
 
-        drag = false;
+            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+                ObjectMap[mx][my] = selectedObject;
+            }
+        }
     }
     else if (Input::GetKey(eKeyCode::LButton)) {
-        int mx = Input::GetMousePosition().x / 20;
-        int my = Input::GetMousePosition().y / 20;
+        if (drag) {
+            int mx = Input::GetMousePosition().x / 20;
+            int my = Input::GetMousePosition().y / 20;
 
-        drawRect.right = mx + 1;
-        drawRect.bottom = my + 1;
+            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+                drawRect.right = mx + 1;
+                drawRect.bottom = my + 1;
+            }
+        }
     }
-
 
     if (Input::GetKeyDown(eKeyCode::S)) {
         Mapfp = fopen("StageCustom.txt", "w");
         Imagefp = fopen("StageCustomImage.txt", "w");
-        if (!Mapfp || !Imagefp) {
+        Objectfp = fopen("StageCustomObejct.txt", "w");
+
+        if (!Mapfp || !Imagefp || !Objectfp) {
             if (Mapfp) fclose(Mapfp);
             if (Imagefp) fclose(Imagefp);
+            if (Objectfp) fclose(Objectfp);
             Mapfp = nullptr;
             Imagefp = nullptr;
+            Objectfp = nullptr;
         }
 
-        // Validate and save data
         bool saveSuccess = true;
         for (int i = 0; i < 40; i++) {
             for (int j = 0; j < 40; j++) {
                 if (fprintf(Mapfp, "%d ", map[j][i]) < 0 ||
-                    fprintf(Imagefp, "%s ", ImageMap[j][i].c_str()) < 0) {
+                    fprintf(Imagefp, "%s ", ImageMap[j][i].c_str()) < 0 ||
+                    fprintf(Objectfp, "%s ", ObjectMap[j][i].c_str()) < 0) {
                     saveSuccess = false;
                     break;
                 }
             }
             fprintf(Mapfp, "\n");
             fprintf(Imagefp, "\n");
+            fprintf(Objectfp, "\n");
             if (!saveSuccess) break;
         }
 
-        // Flush and close files
         fflush(Mapfp);
         fflush(Imagefp);
+        fflush(Objectfp);
         fclose(Mapfp);
         fclose(Imagefp);
+        fclose(Objectfp);
         Mapfp = nullptr;
         Imagefp = nullptr;
+        Objectfp = nullptr;
     }
 }
 
 void MapTool::LateUpdate() {
-
 }

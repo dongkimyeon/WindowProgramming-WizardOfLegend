@@ -15,18 +15,22 @@ public:
 
 private:
     int map[40][40];
-    char ObjectMap[40][40];
     bool drag;
     bool floordrag;
     bool walldrag;
     bool emptydrag;
+    bool ObjectCLK;
     RECT drawRect;
     std::string ImageMap[40][40];
+    std::string ObjectMap[40][40];
     std::string selectedTile;
+    std::string selectedObject;
     CImage wallTile[4];
     CImage wallConerTile[10]; // Increased to 10CImage buffer;
     CImage EmptyTile; 
     CImage floorTile[4]; 
+    CImage Objects[13];
     FILE* Mapfp;
     FILE* Imagefp;
+    FILE* Objectfp;
 };  
