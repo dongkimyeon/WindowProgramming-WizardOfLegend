@@ -201,6 +201,8 @@ void MapManager::Initialize()
     }
 
     buffer.ReleaseDC();
+
+
 }
 
 void MapManager::Update()

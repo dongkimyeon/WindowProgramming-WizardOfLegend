@@ -1,4 +1,5 @@
 #pragma once
+#define _CRT_SECURE_NO_WARNINGS
 #include "Entity.h"
 #include "GameObject.h"	
 #include "Player_Skill_FireBall.h"	

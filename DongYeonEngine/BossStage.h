@@ -27,6 +27,17 @@ private:
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
     std::vector<BossSkill_Spear*> spears;
     std::vector<BossSkill_AquaBall*> aquaBalls;
+
+
+    std::vector<IceBigChunk*> mIceBigChunk;
+    std::vector<IceSmallChunk*> mIceSmallChunk;
+    std::vector<Statue*> mStatue;
+    std::vector<Candle*> mCandle;
+    std::vector<IceFlag*> mIceFlag;
+    std::vector<IceWindow*> mWindow;
+    std::vector<Jar*> mJar;
+    std::vector<IceFlag*> mFlag;
+
     bool portalCreate;
     Boss iceBoss;
     Portal portal;
@@ -82,5 +93,6 @@ public:
     void ResolveCollisionMap(RECT wallRect, GameObject& obj); // ¼öÁ¤: Tile& -> REC
 
     void CreateFireParticles(std::vector<Particle>& particles, float x, float y);
+    void LoadObject(const std::wstring& name);
 };
 

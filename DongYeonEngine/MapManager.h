@@ -1,6 +1,11 @@
 #pragma once
 #include "CommonInclude.h"
 #include "Tile.h"
+#include "Archer.h"
+#include "SwordMan.h"
+#include "Wizard.h"
+#include "MapObjectInclude.h"
+
 
 
 class MapManager : public std::enable_shared_from_this<MapManager>
@@ -19,7 +24,6 @@ public:
     int (*GetMap())[40]; // map 배열 반환 추가
 
     void LoadMap(const std::wstring& name);
-    //void LoadObject(const std::wstring& name);
 
 private:
     static const int MAP_WIDTH = 2000;
