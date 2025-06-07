@@ -653,6 +653,8 @@ void StageCustom::Render(HDC hdc)
         }
     }
 
+
+    // map object
     for (auto& Candle : mCandle) {
         RECT rect = Candle->GetRect();
         if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
@@ -665,6 +667,69 @@ void StageCustom::Render(HDC hdc)
             RestoreDC(CandleDC, savedCandleDC);
         }
     }
+    for (auto& IceBigChunk : mIceBigChunk) {
+        RECT rect = IceBigChunk->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC IceChunkDC = hdc;
+            int savedIceChunkDC = SaveDC(IceChunkDC);
+            OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            IceBigChunk->Render(IceChunkDC);
+            RestoreDC(IceChunkDC, savedIceChunkDC);
+        }
+    }
+    for (auto& IceSmallChunk : mIceSmallChunk) {
+        RECT rect = IceSmallChunk->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC IceChunkDC = hdc;
+            int savedIceChunkDC = SaveDC(IceChunkDC);
+            OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            IceSmallChunk->Render(IceChunkDC);
+            RestoreDC(IceChunkDC, savedIceChunkDC);
+        }
+    }
+    for (auto& MapObject : mIceFlag) {
+        RECT rect = MapObject->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
+    }
+    for (auto& MapObject : mJar) {
+        RECT rect = MapObject->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
+    }
+    for (auto& MapObject : mStatue) {
+        RECT rect = MapObject->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
+    }
+
+
+
 
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
@@ -858,73 +923,88 @@ void StageCustom::LoadObject(const std::wstring& name) {
     if (fp != NULL) {
         for (int i = 0; i < 40; i++) {
             for (int j = 0; j < 40; j++) {
-                std::string Object;
-                if (fscanf(fp, "%s ", Object) == 1) {
+                char tile[15];
+                if (fscanf(fp, "%s", tile) == 1) {
+                    std::string Object = std::string(tile);
                     if (Object != "empty") {
+                        
                         if (Object == "Archer")
                         {
+                            std::cout << Object << "\n";
                             archers.push_back(new Archer());
-                            archers.back()->SetPosition(j * 50, i * 50);
+                            archers.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "SwordMan")
                         {
+                            std::cout << Object << "\n";
                             swordmans.push_back(new SwordMan());
-                            swordmans.back()->SetPosition(j * 50, i * 50);
+                            swordmans.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "Wizard")
                         {
+                            std::cout << Object << "\n";
                             wizards.push_back(new Wizard());
-                            wizards.back()->SetPosition(j * 50, i * 50);
+                            wizards.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "Candle")
                         {
+                            std::cout << Object << "\n";
                             mCandle.push_back(new Candle());
-                            mCandle.back()->SetPosition(j * 50, i * 50);
+                            mCandle.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceChunk0")
                         {
+                            std::cout << Object << "\n";
                             mIceBigChunk.push_back(new IceBigChunk());
-                            mIceBigChunk.back()->SetPosition(j * 50, i * 50);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceChunk1")
                         {
+                            std::cout << Object << "\n";
                             mIceBigChunk.push_back(new IceBigChunk());
-                            mIceBigChunk.back()->SetPosition(j * 50, i * 50);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceFlag")
                         {
+                            std::cout << Object << "\n";
                             mIceFlag.push_back(new IceFlag());
-                            mIceFlag.back()->SetPosition(j * 50, i * 50);
+                            mIceFlag.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceSmallChunk")
                         {
+                            std::cout << Object << "\n";
                             mIceSmallChunk.push_back(new IceSmallChunk());
-                            mIceSmallChunk.back()->SetPosition(j * 50, i * 50);
+                            mIceSmallChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceWindow0")
                         {
+                            std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
-                            mWindow.back()->SetPosition(j * 50, i * 50);
+                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceWindow1")
                         {
+                            std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
-                            mWindow.back()->SetPosition(j * 50, i * 50);
+                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "IceWindow2")
                         {
+                            std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
-                            mWindow.back()->SetPosition(j * 50, i * 50);
+                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "Jar")
                         {
+                            std::cout << Object << "\n";
                             mJar.push_back(new Jar());
-                            mJar.back()->SetPosition(j * 50, i * 50);
+                            mJar.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                         else if (Object == "Statue")
                         {
+                            std::cout << Object << "\n";
                             mStatue.push_back(new Statue());
-                            mStatue.back()->SetPosition(j * 50, i * 50);
+                            mStatue.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
                         }
                     }
                 }
@@ -932,4 +1012,6 @@ void StageCustom::LoadObject(const std::wstring& name) {
         }
         fclose(fp);
     }
+    else
+        std::cout << "File error";
 }
