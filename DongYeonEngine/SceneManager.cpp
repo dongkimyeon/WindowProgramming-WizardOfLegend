@@ -134,7 +134,9 @@ void SceneManager::Update()
                 playTime = 0.0f; // 게임 시간 초기화
                 mIsGameStart = false; // 게임 시작 상태 초기화
                 StartFadeIn();
+                mActiveScene->ObjectDestroy();
                 LoadScene(L"TitleScene");
+                
             }
         }
     }

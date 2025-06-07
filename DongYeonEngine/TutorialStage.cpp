@@ -13,6 +13,60 @@
 #define TILE_SIZE 50
 
 
+void TutorialStage::ObjectDestroy() 
+{
+    // Release Wizards
+    for (auto* wizard : wizards)
+    {
+        delete wizard;
+    }
+    wizards.clear();
+
+    // Release SwordMans
+    for (auto* swordman : swordmans)
+    {
+        delete swordman;
+    }
+    swordmans.clear();
+
+    // Release Archers
+    for (auto* archer : archers)
+    {
+        delete archer;
+    }
+    archers.clear();
+
+    // Release Arrows
+    for (auto* arrow : arrows)
+    {
+        delete arrow;
+    }
+    arrows.clear();
+
+    // Release FireBalls
+    for (auto* fireball : fireballs)
+    {
+        delete fireball;
+    }
+    fireballs.clear();
+
+    // Release Player FireBalls
+    for (auto* playerFireball : playerFireballs)
+    {
+        delete playerFireball;
+    }
+    playerFireballs.clear();
+
+    // Release Player FireDragons
+    for (auto* fireDragon : playerFireDragon)
+    {
+        delete fireDragon;
+    }
+    playerFireDragon.clear();
+
+    // Clear particles
+    mParticles.clear();
+}
 // 파티클 생성 함수
 void TutorialStage::CreateFireParticles(std::vector<Particle>& particles, float x, float y)
 {

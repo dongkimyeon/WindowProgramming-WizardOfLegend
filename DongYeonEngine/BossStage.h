@@ -56,6 +56,7 @@ public:
     void Update() override;
     void LateUpdate() override;
     void Render(HDC hdc) override;
+    void ObjectDestroy() override;
     void AddArrow(Arrow* arrow) override { arrows.push_back(arrow); }
     void AddFireBall(FireBall* fireball) override
     {

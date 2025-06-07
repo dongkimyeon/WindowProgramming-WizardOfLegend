@@ -29,6 +29,10 @@ void Scene::ObjectInitialize()
 {
 }
 
+void Scene::ObjectDestroy()
+{
+}
+
 void Scene::AddPlayerSkillFireBall(Player_Skill_FireBall* fireball)
 {
 
