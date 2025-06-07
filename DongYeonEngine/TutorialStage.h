@@ -39,15 +39,6 @@ private:
     std::vector<Player_Skill_FireDragon*> playerFireDragon;
     std::vector<Dummy*> dummies;
 
-    std::vector<IceBigChunk*> mIceBigChunk;
-    std::vector<IceSmallChunk*> mIceSmallChunk;
-    std::vector<Statue*> mStatue;
-    std::vector<Candle*> mCandle;
-    std::vector<IceFlag*> mIceFlag;
-    std::vector<IceWindow*> mWindow;
-    std::vector<Jar*> mJar;
-    std::vector<IceFlag*> mFlag;
-
     std::queue<std::wstring> tutorialQue;
     bool isStepCompleted;
     std::wstring currentTutorialStep;
@@ -85,6 +76,5 @@ public:
     void HandleCollisionMap(int (*map)[40], GameObject& obj); // 수정: Tile** -> int (*)[40]
     void ResolveCollisionMap(RECT wallRect, GameObject& obj); // 수정: Tile& -> REC
     void CreateFireParticles(std::vector<Particle>& particles, float x, float y);
-    void LoadObject(const std::wstring& name);
 };
 

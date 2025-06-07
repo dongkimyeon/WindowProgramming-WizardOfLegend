@@ -1,4 +1,4 @@
-#include "CommonInclude.h"
+#pragma once
 #include "GameObject.h"
 class IceSmallChunk : public GameObject
 {
@@ -8,7 +8,7 @@ private:
     int mY;
     float mScale; // Added scale factor
 public:
-    void Initialize()
+    IceSmallChunk()
     {
         mIceSmallChunkImage.Load(L"resources/MapObject/IceSmallChunk.png");
         mX = 0;

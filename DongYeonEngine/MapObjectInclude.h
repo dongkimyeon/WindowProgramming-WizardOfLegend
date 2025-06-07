@@ -1,3 +1,4 @@
+#pragma once
 #include "IceBigChunk.h"
 #include "IceSmallChunk.h"
 #include "IceWindow.h"

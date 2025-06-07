@@ -1,4 +1,4 @@
-#include "CommonInclude.h"
+#pragma once
 #include "GameObject.h"
 
 class Statue : public GameObject
@@ -9,7 +9,7 @@ private:
 	int mX;
 	int mY;
 public:
-	void Initialize()
+	Statue()
 	{
 		mStatueImage.Load(L"resources/MapObject/Statue.png");
 		mX = 0;

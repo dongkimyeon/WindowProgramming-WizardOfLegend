@@ -1,4 +1,4 @@
-#include "CommonInclude.h"
+#pragma once
 #include "GameObject.h"
 class Jar : public GameObject
 {
@@ -7,7 +7,7 @@ private:
 	int mX;
 	int mY;
 public:
-	void Initialize()
+	Jar()
 	{
 		mJarImage.Load(L"resources/MapObject/Jar.png");
 		mX = 0;

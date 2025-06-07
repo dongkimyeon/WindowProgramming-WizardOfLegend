@@ -1,4 +1,4 @@
-#include "CommonInclude.h"
+#pragma once
 #include "GameObject.h"
 class IceWindow : public GameObject
 {
@@ -11,7 +11,7 @@ private:
 	int mImageNum;
 public:
 
-	void Initialize()
+	IceWindow()
 	{
 		mIceWindow0.Load(L"resources/MapObject/IceWindow0.png");
 		mIceWindow1.Load(L"resources/MapObject/IceWindow1.png");

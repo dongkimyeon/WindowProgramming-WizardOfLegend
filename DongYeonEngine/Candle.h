@@ -1,4 +1,4 @@
-#include "CommonInclude.h"
+#pragma once
 #include "GameObject.h"
 
 class Candle : public GameObject
@@ -10,7 +10,8 @@ private:
     float mScale; // 스케일 값 추가
 
 public:
-    void Initialize()
+
+    Candle()
     {
         mCandleImage.Load(L"resources/MapObject/Candle.png");
         mX = 0;

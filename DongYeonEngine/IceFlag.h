@@ -1,4 +1,4 @@
-#include "CommonInclude.h"
+#pragma once
 #include "GameObject.h"
 class IceFlag : public GameObject
 {
@@ -8,7 +8,7 @@ private:
 	int mY;
 	float mScale;
 public:
-	void Initialize()
+	IceFlag()
 	{
 		mIceFlag.Load(L"resources/MapObject/IceFlag.png");
 		mX = 0;

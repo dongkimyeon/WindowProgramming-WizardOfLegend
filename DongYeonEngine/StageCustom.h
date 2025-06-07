@@ -11,6 +11,7 @@
 #include "Camera.h"
 #include "Player_Skill_FireBall.h"
 #include "Player_Skill_FireDragon.h"
+#include "MapObjectInclude.h"
 
 class StageCustom : public Scene
 {

@@ -4,8 +4,6 @@
 #include "Archer.h"
 #include "SwordMan.h"
 #include "Wizard.h"
-#include "MapObjectInclude.h"
-
 
 
 class MapManager : public std::enable_shared_from_this<MapManager>

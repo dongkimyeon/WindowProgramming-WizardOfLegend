@@ -654,7 +654,16 @@ void StageCustom::Render(HDC hdc)
     }
 
     for (auto& Candle : mCandle) {
-
+        RECT rect = Candle->GetRect();
+        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        {
+            HDC CandleDC = hdc;
+            int savedCandleDC = SaveDC(CandleDC);
+            OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            Candle->Render(CandleDC);
+            RestoreDC(CandleDC, savedCandleDC);
+        }
     }
 
     HDC playerDC = hdc;
@@ -850,7 +859,7 @@ void StageCustom::LoadObject(const std::wstring& name) {
         for (int i = 0; i < 40; i++) {
             for (int j = 0; j < 40; j++) {
                 std::string Object;
-                if (fscanf(fp, "%s", Object) == 1) {
+                if (fscanf(fp, "%s ", Object) == 1) {
                     if (Object != "empty") {
                         if (Object == "Archer")
                         {

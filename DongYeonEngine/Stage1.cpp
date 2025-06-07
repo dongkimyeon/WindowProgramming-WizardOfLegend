@@ -19,8 +19,6 @@ void Stage1::Initialize()
 {
     UI::Initialize();
     camera.SetTarget(SceneManager::GetSharedPlayer());
-    LoadObject(L"Stage1Object.txt");
-
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
     {
@@ -884,87 +882,4 @@ void Stage1::ResolveCollisionMap(RECT wallRect, GameObject& obj)
     }
 
     
-}
-
-void Stage1::LoadObject(const std::wstring& name) {
-    FILE* fp;
-    fp = _wfopen(name.c_str(), L"r");
-
-    if (fp != NULL) {
-        for (int i = 0; i < 40; i++) {
-            for (int j = 0; j < 40; j++) {
-                std::string Object;
-                if (fscanf(fp, "%s", Object) == 1) {
-                    if (Object != "empty") {
-                        if (Object == "Archer")
-                        {
-                            archers.push_back(new Archer());
-                            archers.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "SwordMan")
-                        {
-                            swordmans.push_back(new SwordMan());
-                            swordmans.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "Wizard")
-                        {
-                            wizards.push_back(new Wizard());
-                            wizards.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "Candle")
-                        {
-                            mCandle.push_back(new Candle());
-                            mCandle.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceChunk0")
-                        {
-                            mIceBigChunk.push_back(new IceBigChunk());
-                            mIceBigChunk.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceChunk1")
-                        {
-                            mIceBigChunk.push_back(new IceBigChunk());
-                            mIceBigChunk.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceFlag")
-                        {
-                            mIceFlag.push_back(new IceFlag());
-                            mIceFlag.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceSmallChunk")
-                        {
-                            mIceSmallChunk.push_back(new IceSmallChunk());
-                            mIceSmallChunk.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceWindow0")
-                        {
-                            mWindow.push_back(new IceWindow());
-                            mWindow.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceWindow1")
-                        {
-                            mWindow.push_back(new IceWindow());
-                            mWindow.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "IceWindow2")
-                        {
-                            mWindow.push_back(new IceWindow());
-                            mWindow.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "Jar")
-                        {
-                            mJar.push_back(new Jar());
-                            mJar.back()->SetPosition(j * 50, i * 50);
-                        }
-                        else if (Object == "Statue")
-                        {
-                            mStatue.push_back(new Statue());
-                            mStatue.back()->SetPosition(j * 50, i * 50);
-                        }
-                    }
-                }
-            }
-        }
-        fclose(fp);
-    }
 }
