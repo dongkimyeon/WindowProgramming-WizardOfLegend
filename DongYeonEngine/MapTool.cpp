@@ -96,7 +96,7 @@ void MapTool::Initialize() {
 }
 
 void MapTool::Render(HDC hdc) {
-    HPEN hPen, hOldPen;
+    HPEN hPen, hOldPen, hRedPen;
 
     for (int i = 0; i < 40; i++) {
         for (int j = 0; j < 40; j++) {
@@ -153,6 +153,7 @@ void MapTool::Render(HDC hdc) {
     }
 
     hPen = CreatePen(PS_SOLID, 1, RGB(128, 128, 128));
+    hRedPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
     hOldPen = (HPEN)SelectObject(hdc, hPen);
     for (int i = 0; i <= 40; i++) {
         MoveToEx(hdc, i * 20, 0, NULL);
@@ -163,40 +164,90 @@ void MapTool::Render(HDC hdc) {
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
 
-    if (!floorTile[0].IsNull()) floorTile[0].StretchBlt(hdc, 850, 50, 40, 40, SRCCOPY);
-    if (!floorTile[1].IsNull()) floorTile[1].StretchBlt(hdc, 850, 100, 40, 40, SRCCOPY);
-    if (!floorTile[2].IsNull()) floorTile[2].StretchBlt(hdc, 850, 150, 40, 40, SRCCOPY);
-    if (!floorTile[3].IsNull()) floorTile[3].StretchBlt(hdc, 850, 200, 40, 40, SRCCOPY);
-    if (!EmptyTile.IsNull()) EmptyTile.StretchBlt(hdc, 850, 250, 40, 40, SRCCOPY);
-    if (!wallTile[0].IsNull()) wallTile[0].StretchBlt(hdc, 850, 300, 40, 40, SRCCOPY);
-    if (!wallTile[1].IsNull()) wallTile[1].StretchBlt(hdc, 850, 350, 40, 40, SRCCOPY);
-    if (!wallTile[2].IsNull()) wallTile[2].StretchBlt(hdc, 850, 400, 40, 40, SRCCOPY);
-    if (!wallTile[3].IsNull()) wallTile[3].StretchBlt(hdc, 850, 450, 40, 40, SRCCOPY);
+    // Render tiles and objects in 4-5 rows per category, starting at y=50
+    int baseX = 850, baseY = 50, tileSize = 40, spacing = 10;
 
-    if (!wallConerTile[0].IsNull()) wallConerTile[0].StretchBlt(hdc, 910, 50, 40, 40, SRCCOPY);
-    if (!wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, 910, 100, 40, 40, SRCCOPY);
-    if (!wallConerTile[2].IsNull()) wallConerTile[2].StretchBlt(hdc, 910, 150, 40, 40, SRCCOPY);
-    if (!wallConerTile[3].IsNull()) wallConerTile[3].StretchBlt(hdc, 910, 200, 40, 40, SRCCOPY);
-    if (!wallConerTile[4].IsNull()) wallConerTile[4].StretchBlt(hdc, 910, 250, 40, 40, SRCCOPY);
-    if (!wallConerTile[5].IsNull()) wallConerTile[5].StretchBlt(hdc, 910, 300, 40, 40, SRCCOPY);
-    if (!wallConerTile[6].IsNull()) wallConerTile[6].StretchBlt(hdc, 910, 350, 40, 40, SRCCOPY);
-    if (!wallConerTile[7].IsNull()) wallConerTile[7].StretchBlt(hdc, 910, 400, 40, 40, SRCCOPY);
-    if (!wallConerTile[8].IsNull()) wallConerTile[8].StretchBlt(hdc, 910, 450, 40, 40, SRCCOPY);
-    if (!wallConerTile[9].IsNull()) wallConerTile[9].StretchBlt(hdc, 910, 500, 40, 40, SRCCOPY);
+    // Floor Tiles (4 items)
+    for (int i = 0; i < 4; i++) {
+        int x = baseX + (i % 4) * (tileSize + spacing);
+        int y = baseY + (i / 4) * (tileSize + spacing);
+        if (!floorTile[i].IsNull()) floorTile[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        if (selectedTile == ("f" + std::to_string(i + 1))) {
+            SelectObject(hdc, hRedPen);
+            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            SelectObject(hdc, hOldPen);
+        }
+    }
 
-    if (!Objects[0].IsNull()) Objects[0].StretchBlt(hdc, 960, 50, 40, 40, SRCCOPY);
-    if (!Objects[1].IsNull()) Objects[1].StretchBlt(hdc, 960, 100, 40, 40, SRCCOPY);
-    if (!Objects[2].IsNull()) Objects[2].StretchBlt(hdc, 960, 150, 40, 40, SRCCOPY);
-    if (!Objects[3].IsNull()) Objects[3].StretchBlt(hdc, 960, 200, 40, 40, SRCCOPY);
-    if (!Objects[4].IsNull()) Objects[4].StretchBlt(hdc, 960, 250, 40, 40, SRCCOPY);
-    if (!Objects[5].IsNull()) Objects[5].StretchBlt(hdc, 960, 300, 40, 40, SRCCOPY);
-    if (!Objects[6].IsNull()) Objects[6].StretchBlt(hdc, 960, 350, 40, 40, SRCCOPY);
-    if (!Objects[7].IsNull()) Objects[7].StretchBlt(hdc, 960, 400, 40, 40, SRCCOPY);
-    if (!Objects[8].IsNull()) Objects[8].StretchBlt(hdc, 960, 450, 40, 40, SRCCOPY);
-    if (!Objects[9].IsNull()) Objects[9].StretchBlt(hdc, 960, 500, 40, 40, SRCCOPY);
-    if (!Objects[10].IsNull()) Objects[10].StretchBlt(hdc, 960, 550, 40, 40, SRCCOPY);
-    if (!Objects[11].IsNull()) Objects[11].StretchBlt(hdc, 960, 600, 40, 40, SRCCOPY);
-    if (!Objects[12].IsNull()) Objects[12].StretchBlt(hdc, 960, 650, 40, 40, SRCCOPY);
+    // Empty Tile (1 item)
+    int emptyY = baseY + tileSize + spacing;
+    if (!EmptyTile.IsNull()) EmptyTile.StretchBlt(hdc, baseX, emptyY, tileSize, tileSize, SRCCOPY);
+    if (selectedTile == "e") {
+        SelectObject(hdc, hRedPen);
+        Rectangle(hdc, baseX, emptyY, baseX + tileSize, emptyY + tileSize);
+        SelectObject(hdc, hOldPen);
+    }
+
+    // Wall Tiles (4 items)
+    int wallY = emptyY + tileSize + spacing;
+    for (int i = 0; i < 4; i++) {
+        int x = baseX + (i % 4) * (tileSize + spacing);
+        int y = wallY + (i / 4) * (tileSize + spacing);
+        if (!wallTile[i].IsNull()) wallTile[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        if (selectedTile == ("w" + std::to_string(i + 1))) {
+            SelectObject(hdc, hRedPen);
+            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            SelectObject(hdc, hOldPen);
+        }
+    }
+
+    // Wall Corner Tiles (10 items, 5 per row)
+    int cornerY = wallY + tileSize + spacing;
+    for (int i = 0; i < 10; i++) {
+        int x = baseX + (i % 5) * (tileSize + spacing);
+        int y = cornerY + (i / 5) * (tileSize + spacing);
+        if (!wallConerTile[i].IsNull()) wallConerTile[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        if (selectedTile == ("wc" + std::to_string(i + 1))) {
+            SelectObject(hdc, hRedPen);
+            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            SelectObject(hdc, hOldPen);
+        }
+    }
+
+    // Objects (13 items, 5 per row) + Empty and Cancel buttons
+    int objectY = cornerY + 2 * (tileSize + spacing);
+    std::string objectNames[] = { "Archer", "SwordMan", "Wizard", "Candle", "IceChunk0", "IceChunk1", "IceFlag", "IceSmallChunk", "IceWindow0", "IceWindow1", "IceWindow2", "Jar", "Statue" };
+    for (int i = 0; i < 13; i++) {
+        int x = baseX + (i % 5) * (tileSize + spacing);
+        int y = objectY + (i / 5) * (tileSize + spacing);
+        if (!Objects[i].IsNull()) Objects[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        if (selectedObject == objectNames[i]) {
+            SelectObject(hdc, hRedPen);
+            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            SelectObject(hdc, hOldPen);
+        }
+    }
+
+    // Empty Button
+    int emptyButtonY = objectY + 3 * (tileSize + spacing);
+    hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+    SelectObject(hdc, hPen);
+    Rectangle(hdc, baseX, emptyButtonY, baseX + tileSize, emptyButtonY + tileSize);
+    if (selectedObject == "empty") {
+        SelectObject(hdc, hRedPen);
+        Rectangle(hdc, baseX, emptyButtonY, baseX + tileSize, emptyButtonY + tileSize);
+        SelectObject(hdc, hOldPen);
+    }
+    SelectObject(hdc, hOldPen);
+    DeleteObject(hPen);
+
+    // Cancel Button
+    int cancelButtonY = emptyButtonY + tileSize + spacing;
+    hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+    SelectObject(hdc, hPen);
+    Rectangle(hdc, baseX, cancelButtonY, baseX + tileSize, cancelButtonY + tileSize);
+    SelectObject(hdc, hOldPen);
+    DeleteObject(hPen);
 
     if (drag) {
         int left = min(drawRect.left, drawRect.right) * 20;
@@ -205,242 +256,102 @@ void MapTool::Render(HDC hdc) {
         int bottom = max(drawRect.top, drawRect.bottom) * 20;
         Rectangle(hdc, left, top, right, bottom);
     }
+
+    DeleteObject(hRedPen);
 }
 
 void MapTool::Update() {
     if (Input::GetKeyDown(eKeyCode::LButton)) {
         int mx = Input::GetMousePosition().x;
         int my = Input::GetMousePosition().y;
+        int baseX = 850, tileSize = 40, spacing = 10;
 
-        if (Input::GetMousePosition().x >= 850 && Input::GetMousePosition().x <= 890) {
-            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) {
-                selectedTile = "f1";
+        // Floor Tiles
+        for (int i = 0; i < 4; i++) {
+            int x = baseX + (i % 4) * (tileSize + spacing);
+            int y = 50 + (i / 4) * (tileSize + spacing);
+            if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                selectedTile = "f" + std::to_string(i + 1);
                 floordrag = true;
                 walldrag = false;
                 emptydrag = false;
                 ObjectCLK = false;
             }
-            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) {
-                selectedTile = "f2";
-                floordrag = true;
-                walldrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) {
-                selectedTile = "f3";
-                floordrag = true;
-                walldrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) {
-                selectedTile = "f4";
-                floordrag = true;
-                walldrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) {
-                selectedTile = "e";
-                emptydrag = true;
-                walldrag = false;
-                floordrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) {
-                selectedTile = "w1";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) {
-                selectedTile = "w2";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) {
-                selectedTile = "w3";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) {
-                selectedTile = "w4";
+        }
+
+        // Empty Tile
+        int emptyY = 50 + tileSize + spacing;
+        if (mx >= baseX && mx <= baseX + tileSize && my >= emptyY && my <= emptyY + tileSize) {
+            selectedTile = "e";
+            emptydrag = true;
+            walldrag = false;
+            floordrag = false;
+            ObjectCLK = false;
+        }
+
+        // Wall Tiles
+        int wallY = emptyY + tileSize + spacing;
+        for (int i = 0; i < 4; i++) {
+            int x = baseX + (i % 4) * (tileSize + spacing);
+            int y = wallY + (i / 4) * (tileSize + spacing);
+            if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                selectedTile = "w" + std::to_string(i + 1);
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
                 ObjectCLK = false;
             }
         }
-        else if (Input::GetMousePosition().x >= 910 && Input::GetMousePosition().x <= 950) {
-            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) {
-                selectedTile = "wc1";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) {
-                selectedTile = "wc2";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) {
-                selectedTile = "wc3";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) {
-                selectedTile = "wc4";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) {
-                selectedTile = "wc5";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) {
-                selectedTile = "wc6";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) {
-                selectedTile = "wc7";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) {
-                selectedTile = "wc8";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) {
-                selectedTile = "wc9";
-                walldrag = true;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = false;
-            }
-            else if (Input::GetMousePosition().y >= 500 && Input::GetMousePosition().y <= 540) {
-                selectedTile = "wc10";
+
+        // Wall Corner Tiles
+        int cornerY = wallY + tileSize + spacing;
+        for (int i = 0; i < 10; i++) {
+            int x = baseX + (i % 5) * (tileSize + spacing);
+            int y = cornerY + (i / 5) * (tileSize + spacing);
+            if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                selectedTile = "wc" + std::to_string(i + 1);
                 walldrag = true;
                 floordrag = false;
                 emptydrag = false;
                 ObjectCLK = false;
             }
         }
-        else if (Input::GetMousePosition().x >= 960 && Input::GetMousePosition().x <= 1000) {
-            if (Input::GetMousePosition().y >= 50 && Input::GetMousePosition().y <= 90) {
-                selectedObject = "Archer";
+
+        // Objects
+        int objectY = cornerY + 2 * (tileSize + spacing);
+        std::string objectNames[] = { "Archer", "SwordMan", "Wizard", "Candle", "IceChunk0", "IceChunk1", "IceFlag", "IceSmallChunk", "IceWindow0", "IceWindow1", "IceWindow2", "Jar", "Statue" };
+        for (int i = 0; i < 13; i++) {
+            int x = baseX + (i % 5) * (tileSize + spacing);
+            int y = objectY + (i / 5) * (tileSize + spacing);
+            if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                selectedObject = objectNames[i];
                 walldrag = false;
                 floordrag = false;
                 emptydrag = false;
                 ObjectCLK = true;
             }
-            else if (Input::GetMousePosition().y >= 100 && Input::GetMousePosition().y <= 140) {
-                selectedObject = "SwordMan";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 150 && Input::GetMousePosition().y <= 190) {
-                selectedObject = "Wizard";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 200 && Input::GetMousePosition().y <= 240) {
-                selectedObject = "Candle";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 250 && Input::GetMousePosition().y <= 290) {
-                selectedObject = "IceChunk0";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 300 && Input::GetMousePosition().y <= 340) {
-                selectedObject = "IceChunk1";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 350 && Input::GetMousePosition().y <= 390) {
-                selectedObject = "IceFlag";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 400 && Input::GetMousePosition().y <= 440) {
-                selectedObject = "IceSmallChunk";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 450 && Input::GetMousePosition().y <= 490) {
-                selectedObject = "IceWindow0";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 500 && Input::GetMousePosition().y <= 540) {
-                selectedObject = "IceWindow1";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 550 && Input::GetMousePosition().y <= 590) {
-                selectedObject = "IceWindow2";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 600 && Input::GetMousePosition().y <= 640) {
-                selectedObject = "Jar";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
-            else if (Input::GetMousePosition().y >= 650 && Input::GetMousePosition().y <= 690) {
-                selectedObject = "Statue";
-                walldrag = false;
-                floordrag = false;
-                emptydrag = false;
-                ObjectCLK = true;
-            }
+        }
+
+        // Empty Button
+        int emptyButtonY = objectY + 3 * (tileSize + spacing);
+        if (mx >= baseX && mx <= baseX + tileSize && my >= emptyButtonY && my <= emptyButtonY + tileSize) {
+            selectedObject = "empty";
+            walldrag = false;
+            floordrag = false;
+            emptydrag = false;
+            ObjectCLK = true;
+        }
+
+        // Cancel Button
+        int cancelButtonY = emptyButtonY + tileSize + spacing;
+        if (mx >= baseX && mx <= baseX + tileSize && my >= cancelButtonY && my <= cancelButtonY + tileSize) {
+            selectedTile = "f1";
+            selectedObject = "empty";
+            walldrag = false;
+            floordrag = false;
+            emptydrag = false;
+            ObjectCLK = false;
+            drag = false;
         }
 
         if (walldrag || floordrag || emptydrag) {
