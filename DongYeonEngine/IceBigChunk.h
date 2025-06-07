@@ -9,6 +9,7 @@ private:
 	int mX;
 	int mY;
 	int mImageNum;
+	float mScale; // Added scale factor
 public:
 	IceBigChunk()
 	{
@@ -17,16 +18,20 @@ public:
 		mX = 0;
 		mY = 0;
 		mImageNum = 0;
+		mScale = 1.7f; // Default scale
 	}
 	void SetPosition(int x, int y)
 	{
 		mX = x;
 		mY = y;
-
 	}
 	void SetImageNum(int a)
 	{
 		mImageNum = a;
+	}
+	void SetScale(float scale)
+	{
+		mScale = scale;
 	}
 	void TakeDamage(int d);
 	void Render(HDC hdc)
@@ -35,13 +40,17 @@ public:
 		{
 			int width = mIceBigChunkImage0.GetWidth();
 			int height = mIceBigChunkImage0.GetHeight();
-			mIceBigChunkImage0.Draw(hdc, mX - width / 2, mY - height / 2, width, height);
+			int scaledWidth = static_cast<int>(width * mScale);
+			int scaledHeight = static_cast<int>(height * mScale);
+			mIceBigChunkImage0.Draw(hdc, mX - scaledWidth / 2, mY - scaledHeight / 2, scaledWidth, scaledHeight);
 		}
 		else
 		{
 			int width = mIceBigChunkImage1.GetWidth();
 			int height = mIceBigChunkImage1.GetHeight();
-			mIceBigChunkImage1.Draw(hdc, mX - width / 2, mY - height / 2, width, height);
+			int scaledWidth = static_cast<int>(width * mScale);
+			int scaledHeight = static_cast<int>(height * mScale);
+			mIceBigChunkImage1.Draw(hdc, mX - scaledWidth / 2, mY - scaledHeight / 2, scaledWidth, scaledHeight);
 		}
 	}
 };
