@@ -136,6 +136,7 @@ void SceneManager::Update()
                 StartFadeIn();
                 mActiveScene->ObjectDestroy();
                 LoadScene(L"TitleScene");
+                SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
                 
             }
         }

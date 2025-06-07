@@ -863,3 +863,108 @@ void Stage2::ResolveCollisionMap(RECT wallRect, GameObject& obj)
         }
     }
 }
+
+void Stage2::LoadObject(const std::wstring& name) {
+    FILE* fp;
+    fp = _wfopen(name.c_str(), L"r");
+
+    if (fp != NULL) {
+        for (int i = 0; i < 40; i++) {
+            for (int j = 0; j < 40; j++) {
+                char tile[15];
+                if (fscanf(fp, "%s", tile) == 1) {
+                    std::string Object = std::string(tile);
+                    if (Object != "empty") {
+
+                        if (Object == "Archer")
+                        {
+                            std::cout << Object << "\n";
+                            archers.push_back(new Archer());
+                            archers.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "SwordMan")
+                        {
+                            std::cout << Object << "\n";
+                            swordmans.push_back(new SwordMan());
+                            swordmans.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "Wizard")
+                        {
+                            std::cout << Object << "\n";
+                            wizards.push_back(new Wizard());
+                            wizards.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "Candle")
+                        {
+                            std::cout << Object << "\n";
+                            mCandle.push_back(new Candle());
+                            mCandle.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceChunk0")
+                        {
+                            std::cout << Object << "\n";
+                            mIceBigChunk.push_back(new IceBigChunk());
+                            mIceBigChunk.back()->SetImageNum(0);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceChunk1")
+                        {
+                            std::cout << Object << "\n";
+                            mIceBigChunk.push_back(new IceBigChunk());
+                            mIceBigChunk.back()->SetImageNum(1);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceFlag")
+                        {
+                            std::cout << Object << "\n";
+                            mIceFlag.push_back(new IceFlag());
+                            mIceFlag.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceSmallChunk")
+                        {
+                            std::cout << Object << "\n";
+                            mIceSmallChunk.push_back(new IceSmallChunk());
+                            mIceSmallChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceWindow0")
+                        {
+                            std::cout << Object << "\n";
+                            mWindow.push_back(new IceWindow());
+                            mWindow.back()->SetImageNum(0);
+                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceWindow1")
+                        {
+                            std::cout << Object << "\n";
+                            mWindow.push_back(new IceWindow());
+                            mWindow.back()->SetImageNum(1);
+                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "IceWindow2")
+                        {
+                            std::cout << Object << "\n";
+                            mWindow.push_back(new IceWindow());
+                            mWindow.back()->SetImageNum(2);
+                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "Jar")
+                        {
+                            std::cout << Object << "\n";
+                            mJar.push_back(new Jar());
+                            mJar.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                        else if (Object == "Statue")
+                        {
+                            std::cout << Object << "\n";
+                            mStatue.push_back(new Statue());
+                            mStatue.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                        }
+                    }
+                }
+            }
+        }
+        fclose(fp);
+    }
+    else
+        std::cout << "File error";
+}

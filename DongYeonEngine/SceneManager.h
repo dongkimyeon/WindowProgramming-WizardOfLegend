@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "MapManager.h"
 #include "Snow.h"
+#include "SoundManager.h"
 
 class SceneManager
 {
