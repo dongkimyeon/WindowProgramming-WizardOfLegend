@@ -12,6 +12,60 @@
 #define MAP_ROWS 40
 #define TILE_SIZE 50
 
+void Stage2::ObjectDestroy()
+{
+    // Release Wizards
+    for (auto* wizard : wizards)
+    {
+        delete wizard;
+    }
+    wizards.clear();
+
+    // Release SwordMans
+    for (auto* swordman : swordmans)
+    {
+        delete swordman;
+    }
+    swordmans.clear();
+
+    // Release Archers
+    for (auto* archer : archers)
+    {
+        delete archer;
+    }
+    archers.clear();
+
+    // Release Arrows
+    for (auto* arrow : arrows)
+    {
+        delete arrow;
+    }
+    arrows.clear();
+
+    // Release FireBalls
+    for (auto* fireball : fireballs)
+    {
+        delete fireball;
+    }
+    fireballs.clear();
+
+    // Release Player FireBalls
+    for (auto* playerFireball : playerFireballs)
+    {
+        delete playerFireball;
+    }
+    playerFireballs.clear();
+
+    // Release Player FireDragons
+    for (auto* fireDragon : playerFireDragon)
+    {
+        delete fireDragon;
+    }
+    playerFireDragon.clear();
+
+    // Clear particles
+    mParticles.clear();
+}
 void Stage2::Initialize()
 {
     //카메라 설정
@@ -451,6 +505,7 @@ void Stage2::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         SceneManager::StartFadeIn();
+        ObjectDestroy();
         SceneManager::LoadScene(L"BossStage");
         MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
         SoundManager::GetInstance()->mPlaySound("ExitPortal", false);

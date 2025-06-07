@@ -28,7 +28,7 @@ public:
 	virtual void LateUpdate();
 	virtual void Render(HDC hdc);
 	virtual void ObjectInitialize();
-	
+	virtual void ObjectDestroy();
 
 	virtual void AddPlayerSkillFireBall(Player_Skill_FireBall* fireball);
 	virtual void AddArrow(Arrow* arrow);

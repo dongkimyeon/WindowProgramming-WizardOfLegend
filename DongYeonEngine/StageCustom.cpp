@@ -14,10 +14,64 @@
 #define MAP_ROWS 40
 #define TILE_SIZE 50
 
+void StageCustom::ObjectDestroy()
+{
+	// Release Wizards
+	for (auto* wizard : wizards)
+	{
+		delete wizard;
+	}
+	wizards.clear();
+
+	// Release SwordMans
+	for (auto* swordman : swordmans)
+	{
+		delete swordman;
+	}
+	swordmans.clear();
+
+	// Release Archers
+	for (auto* archer : archers)
+	{
+		delete archer;
+	}
+	archers.clear();
+
+	// Release Arrows
+	for (auto* arrow : arrows)
+	{
+		delete arrow;
+	}
+	arrows.clear();
+
+	// Release FireBalls
+	for (auto* fireball : fireballs)
+	{
+		delete fireball;
+	}
+	fireballs.clear();
+
+	// Release Player FireBalls
+	for (auto* playerFireball : playerFireballs)
+	{
+		delete playerFireball;
+	}
+	playerFireballs.clear();
+
+	// Release Player FireDragons
+	for (auto* fireDragon : playerFireDragon)
+	{
+		delete fireDragon;
+	}
+	playerFireDragon.clear();
+
+	// Clear particles
+	mParticles.clear();
+}
 void StageCustom::Initialize()
 {
 	camera.SetTarget(SceneManager::GetSharedPlayer());
-	LoadObject(L"StageCustomObject.txt");
+	
 	// 파티클 이미지 로드
 	for (int i = 0; i < 20; ++i)
 	{
@@ -35,15 +89,8 @@ void StageCustom::Initialize()
 
 void StageCustom::ObjectInitialize()
 {
-	// 몬스터 추가
-   /* archers.push_back(new Archer());
-	archers.back()->SetPosition(200, 270);
-
-	swordmans.push_back(new SwordMan());
-	swordmans.back()->SetPosition(230, 270);*/
-
-	// 포털 룸
-	//portal.SetPosition(1370, 1800);
+	LoadObject(L"StageCustomObject.txt");
+	portal.SetPosition(1370, 1800);
 }
 
 // 파티클 생성 함수
@@ -450,14 +497,10 @@ void StageCustom::Update()
 	if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
 	{
 		SceneManager::StartFadeIn();
-		SceneManager::LoadScene(L"Stage2");
-		MapManager::GetInstance()->LoadMap(L"Stage2.txt");
+		ObjectDestroy();
+		SceneManager::LoadScene(L"TitleScene");
 		SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
-		wizards.clear();
-		archers.clear();
-		swordmans.clear();
-		SceneManager::GetSharedPlayer()->SetPosition(180, 270);
-		SceneManager::GetSharedPlayer()->SetTelporting(true);
+		SceneManager::GetSharedPlayer()->SetHp(300);
 	}
 
 	HandleCollision();
@@ -485,19 +528,19 @@ void StageCustom::Render(HDC hdc)
 	MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
 
-	// 플레이어 스폰포인트 렌더링
-	HDC spawnDC = hdc;
-	int savedSpawnDC = SaveDC(spawnDC);
-	OffsetViewportOrgEx(spawnDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-	float spawnScale = 1.5f; // 스케일 값 (기본값 1.0, 필요 시 조정 가능)
-	int spawnWidth = 100; // 기본 이미지 너비 (예시, 실제 이미지 크기에 맞게 조정)
-	int spawnHeight = 100; // 기본 이미지 높이 (예시, 실제 이미지 크기에 맞게 조정)
-	int scaledWidth = static_cast<int>(spawnWidth * spawnScale);
-	int scaledHeight = static_cast<int>(spawnHeight * spawnScale);
-	int spawnX = static_cast<int>(183 - scaledWidth / 2.0f); // 중심을 (183, 304)로 설정
-	int spawnY = static_cast<int>(334 - scaledHeight / 2.0f);
-	mPlayerSpawnPoint.Draw(spawnDC, spawnX, spawnY, scaledWidth, scaledHeight);
-	RestoreDC(spawnDC, savedSpawnDC);
+	//// 플레이어 스폰포인트 렌더링
+	//HDC spawnDC = hdc;
+	//int savedSpawnDC = SaveDC(spawnDC);
+	//OffsetViewportOrgEx(spawnDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+	//float spawnScale = 1.5f; // 스케일 값 (기본값 1.0, 필요 시 조정 가능)
+	//int spawnWidth = 100; // 기본 이미지 너비 (예시, 실제 이미지 크기에 맞게 조정)
+	//int spawnHeight = 100; // 기본 이미지 높이 (예시, 실제 이미지 크기에 맞게 조정)
+	//int scaledWidth = static_cast<int>(spawnWidth * spawnScale);
+	//int scaledHeight = static_cast<int>(spawnHeight * spawnScale);
+	//int spawnX = static_cast<int>(183 - scaledWidth / 2.0f); // 중심을 (183, 304)로 설정
+	//int spawnY = static_cast<int>(334 - scaledHeight / 2.0f);
+	//mPlayerSpawnPoint.Draw(spawnDC, spawnX, spawnY, scaledWidth, scaledHeight);
+	//RestoreDC(spawnDC, savedSpawnDC);
 
 
 
