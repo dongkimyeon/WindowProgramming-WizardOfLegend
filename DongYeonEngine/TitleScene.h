@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "StageCustom.h"
 
 class TitleScene : public Scene
 {
