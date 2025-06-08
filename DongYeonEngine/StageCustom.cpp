@@ -138,7 +138,7 @@ void StageCustom::Initialize()
 void StageCustom::ObjectInitialize()
 {
 	LoadObject(L"StageCustomObject.txt");
-	portal.SetPosition(1370, 1800);
+	
 }
 
 // 파티클 생성 함수
@@ -541,15 +541,8 @@ void StageCustom::Update()
 
 	RECT temp;
 	RECT playerRect = player->GetRect();
-	RECT portalRect = portal.GetRect();
-	if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
-	{
-		SceneManager::StartFadeIn();
-		ObjectDestroy();
-		SceneManager::LoadScene(L"TitleScene");
-		SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
-		SceneManager::GetSharedPlayer()->SetHp(300);
-	}
+	
+
 
 	HandleCollision();
 
@@ -592,11 +585,7 @@ void StageCustom::Render(HDC hdc)
 
 
 
-	HDC portalDC = hdc;
-	int savedPortalDC = SaveDC(portalDC);
-	OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-	portal.Render(portalDC);
-	RestoreDC(portalDC, savedPortalDC);
+
 
 	for (auto* wizard : wizards)
 	{
@@ -818,7 +807,7 @@ void StageCustom::Render(HDC hdc)
 	HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
 	wchar_t StageIdText[20];
-	swprintf_s(StageIdText, L"Stage1");
+	swprintf_s(StageIdText, L"CustomStage");
 
 	SIZE textSize;
 	GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
@@ -831,13 +820,6 @@ void StageCustom::Render(HDC hdc)
 	SelectObject(hdc, hOldFont);
 	DeleteObject(hFont);
 
-	WCHAR mousePosText[100];
-	float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
-	float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-	wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d",
-		static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
-	TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
-		static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
 }
 
 void StageCustom::HandleCollision()

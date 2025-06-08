@@ -62,7 +62,54 @@ void Stage2::ObjectDestroy()
         delete fireDragon;
     }
     playerFireDragon.clear();
+    // Release IceBigChunks
+    for (auto* iceBigChunk : mIceBigChunk)
+    {
+        delete iceBigChunk;
+    }
+    mIceBigChunk.clear();
 
+    // Release IceSmallChunks
+    for (auto* iceSmallChunk : mIceSmallChunk)
+    {
+        delete iceSmallChunk;
+    }
+    mIceSmallChunk.clear();
+
+    // Release Statues
+    for (auto* statue : mStatue)
+    {
+        delete statue;
+    }
+    mStatue.clear();
+
+    // Release Candles
+    for (auto* candle : mCandle)
+    {
+        delete candle;
+    }
+    mCandle.clear();
+
+    // Release IceFlags
+    for (auto* iceFlag : mIceFlag)
+    {
+        delete iceFlag;
+    }
+    mIceFlag.clear();
+
+    // Release IceWindows
+    for (auto* window : mWindow)
+    {
+        delete window;
+    }
+    mWindow.clear();
+
+    // Release Jars
+    for (auto* jar : mJar)
+    {
+        delete jar;
+    }
+    mJar.clear();
     // Clear particles
     mParticles.clear();
 }
@@ -79,6 +126,7 @@ void Stage2::Initialize()
             std::cout << "Failed to load particle image: " << i << std::endl;
         }
     }
+    mPlayerSpawnPoint.Load(L"resources/TELEPORT.png");
     // 파티클 관련 변수 초기화
     mParticleTimer = 0.0f;
     mParticleSpawnInterval = 0.1f;
@@ -532,6 +580,21 @@ void Stage2::Render(HDC hdc)
     int viewHeight = 720;
 
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
+
+
+    // 플레이어 스폰포인트 렌더링
+    HDC spawnDC = hdc;
+    int savedSpawnDC = SaveDC(spawnDC);
+    OffsetViewportOrgEx(spawnDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+    float spawnScale = 1.5f; // 스케일 값 (기본값 1.0, 필요 시 조정 가능)
+    int spawnWidth = 100; // 기본 이미지 너비 (예시, 실제 이미지 크기에 맞게 조정)
+    int spawnHeight = 100; // 기본 이미지 높이 (예시, 실제 이미지 크기에 맞게 조정)
+    int scaledWidth = static_cast<int>(spawnWidth * spawnScale);
+    int scaledHeight = static_cast<int>(spawnHeight * spawnScale);
+    int spawnX = static_cast<int>(205 - scaledWidth / 2.0f); // 중심을 (183, 304)로 설정
+    int spawnY = static_cast<int>(385 - scaledHeight / 2.0f);
+    mPlayerSpawnPoint.Draw(spawnDC, spawnX, spawnY, scaledWidth, scaledHeight);
+    RestoreDC(spawnDC, savedSpawnDC);
 
     HDC portalDC = hdc;
     int savedPortalDC = SaveDC(portalDC);

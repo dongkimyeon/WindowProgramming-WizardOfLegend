@@ -1,18 +1,52 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "MapTool.h"
 #include "SceneManager.h"
+#include <algorithm>
 
-std::wstring const mChangeStageMapfp = L"Stage1.txt";
-std::wstring const mChangeStageImagefp = L"Stage1Image.txt";
-std::wstring const mChangeStageObjectfp = L"Stage1Object.txt";
+// 상수 정의
+#define GRID_SIZE 18           // 그리드 한 칸의 크기 (픽셀)
+#define MAP_WIDTH 40           // 맵의 가로 타일 수
+#define MAP_HEIGHT 40          // 맵의 세로 타일 수
+#define MAP_PIXEL_WIDTH (MAP_WIDTH * GRID_SIZE)  // 맵의 전체 픽셀 너비
+#define MAP_PIXEL_HEIGHT (MAP_HEIGHT * GRID_SIZE) // 맵의 전체 픽셀 높이
+#define UI_BASE_X 850          // UI 시작 X 좌표
+#define UI_BASE_Y 50           // UI 시작 Y 좌표
+#define UI_TILE_SIZE 40        // UI 타일 크기
+#define UI_SPACING 10          // UI 타일 간 간격
+#define BUTTON_WIDTH 100       // 버튼 너비
+#define BUTTON_HEIGHT 50       // 버튼 높이
+#define BUTTON_OFFSET_X 250    // 버튼 X 오프셋
+#define SAVE_BUTTON_TOP 530    // Save 버튼 Y 시작 위치
+#define CANCEL_BUTTON_TOP 590  // Cancel 버튼 Y 시작 위치
+#define EXIT_BUTTON_TOP 650    // Exit 버튼 Y 시작 위치
+#define TEXT_OFFSET_X 30       // 버튼 텍스트 X 오프셋
+#define TEXT_OFFSET_Y 15       // 버튼 텍스트 Y 오프셋
+#define ERASE_TEXT_OFFSET_X 2  // 지우기 버튼 텍스트 X 오프셋
+#define ERASE_TEXT_OFFSET_Y 10 // 지우기 버튼 텍스트 Y 오프셋
+#define UI_FLOOR_Y_OFFSET 20   // Floor Tiles Y 오프셋
+#define UI_WALL_Y_OFFSET 70    // Wall Tiles Y 오프셋
+#define UI_WALL_CORNER_Y_OFFSET 140 // Wall Corner Tiles Y 오프셋
+#define UI_TILE_ERASER_Y_OFFSET 250 // Tile Eraser Y 오프셋
+#define UI_OBJECT_Y_OFFSET 310 // Objects Y 오프셋
+#define UI_OBJECT_ERASER_Y_OFFSET 470 // Object Eraser Y 오프셋
+#define UI_FLOOR_Y 20          // Floor Tiles Y 위치
+#define UI_WALL_Y 90           // Wall Tiles Y 위치
+#define UI_WALL_CORNER_Y 160   // Wall Corner Tiles Y 위치
+#define UI_TILE_ERASER_Y 270   // Tile Eraser Y 위치
+#define UI_OBJECT_Y 330        // Objects Y 위치
+#define UI_OBJECT_ERASER_Y 490 // Object Eraser Y 위치
+
+std::wstring const mChangeStageMapfp = L"StageCustom.txt";
+std::wstring const mChangeStageImagefp = L"StageCustomImage.txt";
+std::wstring const mChangeStageObjectfp = L"StageCustomObject.txt";
 
 void MapTool::Initialize() {
     Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"r");
     Imagefp = _wfopen(mChangeStageImagefp.c_str(), L"r");
     Objectfp = _wfopen(mChangeStageObjectfp.c_str(), L"r");
 
-    for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 40; j++) {
+    for (int i = 0; i < MAP_WIDTH; i++) {
+        for (int j = 0; j < MAP_HEIGHT; j++) {
             map[i][j] = 0;
             ImageMap[i][j] = "f1";
             ObjectMap[i][j] = "empty";
@@ -20,8 +54,8 @@ void MapTool::Initialize() {
     }
 
     if (Mapfp) {
-        for (int i = 0; i < 40; i++) {
-            for (int j = 0; j < 40; j++) {
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
                 int value;
                 if (fscanf(Mapfp, "%d", &value) == 1) {
                     map[j][i] = value;
@@ -33,8 +67,8 @@ void MapTool::Initialize() {
     }
 
     if (Imagefp) {
-        for (int i = 0; i < 40; i++) {
-            for (int j = 0; j < 40; j++) {
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
                 char tile[10] = { 0 };
                 if (fscanf(Imagefp, "%s", tile) == 1) {
                     ImageMap[j][i] = std::string(tile);
@@ -46,8 +80,8 @@ void MapTool::Initialize() {
     }
 
     if (Objectfp) {
-        for (int i = 0; i < 40; i++) {
-            for (int j = 0; j < 40; j++) {
+        for (int i = 0; i < MAP_HEIGHT; i++) {
+            for (int j = 0; j < MAP_WIDTH; j++) {
                 char tile[15] = { 0 };
                 if (fscanf(Objectfp, "%s", tile) == 1) {
                     ObjectMap[j][i] = std::string(tile);
@@ -96,28 +130,28 @@ void MapTool::Initialize() {
     currentMode = EditMode::NONE;
     drag = false;
 
-    // 버튼 위치 초기화 (우측 하단, 상단으로 이동)
-    mSaveButton = { 850 + 250, 530, 950 + 250, 580 };   // Save 버튼
-    mCancelButton = { 850 + 250, 590, 950 + 250, 640 }; // Cancel 버튼
-    mExitButton = { 850 + 250, 650, 950 + 250, 700 };   // Exit 버튼
+    // 버튼 위치 초기화
+    mSaveButton = { UI_BASE_X + BUTTON_OFFSET_X, SAVE_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, SAVE_BUTTON_TOP + BUTTON_HEIGHT };
+    mCancelButton = { UI_BASE_X + BUTTON_OFFSET_X, CANCEL_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, CANCEL_BUTTON_TOP + BUTTON_HEIGHT };
+    mExitButton = { UI_BASE_X + BUTTON_OFFSET_X, EXIT_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, EXIT_BUTTON_TOP + BUTTON_HEIGHT };
 }
 
 void MapTool::Render(HDC hdc) {
     HPEN hPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
     HPEN hRedPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
-    HBRUSH hButtonBrush = CreateSolidBrush(RGB(200, 200, 200)); // 버튼 배경색 (회색)
-    HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH); // 투명 브러시
+    HBRUSH hButtonBrush = CreateSolidBrush(RGB(200, 200, 200));
+    HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
     HBRUSH hOldBrush;
     HPEN hOldPen;
     SetTextColor(hdc, RGB(0, 0, 0));
 
     // 맵 그리기
-    for (int i = 0; i < 40; i++) {
-        for (int j = 0; j < 40; j++) {
-            int left = i * 20;
-            int top = j * 20;
-            int right = (i + 1) * 20;
-            int bottom = (j + 1) * 20;
+    for (int i = 0; i < MAP_WIDTH; i++) {
+        for (int j = 0; j < MAP_HEIGHT; j++) {
+            int left = i * GRID_SIZE;
+            int top = j * GRID_SIZE;
+            int right = (i + 1) * GRID_SIZE;
+            int bottom = (j + 1) * GRID_SIZE;
             if (map[i][j] == 0) {
                 if (ImageMap[i][j] == "f1") floorTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "f2") floorTile[1].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
@@ -146,7 +180,7 @@ void MapTool::Render(HDC hdc) {
                 EmptyTile.StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
             }
 
-            // 오브젝트 그리기 (TransparentBlt로 투명 배경 처리)
+            // 오브젝트 그리기
             if (ObjectMap[i][j] != "empty") {
                 if (ObjectMap[i][j] == "Archer") {
                     TransparentBlt(hdc, left, top, right - left, bottom - top, Objects[0].GetDC(), 0, 0, Objects[0].GetWidth(), Objects[0].GetHeight(), RGB(0, 0, 0));
@@ -192,120 +226,110 @@ void MapTool::Render(HDC hdc) {
     }
 
     hOldPen = (HPEN)SelectObject(hdc, hPen);
-    for (int i = 0; i <= 40; i++) {
-        MoveToEx(hdc, i * 20, 0, NULL);
-        LineTo(hdc, i * 20, 800);
-        MoveToEx(hdc, 0, i * 20, NULL);
-        LineTo(hdc, 800, i * 20);
+    for (int i = 0; i <= MAP_WIDTH; i++) {
+        MoveToEx(hdc, i * GRID_SIZE, 0, NULL);
+        LineTo(hdc, i * GRID_SIZE, MAP_PIXEL_HEIGHT);
+        MoveToEx(hdc, 0, i * GRID_SIZE, NULL);
+        LineTo(hdc, MAP_PIXEL_WIDTH, i * GRID_SIZE);
     }
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
 
     // UI 그리기
-    int baseX = 850, baseY = 50, tileSize = 40, spacing = 10;
-
-    // Floor Tiles
-    hOldBrush = (HBRUSH)SelectObject(hdc, hNullBrush); // 투명 브러시 선택
-    TextOut(hdc, baseX, baseY, L"Floor Tiles:", 12);
+    hOldBrush = (HBRUSH)SelectObject(hdc, hNullBrush);
+    TextOut(hdc, UI_BASE_X, UI_BASE_Y, L"Floor Tiles:", 12);
     for (int i = 0; i < 4; i++) {
-        int x = baseX + i * (tileSize + spacing);
-        int y = baseY + 20;
-        floorTile[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        int x = UI_BASE_X + i * (UI_TILE_SIZE + UI_SPACING);
+        int y = UI_BASE_Y + UI_FLOOR_Y;
+        floorTile[i].StretchBlt(hdc, x, y, UI_TILE_SIZE, UI_TILE_SIZE, SRCCOPY);
         if (currentMode == EditMode::TILE_PLACE && selectedTile == "f" + std::to_string(i + 1)) {
             SelectObject(hdc, hRedPen);
-            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            Rectangle(hdc, x, y, x + UI_TILE_SIZE, y + UI_TILE_SIZE);
             SelectObject(hdc, hOldPen);
         }
     }
 
-    // Wall Tiles
-    TextOut(hdc, baseX, baseY + 70, L"Wall Tiles:", 11);
+    TextOut(hdc, UI_BASE_X, UI_BASE_Y + UI_WALL_Y_OFFSET, L"Wall Tiles:", 11);
     for (int i = 0; i < 4; i++) {
-        int x = baseX + i * (tileSize + spacing);
-        int y = baseY + 90;
-        wallTile[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        int x = UI_BASE_X + i * (UI_TILE_SIZE + UI_SPACING);
+        int y = UI_BASE_Y + UI_WALL_Y;
+        wallTile[i].StretchBlt(hdc, x, y, UI_TILE_SIZE, UI_TILE_SIZE, SRCCOPY);
         if (currentMode == EditMode::TILE_PLACE && selectedTile == "w" + std::to_string(i + 1)) {
             SelectObject(hdc, hRedPen);
-            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            Rectangle(hdc, x, y, x + UI_TILE_SIZE, y + UI_TILE_SIZE);
             SelectObject(hdc, hOldPen);
         }
     }
 
-    // Wall Corner Tiles
-    TextOut(hdc, baseX, baseY + 140, L"Wall Corner Tiles:", 18);
+    TextOut(hdc, UI_BASE_X, UI_BASE_Y + UI_WALL_CORNER_Y_OFFSET, L"Wall Corner Tiles:", 18);
     for (int i = 0; i < 10; i++) {
         int row = i / 5;
         int col = i % 5;
-        int x = baseX + col * (tileSize + spacing);
-        int y = baseY + 160 + row * (tileSize + spacing);
-        wallConerTile[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        int x = UI_BASE_X + col * (UI_TILE_SIZE + UI_SPACING);
+        int y = UI_BASE_Y + UI_WALL_CORNER_Y + row * (UI_TILE_SIZE + UI_SPACING);
+        wallConerTile[i].StretchBlt(hdc, x, y, UI_TILE_SIZE, UI_TILE_SIZE, SRCCOPY);
         if (currentMode == EditMode::TILE_PLACE && selectedTile == "wc" + std::to_string(i + 1)) {
             SelectObject(hdc, hRedPen);
-            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            Rectangle(hdc, x, y, x + UI_TILE_SIZE, y + UI_TILE_SIZE);
             SelectObject(hdc, hOldPen);
         }
     }
 
-    // Tile Eraser
-    TextOut(hdc, baseX, baseY + 250, L"Tile Eraser:", 12);
-    int tileEraserX = baseX;
-    int tileEraserY = baseY + 270;
-    Rectangle(hdc, tileEraserX, tileEraserY, tileEraserX + tileSize, tileEraserY + tileSize);
-    TextOut(hdc, tileEraserX + 2, tileEraserY + 10, L"Erase", 5);
+    TextOut(hdc, UI_BASE_X, UI_BASE_Y + UI_TILE_ERASER_Y_OFFSET, L"Tile Eraser:", 12);
+    int tileEraserX = UI_BASE_X;
+    int tileEraserY = UI_BASE_Y + UI_TILE_ERASER_Y;
+    Rectangle(hdc, tileEraserX, tileEraserY, tileEraserX + UI_TILE_SIZE, tileEraserY + UI_TILE_SIZE);
+    TextOut(hdc, tileEraserX + ERASE_TEXT_OFFSET_X, tileEraserY + ERASE_TEXT_OFFSET_Y, L"Erase", 5);
     if (currentMode == EditMode::TILE_ERASE) {
         SelectObject(hdc, hRedPen);
-        Rectangle(hdc, tileEraserX, tileEraserY, tileEraserX + tileSize, tileEraserY + tileSize);
+        Rectangle(hdc, tileEraserX, tileEraserY, tileEraserX + UI_TILE_SIZE, tileEraserY + UI_TILE_SIZE);
         SelectObject(hdc, hOldPen);
     }
 
-    // Objects
-    TextOut(hdc, baseX, baseY + 310, L"Objects:", 8);
+    TextOut(hdc, UI_BASE_X, UI_BASE_Y + UI_OBJECT_Y_OFFSET, L"Objects:", 8);
     std::string objectNames[] = { "Archer", "SwordMan", "Wizard", "Candle", "IceChunk0", "IceChunk1", "IceFlag", "IceSmallChunk", "IceWindow0", "IceWindow1", "IceWindow2", "Jar", "Statue" };
     for (int i = 0; i < 13; i++) {
         int row = i / 5;
         int col = i % 5;
-        int x = baseX + col * (tileSize + spacing);
-        int y = baseY + 330 + row * (tileSize + spacing);
-        Objects[i].StretchBlt(hdc, x, y, tileSize, tileSize, SRCCOPY);
+        int x = UI_BASE_X + col * (UI_TILE_SIZE + UI_SPACING);
+        int y = UI_BASE_Y + UI_OBJECT_Y + row * (UI_TILE_SIZE + UI_SPACING);
+        Objects[i].StretchBlt(hdc, x, y, UI_TILE_SIZE, UI_TILE_SIZE, SRCCOPY);
         if (currentMode == EditMode::OBJECT_PLACE && selectedObject == objectNames[i]) {
             SelectObject(hdc, hRedPen);
-            Rectangle(hdc, x, y, x + tileSize, y + tileSize);
+            Rectangle(hdc, x, y, x + UI_TILE_SIZE, y + UI_TILE_SIZE);
             SelectObject(hdc, hOldPen);
         }
     }
 
-    // Object Eraser
-    TextOut(hdc, baseX, baseY + 470, L"Object Eraser:", 14);
-    int objectEraserX = baseX;
-    int objectEraserY = baseY + 490;
-    Rectangle(hdc, objectEraserX, objectEraserY, objectEraserX + tileSize, objectEraserY + tileSize);
-    TextOut(hdc, objectEraserX + 2, objectEraserY + 10, L"Erase", 5);
+    TextOut(hdc, UI_BASE_X, UI_BASE_Y + UI_OBJECT_ERASER_Y_OFFSET, L"Object Eraser:", 14);
+    int objectEraserX = UI_BASE_X;
+    int objectEraserY = UI_BASE_Y + UI_OBJECT_ERASER_Y;
+    Rectangle(hdc, objectEraserX, objectEraserY, objectEraserX + UI_TILE_SIZE, objectEraserY + UI_TILE_SIZE);
+    TextOut(hdc, objectEraserX + ERASE_TEXT_OFFSET_X, objectEraserY + ERASE_TEXT_OFFSET_Y, L"Erase", 5);
     if (currentMode == EditMode::OBJECT_ERASE) {
         SelectObject(hdc, hRedPen);
-        Rectangle(hdc, objectEraserX, objectEraserY, objectEraserX + tileSize, objectEraserY + tileSize);
+        Rectangle(hdc, objectEraserX, objectEraserY, objectEraserX + UI_TILE_SIZE, objectEraserY + UI_TILE_SIZE);
         SelectObject(hdc, hOldPen);
     }
 
-    // Save, Cancel, Exit 버튼 렌더링
     SelectObject(hdc, hButtonBrush);
     Rectangle(hdc, mSaveButton.left, mSaveButton.top, mSaveButton.right, mSaveButton.bottom);
-    TextOut(hdc, mSaveButton.left + 30, mSaveButton.top + 15, L"Save", 4);
+    TextOut(hdc, mSaveButton.left + TEXT_OFFSET_X, mSaveButton.top + TEXT_OFFSET_Y, L"Save", 4);
 
     Rectangle(hdc, mCancelButton.left, mCancelButton.top, mCancelButton.right, mCancelButton.bottom);
-    TextOut(hdc, mCancelButton.left + 25, mCancelButton.top + 15, L"Cancel", 6);
+    TextOut(hdc, mCancelButton.left + TEXT_OFFSET_X - 5, mCancelButton.top + TEXT_OFFSET_Y, L"Cancel", 6);
 
     Rectangle(hdc, mExitButton.left, mExitButton.top, mExitButton.right, mExitButton.bottom);
-    TextOut(hdc, mExitButton.left + 30, mExitButton.top + 15, L"Exit", 4);
+    TextOut(hdc, mExitButton.left + TEXT_OFFSET_X, mExitButton.top + TEXT_OFFSET_Y, L"Exit", 4);
     SelectObject(hdc, hOldBrush);
 
-    // 드래그 영역 표시
     if (drag) {
-        int left = min(drawRect.left, drawRect.right) * 20;
-        int top = min(drawRect.top, drawRect.bottom) * 20;
-        int right = max(drawRect.left, drawRect.right) * 20;
-        int bottom = max(drawRect.top, drawRect.bottom) * 20;
+        int left = min(drawRect.left, drawRect.right) * GRID_SIZE;
+        int top = min(drawRect.top, drawRect.bottom) * GRID_SIZE;
+        int right = max(drawRect.left, drawRect.right) * GRID_SIZE;
+        int bottom = max(drawRect.top, drawRect.bottom) * GRID_SIZE;
         SelectObject(hdc, hRedPen);
-        SelectObject(hdc, hNullBrush); // 투명 브러시로 드래그 영역 테두리만 표시
+        SelectObject(hdc, hNullBrush);
         Rectangle(hdc, left, top, right, bottom);
         SelectObject(hdc, hOldPen);
         SelectObject(hdc, hOldBrush);
@@ -316,11 +340,10 @@ void MapTool::Render(HDC hdc) {
 }
 
 void MapTool::Update() {
-    // 현재 맵 상태 저장 함수
     auto SaveMapState = [&]() {
         MapState state;
-        for (int i = 0; i < 40; i++) {
-            for (int j = 0; j < 40; j++) {
+        for (int i = 0; i < MAP_WIDTH; i++) {
+            for (int j = 0; j < MAP_HEIGHT; j++) {
                 state.map[i][j] = map[i][j];
                 state.ImageMap[i][j] = ImageMap[i][j];
                 state.ObjectMap[i][j] = ObjectMap[i][j];
@@ -332,7 +355,6 @@ void MapTool::Update() {
     if (Input::GetKeyDown(eKeyCode::LButton)) {
         int mx = Input::GetMousePosition().x;
         int my = Input::GetMousePosition().y;
-        int baseX = 850, baseY = 50, tileSize = 40, spacing = 10;
 
         // Save 버튼 클릭
         if (mx >= mSaveButton.left && mx <= mSaveButton.right && my >= mSaveButton.top && my <= mSaveButton.bottom) {
@@ -350,8 +372,8 @@ void MapTool::Update() {
                 return;
             }
 
-            for (int i = 0; i < 40; i++) {
-                for (int j = 0; j < 40; j++) {
+            for (int i = 0; i < MAP_HEIGHT; i++) {
+                for (int j = 0; j < MAP_WIDTH; j++) {
                     fwprintf(Mapfp, L"%d ", map[j][i]);
                     fwprintf(Imagefp, L"%S ", ImageMap[j][i].c_str());
                     fwprintf(Objectfp, L"%S ", ObjectMap[j][i].c_str());
@@ -378,8 +400,8 @@ void MapTool::Update() {
             if (!undoStack.empty()) {
                 MapState prevState = undoStack.top();
                 undoStack.pop();
-                for (int i = 0; i < 40; i++) {
-                    for (int j = 0; j < 40; j++) {
+                for (int i = 0; i < MAP_WIDTH; i++) {
+                    for (int j = 0; j < MAP_HEIGHT; j++) {
                         map[i][j] = prevState.map[i][j];
                         ImageMap[i][j] = prevState.ImageMap[i][j];
                         ObjectMap[i][j] = prevState.ObjectMap[i][j];
@@ -405,8 +427,8 @@ void MapTool::Update() {
                 return;
             }
 
-            for (int i = 0; i < 40; i++) {
-                for (int j = 0; j < 40; j++) {
+            for (int i = 0; i < MAP_HEIGHT; i++) {
+                for (int j = 0; j < MAP_WIDTH; j++) {
                     fwprintf(Mapfp, L"%d ", map[j][i]);
                     fwprintf(Imagefp, L"%S ", ImageMap[j][i].c_str());
                     fwprintf(Objectfp, L"%S ", ObjectMap[j][i].c_str());
@@ -431,84 +453,77 @@ void MapTool::Update() {
             return;
         }
 
-        if (mx >= 0 && mx < 800 && my >= 0 && my < 800) {
-            // 맵 영역 (작업 전 상태 저장)
+        if (mx >= 0 && mx < MAP_PIXEL_WIDTH && my >= 0 && my < MAP_PIXEL_HEIGHT) {
             if (currentMode == EditMode::TILE_PLACE || currentMode == EditMode::TILE_ERASE || currentMode == EditMode::OBJECT_ERASE) {
                 SaveMapState();
                 drag = true;
-                drawRect.left = mx / 20;
-                drawRect.top = my / 20;
+                drawRect.left = mx / GRID_SIZE;
+                drawRect.top = my / GRID_SIZE;
                 drawRect.right = drawRect.left + 1;
                 drawRect.bottom = drawRect.top + 1;
             }
         }
         else {
             // UI 영역
-            // Floor Tiles
             for (int i = 0; i < 4; i++) {
-                int x = baseX + i * (tileSize + spacing);
-                int y = baseY + 20;
-                if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                int x = UI_BASE_X + i * (UI_TILE_SIZE + UI_SPACING);
+                int y = UI_BASE_Y + UI_FLOOR_Y;
+                if (mx >= x && mx <= x + UI_TILE_SIZE && my >= y && my <= y + UI_TILE_SIZE) {
                     selectedTile = "f" + std::to_string(i + 1);
                     currentMode = EditMode::TILE_PLACE;
                 }
             }
 
-            // Wall Tiles
             for (int i = 0; i < 4; i++) {
-                int x = baseX + i * (tileSize + spacing);
-                int y = baseY + 90;
-                if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                int x = UI_BASE_X + i * (UI_TILE_SIZE + UI_SPACING);
+                int y = UI_BASE_Y + UI_WALL_Y;
+                if (mx >= x && mx <= x + UI_TILE_SIZE && my >= y && my <= y + UI_TILE_SIZE) {
                     selectedTile = "w" + std::to_string(i + 1);
                     currentMode = EditMode::TILE_PLACE;
                 }
             }
 
-            // Wall Corner Tiles
             for (int i = 0; i < 10; i++) {
                 int row = i / 5;
                 int col = i % 5;
-                int x = baseX + col * (tileSize + spacing);
-                int y = baseY + 160 + row * (tileSize + spacing);
-                if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                int x = UI_BASE_X + col * (UI_TILE_SIZE + UI_SPACING);
+                int y = UI_BASE_Y + UI_WALL_CORNER_Y + row * (UI_TILE_SIZE + UI_SPACING);
+                if (mx >= x && mx <= x + UI_TILE_SIZE && my >= y && my <= y + UI_TILE_SIZE) {
                     selectedTile = "wc" + std::to_string(i + 1);
                     currentMode = EditMode::TILE_PLACE;
                 }
             }
 
-            // Tile Eraser
-            int tileEraserX = baseX;
-            int tileEraserY = baseY + 270;
-            if (mx >= tileEraserX && mx <= tileEraserX + tileSize && my >= tileEraserY && my <= tileEraserY + tileSize) {
+            int tileEraserX = UI_BASE_X;
+            int tileEraserY = UI_BASE_Y + UI_TILE_ERASER_Y;
+            if (mx >= tileEraserX && mx <= tileEraserX + UI_TILE_SIZE && my >= tileEraserY && my <= tileEraserY + UI_TILE_SIZE) {
                 currentMode = EditMode::TILE_ERASE;
             }
 
-            // Objects
             std::string objectNames[] = { "Archer", "SwordMan", "Wizard", "Candle", "IceChunk0", "IceChunk1", "IceFlag", "IceSmallChunk", "IceWindow0", "IceWindow1", "IceWindow2", "Jar", "Statue" };
             for (int i = 0; i < 13; i++) {
                 int row = i / 5;
                 int col = i % 5;
-                int x = baseX + col * (tileSize + spacing);
-                int y = baseY + 330 + row * (tileSize + spacing);
-                if (mx >= x && mx <= x + tileSize && my >= y && my <= y + tileSize) {
+                int x = UI_BASE_X + col * (UI_TILE_SIZE + UI_SPACING);
+                int y = UI_BASE_Y + UI_OBJECT_Y + row * (UI_TILE_SIZE + UI_SPACING);
+                if (mx >= x && mx <= x + UI_TILE_SIZE && my >= y && my <= y + UI_TILE_SIZE) {
                     selectedObject = objectNames[i];
                     currentMode = EditMode::OBJECT_PLACE;
                 }
             }
 
-            // Object Eraser
-            int objectEraserX = baseX;
-            int objectEraserY = baseY + 490;
-            if (mx >= objectEraserX && mx <= objectEraserX + tileSize && my >= objectEraserY && my <= objectEraserY + tileSize) {
+            int objectEraserX = UI_BASE_X;
+            int objectEraserY = UI_BASE_Y + UI_OBJECT_ERASER_Y;
+            if (mx >= objectEraserX && mx <= objectEraserX + UI_TILE_SIZE && my >= objectEraserY && my <= objectEraserY + UI_TILE_SIZE) {
                 currentMode = EditMode::OBJECT_ERASE;
             }
         }
     }
     else if (Input::GetKeyUp(eKeyCode::LButton)) {
         if (drag) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
-            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+            int mx = Input::GetMousePosition().x / GRID_SIZE;
+            int my = Input::GetMousePosition().y / GRID_SIZE;
+            if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
                 drawRect.right = mx + 1;
                 drawRect.bottom = my + 1;
                 int left = min(drawRect.left, drawRect.right - 1);
@@ -539,32 +554,33 @@ void MapTool::Update() {
             drag = false;
         }
         else if (currentMode == EditMode::OBJECT_PLACE) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
-            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+            int mx = Input::GetMousePosition().x / GRID_SIZE;
+            int my = Input::GetMousePosition().y / GRID_SIZE;
+            if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
                 SaveMapState();
                 ObjectMap[mx][my] = selectedObject;
             }
         }
         else if (currentMode == EditMode::OBJECT_ERASE) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
-            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
-                SaveMapState(); // 단일 클릭 오브젝트 지우기 전에 상태 저장
+            int mx = Input::GetMousePosition().x / GRID_SIZE;
+            int my = Input::GetMousePosition().y / GRID_SIZE;
+            if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
+                SaveMapState();
                 ObjectMap[mx][my] = "empty";
             }
         }
     }
     else if (Input::GetKey(eKeyCode::LButton)) {
         if (drag) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
-            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+            int mx = Input::GetMousePosition().x / GRID_SIZE;
+            int my = Input::GetMousePosition().y / GRID_SIZE;
+            if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
                 drawRect.right = mx + 1;
                 drawRect.bottom = my + 1;
             }
         }
     }
 }
+
 void MapTool::LateUpdate() {
 }

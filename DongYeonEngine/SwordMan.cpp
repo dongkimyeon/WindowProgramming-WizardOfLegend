@@ -22,7 +22,7 @@ SwordMan::SwordMan()
     mIsHit = false;
     mCurrentHitFrame = 0;
     PlayerDetectRange = 300.0f;
-    AttackRange = 80.0f;
+    AttackRange = 90.0f;
     mAttackCooldown = 0.0f;
     mAttackFrameTime = 0.0f;
     mAttackDirectionX = 0.0f;

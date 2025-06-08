@@ -33,7 +33,7 @@ void GameOverScene::Update()
     {
         SceneManager::LoadScene(L"TitleScene");
         SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
-        SceneManager::GetSharedPlayer()->SetHp(100);
+        SceneManager::GetSharedPlayer()->SetHp(300);
         SceneManager::GetSharedPlayer()->Setrevive();
         SceneManager::ResetPlayTime();
         SceneManager::SetmIsGameStart(false);

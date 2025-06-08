@@ -135,6 +135,7 @@ void SceneManager::Update()
                 mIsGameStart = false; // 게임 시작 상태 초기화
                 StartFadeIn();
                 mActiveScene->ObjectDestroy();
+                mSharedPlayer->SetHp(300);
                 LoadScene(L"TitleScene");
                 SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
                 

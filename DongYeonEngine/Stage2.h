@@ -30,6 +30,7 @@ private:
     float mParticleSpawnInterval;     // 파티클 생성 간격
     CImage mFireParticleImage[20];    // 파티클 이미지 배열
 
+    CImage  mPlayerSpawnPoint;
     std::vector<Wizard*> wizards;
     std::vector<SwordMan*> swordmans;
     std::vector<Archer*> archers;

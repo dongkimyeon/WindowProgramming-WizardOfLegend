@@ -89,5 +89,7 @@ public:
     void ResolveCollisionMap(RECT wallRect, GameObject& obj); // ¼öÁ¤: Tile& -> REC
     void CreateFireParticles(std::vector<Particle>& particles, float x, float y);
     void LoadObject(const std::wstring& name);
+
+   
 };
 

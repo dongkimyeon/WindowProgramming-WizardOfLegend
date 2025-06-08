@@ -65,6 +65,7 @@ void Stage1::ObjectDestroy()
         delete fireDragon;
     }
     playerFireDragon.clear();
+
     // Release IceBigChunks
     for (auto* iceBigChunk : mIceBigChunk)
     {
@@ -138,12 +139,7 @@ void Stage1::Initialize()
 
 void Stage1::ObjectInitialize()
 {
-    // 몬스터 추가
-   /* archers.push_back(new Archer());
-    archers.back()->SetPosition(200, 270);
-
-    swordmans.push_back(new SwordMan());
-    swordmans.back()->SetPosition(230, 270);*/
+   
     LoadObject(L"Stage1Object.txt");
 
     portal.SetPosition(1350, 1875);
@@ -561,7 +557,7 @@ void Stage1::Update()
         MapManager::GetInstance()->LoadMap(L"Stage2.txt");
         SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
 
-        SceneManager::GetSharedPlayer()->SetPosition(200, 270);
+        SceneManager::GetSharedPlayer()->SetPosition(200, 340);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
     //객체간에 충돌처리 밀어내는거
@@ -849,13 +845,6 @@ void Stage1::Render(HDC hdc)
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
 
-    WCHAR mousePosText[100];
-    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
-    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-    wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d",
-        static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
-    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
-        static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
 }
 
 void Stage1::HandleCollision()

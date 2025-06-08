@@ -63,6 +63,55 @@ void BossStage::ObjectDestroy()
     }
     playerFireDragon.clear();
 
+    // Release IceBigChunks
+    for (auto* iceBigChunk : mIceBigChunk)
+    {
+        delete iceBigChunk;
+    }
+    mIceBigChunk.clear();
+
+    // Release IceSmallChunks
+    for (auto* iceSmallChunk : mIceSmallChunk)
+    {
+        delete iceSmallChunk;
+    }
+    mIceSmallChunk.clear();
+
+    // Release Statues
+    for (auto* statue : mStatue)
+    {
+        delete statue;
+    }
+    mStatue.clear();
+
+    // Release Candles
+    for (auto* candle : mCandle)
+    {
+        delete candle;
+    }
+    mCandle.clear();
+
+    // Release IceFlags
+    for (auto* iceFlag : mIceFlag)
+    {
+        delete iceFlag;
+    }
+    mIceFlag.clear();
+
+    // Release IceWindows
+    for (auto* window : mWindow)
+    {
+        delete window;
+    }
+    mWindow.clear();
+
+    // Release Jars
+    for (auto* jar : mJar)
+    {
+        delete jar;
+    }
+    mJar.clear();
+
     // Release Boss Spears
     for (auto* spear : spears)
     {
@@ -682,17 +731,24 @@ void BossStage::Render(HDC hdc)
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
     
-    // mBossEntrance 그리기 수정
-    float scale = 0.5f; // 스케일 값 (예: 0.5로 50% 크기)
+    // mBossEntrance 그리기
+    float scale = 2.9f; // 스케일 값 (예: 0.5로 50% 크기)
     int scaledWidth = static_cast<int>(mBossEntrance.GetWidth() * scale);
     int scaledHeight = static_cast<int>(mBossEntrance.GetHeight() * scale);
-    
+    HDC bossEntranceDC = hdc;
+    int savedBossEntranceDC = SaveDC(bossEntranceDC);
+    OffsetViewportOrgEx(bossEntranceDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+    mBossEntrance.Draw(bossEntranceDC,
+        static_cast<int>(1025 - scaledWidth / 2), // 중앙 정렬을 위해 위치 조정
+        static_cast<int>(1300 - scaledHeight / 2),
+        scaledWidth,
+        scaledHeight);
+    RestoreDC(bossEntranceDC, savedBossEntranceDC);
 
     HDC portalDC = hdc;
     int savedPortalDC = SaveDC(portalDC);
     OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
     portal.Render(portalDC);
-    mBossEntrance.Draw(portalDC, 1028, 1263, 1028 + scaledWidth, 1263 + scaledHeight);
     RestoreDC(portalDC, savedPortalDC);
 
     for (auto* wizard : wizards)
