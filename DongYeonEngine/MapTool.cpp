@@ -2,10 +2,14 @@
 #include "MapTool.h"
 #include "SceneManager.h"
 
+std::wstring const mChangeStageMapfp = L"Stage1.txt";
+std::wstring const mChangeStageImagefp = L"Stage1Image.txt";
+std::wstring const mChangeStageObjectfp = L"Stage1Object.txt";
+
 void MapTool::Initialize() {
-    Mapfp = fopen("StageCustom.txt", "r");
-    Imagefp = fopen("StageCustomImage.txt", "r");
-    Objectfp = fopen("StageCustomObject.txt", "r");
+    Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"r");
+    Imagefp = _wfopen(mChangeStageImagefp.c_str(), L"r");
+    Objectfp = _wfopen(mChangeStageObjectfp.c_str(), L"r");
 
     for (int i = 0; i < 40; i++) {
         for (int j = 0; j < 40; j++) {
@@ -282,8 +286,8 @@ void MapTool::Render(HDC hdc) {
         SelectObject(hdc, hOldPen);
     }
 
-    // Save, Cancel, Exit 버튼 렌더링 (마지막에 렌더링하여 덮이지 않도록)
-    SelectObject(hdc, hButtonBrush); // 버튼은 회색 배경 유지
+    // Save, Cancel, Exit 버튼 렌더링
+    SelectObject(hdc, hButtonBrush);
     Rectangle(hdc, mSaveButton.left, mSaveButton.top, mSaveButton.right, mSaveButton.bottom);
     TextOut(hdc, mSaveButton.left + 30, mSaveButton.top + 15, L"Save", 4);
 
@@ -332,9 +336,9 @@ void MapTool::Update() {
 
         // Save 버튼 클릭
         if (mx >= mSaveButton.left && mx <= mSaveButton.right && my >= mSaveButton.top && my <= mSaveButton.bottom) {
-            Mapfp = fopen("StageCustom.txt", "w");
-            Imagefp = fopen("StageCustomImage.txt", "w");
-            Objectfp = fopen("StageCustomObject.txt", "w");
+            Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"w");
+            Imagefp = _wfopen(mChangeStageImagefp.c_str(), L"w");
+            Objectfp = _wfopen(mChangeStageObjectfp.c_str(), L"w");
 
             if (!Mapfp || !Imagefp || !Objectfp) {
                 if (Mapfp) fclose(Mapfp);
@@ -348,13 +352,13 @@ void MapTool::Update() {
 
             for (int i = 0; i < 40; i++) {
                 for (int j = 0; j < 40; j++) {
-                    fprintf(Mapfp, "%d ", map[j][i]);
-                    fprintf(Imagefp, "%s ", ImageMap[j][i].c_str());
-                    fprintf(Objectfp, "%s ", ObjectMap[j][i].c_str());
+                    fwprintf(Mapfp, L"%d ", map[j][i]);
+                    fwprintf(Imagefp, L"%S ", ImageMap[j][i].c_str()); // %S는 std::string을 유니코드로 출력
+                    fwprintf(Objectfp, L"%S ", ObjectMap[j][i].c_str());
                 }
-                fprintf(Mapfp, "\n");
-                fprintf(Imagefp, "\n");
-                fprintf(Objectfp, "\n");
+                fwprintf(Mapfp, L"\n");
+                fwprintf(Imagefp, L"\n");
+                fwprintf(Objectfp, L"\n");
             }
 
             fflush(Mapfp);
@@ -387,6 +391,41 @@ void MapTool::Update() {
 
         // Exit 버튼 클릭
         if (mx >= mExitButton.left && mx <= mExitButton.right && my >= mExitButton.top && my <= mExitButton.bottom) {
+            Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"w");
+            Imagefp = _wfopen(mChangeStageImagefp.c_str(), L"w");
+            Objectfp = _wfopen(mChangeStageObjectfp.c_str(), L"w");
+
+            if (!Mapfp || !Imagefp || !Objectfp) {
+                if (Mapfp) fclose(Mapfp);
+                if (Imagefp) fclose(Imagefp);
+                if (Objectfp) fclose(Objectfp);
+                Mapfp = nullptr;
+                Imagefp = nullptr;
+                Objectfp = nullptr;
+                return;
+            }
+
+            for (int i = 0; i < 40; i++) {
+                for (int j = 0; j < 40; j++) {
+                    fwprintf(Mapfp, L"%d ", map[j][i]);
+                    fwprintf(Imagefp, L"%S ", ImageMap[j][i].c_str());
+                    fwprintf(Objectfp, L"%S ", ObjectMap[j][i].c_str());
+                }
+                fwprintf(Mapfp, L"\n");
+                fwprintf(Imagefp, L"\n");
+                fwprintf(Objectfp, L"\n");
+            }
+
+            fflush(Mapfp);
+            fflush(Imagefp);
+            fflush(Objectfp);
+            fclose(Mapfp);
+            fclose(Imagefp);
+            fclose(Objectfp);
+            Mapfp = nullptr;
+            Imagefp = nullptr;
+            Objectfp = nullptr;
+
             SceneManager::StartFadeIn();
             SceneManager::LoadScene(L"TitleScene");
             return;
