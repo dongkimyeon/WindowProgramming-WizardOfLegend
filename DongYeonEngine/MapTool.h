@@ -5,7 +5,7 @@
 #include "Input.h"
 #include <stack>
 
-// 편집 모드를 관리하기 위한 열거형 추가
+
 enum class EditMode {
     NONE,         // 아무 작업도 하지 않음
     TILE_PLACE,   // 타일 배치
@@ -14,7 +14,7 @@ enum class EditMode {
     OBJECT_ERASE  // 오브젝트 지우기
 };
 
-// 편집 작업을 저장하기 위한 구조체
+
 struct MapState {
     int map[40][40];
     std::string ImageMap[40][40];
@@ -34,8 +34,9 @@ private:
     bool drag;
     RECT drawRect;
     RECT mSaveButton;
-    RECT mExitButton;
+    RECT mRedoButton; // Redo 버튼 추가
     RECT mCancelButton;
+    RECT mExitButton;
     std::string ImageMap[40][40];
     std::string ObjectMap[40][40];
     std::string selectedTile;
@@ -48,6 +49,7 @@ private:
     FILE* Mapfp;
     FILE* Imagefp;
     FILE* Objectfp;
-    EditMode currentMode; // 현재 모드를 저장하는 변수 추가
+    EditMode currentMode; // 현재 모드를 저장하는 변수
     std::stack<MapState> undoStack; // 취소 기능을 위한 스택
+    std::stack<MapState> redoStack; // 재실행 기능을 위한 스택
 };

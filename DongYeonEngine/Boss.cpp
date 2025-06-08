@@ -12,7 +12,7 @@ Boss::Boss()
 {
     mX = 1025.0f;
     mY = 600.0f;
-    hp = 500;
+    hp = 800;
     damage = 20;
     speed = 100.0f;
     mScale = 1.6f;

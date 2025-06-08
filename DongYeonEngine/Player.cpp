@@ -15,7 +15,7 @@ Player::Player()
     state = PlayerState::FRONT;
     hp = 300;
 	mp = 100;
-    damage = 11;
+    damage = 21;
     mIsMoving = false;
     mIsDashing = false;
     mIsAttack = false;

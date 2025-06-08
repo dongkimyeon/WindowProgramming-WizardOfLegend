@@ -3,38 +3,38 @@
 #include "SceneManager.h"
 #include <algorithm>
 
-// 상수 정의
-#define GRID_SIZE 18           // 그리드 한 칸의 크기 (픽셀)
-#define MAP_WIDTH 40           // 맵의 가로 타일 수
-#define MAP_HEIGHT 40          // 맵의 세로 타일 수
-#define MAP_PIXEL_WIDTH (MAP_WIDTH * GRID_SIZE)  // 맵의 전체 픽셀 너비
-#define MAP_PIXEL_HEIGHT (MAP_HEIGHT * GRID_SIZE) // 맵의 전체 픽셀 높이
-#define UI_BASE_X 850          // UI 시작 X 좌표
-#define UI_BASE_Y 50           // UI 시작 Y 좌표
-#define UI_TILE_SIZE 40        // UI 타일 크기
-#define UI_SPACING 10          // UI 타일 간 간격
-#define BUTTON_WIDTH 100       // 버튼 너비
-#define BUTTON_HEIGHT 50       // 버튼 높이
-#define BUTTON_OFFSET_X 250    // 버튼 X 오프셋
-#define SAVE_BUTTON_TOP 530    // Save 버튼 Y 시작 위치
-#define CANCEL_BUTTON_TOP 590  // Cancel 버튼 Y 시작 위치
-#define EXIT_BUTTON_TOP 650    // Exit 버튼 Y 시작 위치
-#define TEXT_OFFSET_X 30       // 버튼 텍스트 X 오프셋
-#define TEXT_OFFSET_Y 15       // 버튼 텍스트 Y 오프셋
-#define ERASE_TEXT_OFFSET_X 2  // 지우기 버튼 텍스트 X 오프셋
-#define ERASE_TEXT_OFFSET_Y 10 // 지우기 버튼 텍스트 Y 오프셋
-#define UI_FLOOR_Y_OFFSET 20   // Floor Tiles Y 오프셋
-#define UI_WALL_Y_OFFSET 70    // Wall Tiles Y 오프셋
-#define UI_WALL_CORNER_Y_OFFSET 140 // Wall Corner Tiles Y 오프셋
-#define UI_TILE_ERASER_Y_OFFSET 250 // Tile Eraser Y 오프셋
-#define UI_OBJECT_Y_OFFSET 310 // Objects Y 오프셋
-#define UI_OBJECT_ERASER_Y_OFFSET 470 // Object Eraser Y 오프셋
-#define UI_FLOOR_Y 20          // Floor Tiles Y 위치
-#define UI_WALL_Y 90           // Wall Tiles Y 위치
-#define UI_WALL_CORNER_Y 160   // Wall Corner Tiles Y 위치
-#define UI_TILE_ERASER_Y 270   // Tile Eraser Y 위치
-#define UI_OBJECT_Y 330        // Objects Y 위치
-#define UI_OBJECT_ERASER_Y 490 // Object Eraser Y 위치
+#define GRID_SIZE 18
+#define MAP_WIDTH 40
+#define MAP_HEIGHT 40
+#define MAP_PIXEL_WIDTH (MAP_WIDTH * GRID_SIZE)
+#define MAP_PIXEL_HEIGHT (MAP_HEIGHT * GRID_SIZE)
+#define UI_BASE_X 850
+#define UI_BASE_Y 50
+#define UI_TILE_SIZE 40
+#define UI_SPACING 10
+#define BUTTON_WIDTH 100
+#define BUTTON_HEIGHT 40
+#define BUTTON_OFFSET_X 300
+#define SAVE_BUTTON_TOP 500
+#define REDO_BUTTON_TOP 550
+#define CANCEL_BUTTON_TOP 600
+#define EXIT_BUTTON_TOP 650
+#define TEXT_OFFSET_X 30
+#define TEXT_OFFSET_Y 15
+#define ERASE_TEXT_OFFSET_X 2
+#define ERASE_TEXT_OFFSET_Y 10
+#define UI_FLOOR_Y_OFFSET 20
+#define UI_WALL_Y_OFFSET 70
+#define UI_WALL_CORNER_Y_OFFSET 140
+#define UI_TILE_ERASER_Y_OFFSET 250
+#define UI_OBJECT_Y_OFFSET 310
+#define UI_OBJECT_ERASER_Y_OFFSET 470
+#define UI_FLOOR_Y 20
+#define UI_WALL_Y 90
+#define UI_WALL_CORNER_Y 160
+#define UI_TILE_ERASER_Y 270
+#define UI_OBJECT_Y 330
+#define UI_OBJECT_ERASER_Y 490
 
 std::wstring const mChangeStageMapfp = L"StageCustom.txt";
 std::wstring const mChangeStageImagefp = L"StageCustomImage.txt";
@@ -132,8 +132,14 @@ void MapTool::Initialize() {
 
     // 버튼 위치 초기화
     mSaveButton = { UI_BASE_X + BUTTON_OFFSET_X, SAVE_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, SAVE_BUTTON_TOP + BUTTON_HEIGHT };
+    mRedoButton = { UI_BASE_X + BUTTON_OFFSET_X, REDO_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, REDO_BUTTON_TOP + BUTTON_HEIGHT };
     mCancelButton = { UI_BASE_X + BUTTON_OFFSET_X, CANCEL_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, CANCEL_BUTTON_TOP + BUTTON_HEIGHT };
     mExitButton = { UI_BASE_X + BUTTON_OFFSET_X, EXIT_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, EXIT_BUTTON_TOP + BUTTON_HEIGHT };
+
+    // redoStack 초기화
+    while (!redoStack.empty()) {
+        redoStack.pop();
+    }
 }
 
 void MapTool::Render(HDC hdc) {
@@ -312,15 +318,31 @@ void MapTool::Render(HDC hdc) {
         SelectObject(hdc, hOldPen);
     }
 
+    // 버튼 그리기 및 텍스트 중앙 정렬
     SelectObject(hdc, hButtonBrush);
     Rectangle(hdc, mSaveButton.left, mSaveButton.top, mSaveButton.right, mSaveButton.bottom);
-    TextOut(hdc, mSaveButton.left + TEXT_OFFSET_X, mSaveButton.top + TEXT_OFFSET_Y, L"Save", 4);
+    SIZE saveTextSize;
+    GetTextExtentPoint32(hdc, L"Save", 4, &saveTextSize);
+    TextOut(hdc, mSaveButton.left + (mSaveButton.right - mSaveButton.left - saveTextSize.cx) / 2,
+        mSaveButton.top + (mSaveButton.bottom - mSaveButton.top - saveTextSize.cy) / 2, L"Save", 4);
+
+    Rectangle(hdc, mRedoButton.left, mRedoButton.top, mRedoButton.right, mRedoButton.bottom);
+    SIZE redoTextSize;
+    GetTextExtentPoint32(hdc, L"Redo", 4, &redoTextSize);
+    TextOut(hdc, mRedoButton.left + (mRedoButton.right - mRedoButton.left - redoTextSize.cx) / 2,
+        mRedoButton.top + (mRedoButton.bottom - mRedoButton.top - redoTextSize.cy) / 2, L"Redo", 4);
 
     Rectangle(hdc, mCancelButton.left, mCancelButton.top, mCancelButton.right, mCancelButton.bottom);
-    TextOut(hdc, mCancelButton.left + TEXT_OFFSET_X - 5, mCancelButton.top + TEXT_OFFSET_Y, L"Cancel", 6);
+    SIZE undoTextSize;
+    GetTextExtentPoint32(hdc, L"Undo", 4, &undoTextSize);
+    TextOut(hdc, mCancelButton.left + (mCancelButton.right - mCancelButton.left - undoTextSize.cx) / 2,
+        mCancelButton.top + (mCancelButton.bottom - mCancelButton.top - undoTextSize.cy) / 2, L"Undo", 4);
 
     Rectangle(hdc, mExitButton.left, mExitButton.top, mExitButton.right, mExitButton.bottom);
-    TextOut(hdc, mExitButton.left + TEXT_OFFSET_X, mExitButton.top + TEXT_OFFSET_Y, L"Exit", 4);
+    SIZE exitTextSize;
+    GetTextExtentPoint32(hdc, L"Exit", 4, &exitTextSize);
+    TextOut(hdc, mExitButton.left + (mExitButton.right - mExitButton.left - exitTextSize.cx) / 2,
+        mExitButton.top + (mExitButton.bottom - mExitButton.top - exitTextSize.cy) / 2, L"Exit", 4);
     SelectObject(hdc, hOldBrush);
 
     if (drag) {
@@ -338,7 +360,6 @@ void MapTool::Render(HDC hdc) {
     DeleteObject(hButtonBrush);
     DeleteObject(hRedPen);
 }
-
 void MapTool::Update() {
     auto SaveMapState = [&]() {
         MapState state;
@@ -350,6 +371,10 @@ void MapTool::Update() {
             }
         }
         undoStack.push(state);
+        // 새로운 편집 작업 시 redoStack 비우기
+        while (!redoStack.empty()) {
+            redoStack.pop();
+        }
         };
 
     if (Input::GetKeyDown(eKeyCode::LButton)) {
@@ -395,9 +420,49 @@ void MapTool::Update() {
             return;
         }
 
-        // Cancel 버튼 클릭
+        // Redo 버튼 클릭
+        if (mx >= mRedoButton.left && mx <= mRedoButton.right && my >= mRedoButton.top && my <= mRedoButton.bottom) {
+            if (!redoStack.empty()) {
+                // 현재 상태를 undoStack에 저장
+                MapState currentState;
+                for (int i = 0; i < MAP_WIDTH; i++) {
+                    for (int j = 0; j < MAP_HEIGHT; j++) {
+                        currentState.map[i][j] = map[i][j];
+                        currentState.ImageMap[i][j] = ImageMap[i][j];
+                        currentState.ObjectMap[i][j] = ObjectMap[i][j];
+                    }
+                }
+                undoStack.push(currentState);
+
+                // redoStack에서 상태 복원
+                MapState nextState = redoStack.top();
+                redoStack.pop();
+                for (int i = 0; i < MAP_WIDTH; i++) {
+                    for (int j = 0; j < MAP_HEIGHT; j++) {
+                        map[i][j] = nextState.map[i][j];
+                        ImageMap[i][j] = nextState.ImageMap[i][j];
+                        ObjectMap[i][j] = nextState.ObjectMap[i][j];
+                    }
+                }
+            }
+            return;
+        }
+
+        // Cancel 버튼 클릭 (Undo)
         if (mx >= mCancelButton.left && mx <= mCancelButton.right && my >= mCancelButton.top && my <= mCancelButton.bottom) {
             if (!undoStack.empty()) {
+                // 현재 상태를 redoStack에 저장
+                MapState currentState;
+                for (int i = 0; i < MAP_WIDTH; i++) {
+                    for (int j = 0; j < MAP_HEIGHT; j++) {
+                        currentState.map[i][j] = map[i][j];
+                        currentState.ImageMap[i][j] = ImageMap[i][j];
+                        currentState.ObjectMap[i][j] = ObjectMap[i][j];
+                    }
+                }
+                redoStack.push(currentState);
+
+                // undoStack에서 상태 복원
                 MapState prevState = undoStack.top();
                 undoStack.pop();
                 for (int i = 0; i < MAP_WIDTH; i++) {
