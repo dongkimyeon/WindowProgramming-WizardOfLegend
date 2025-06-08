@@ -100,10 +100,10 @@ void MapTool::Render(HDC hdc) {
 
     for (int i = 0; i < 40; i++) {
         for (int j = 0; j < 40; j++) {
-            int left = i * 20;
-            int top = j * 20;
-            int right = (i + 1) * 20;
-            int bottom = (j + 1) * 20;
+            int left = i * 15;
+            int top = j * 15;
+            int right = (i + 1) * 15;
+            int bottom = (j + 1) * 15;
             if (map[i][j] == 0) {
                 if (ImageMap[i][j] == "f1" && !floorTile[0].IsNull()) floorTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "f2" && !floorTile[1].IsNull()) floorTile[1].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
@@ -117,7 +117,7 @@ void MapTool::Render(HDC hdc) {
                 else if (ImageMap[i][j] == "w3" && !wallTile[2].IsNull()) wallTile[2].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "w4" && !wallTile[3].IsNull()) wallTile[3].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc1" && !wallConerTile[0].IsNull()) wallConerTile[0].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
-                else if (ImageMap[i][j] == "wc2" && !wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, left, top, right - left, top - bottom, SRCCOPY);
+                else if (ImageMap[i][j] == "wc2" && !wallConerTile[1].IsNull()) wallConerTile[1].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc3" && !wallConerTile[2].IsNull()) wallConerTile[2].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc4" && !wallConerTile[3].IsNull()) wallConerTile[3].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
                 else if (ImageMap[i][j] == "wc5" && !wallConerTile[4].IsNull()) wallConerTile[4].StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
@@ -156,16 +156,16 @@ void MapTool::Render(HDC hdc) {
     hRedPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
     hOldPen = (HPEN)SelectObject(hdc, hPen);
     for (int i = 0; i <= 40; i++) {
-        MoveToEx(hdc, i * 20, 0, NULL);
-        LineTo(hdc, i * 20, 800);
-        MoveToEx(hdc, 0, i * 20, NULL);
-        LineTo(hdc, 800, i * 20);
+        MoveToEx(hdc, i * 15, 0, NULL);
+        LineTo(hdc, i * 15, 600);
+        MoveToEx(hdc, 0, i * 15, NULL);
+        LineTo(hdc, 600, i * 15);
     }
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
 
     // Render tiles and objects in 4-5 rows per category, starting at y=50
-    int baseX = 850, baseY = 50, tileSize = 40, spacing = 10;
+    int baseX = 650, baseY = 50, tileSize = 30, spacing = 8;
 
     // Floor Tiles (4 items)
     for (int i = 0; i < 4; i++) {
@@ -250,10 +250,10 @@ void MapTool::Render(HDC hdc) {
     DeleteObject(hPen);
 
     if (drag) {
-        int left = min(drawRect.left, drawRect.right) * 20;
-        int top = min(drawRect.top, drawRect.bottom) * 20;
-        int right = max(drawRect.left, drawRect.right) * 20;
-        int bottom = max(drawRect.top, drawRect.bottom) * 20;
+        int left = min(drawRect.left, drawRect.right) * 15;
+        int top = min(drawRect.top, drawRect.bottom) * 15;
+        int right = max(drawRect.left, drawRect.right) * 15;
+        int bottom = max(drawRect.top, drawRect.bottom) * 15;
         Rectangle(hdc, left, top, right, bottom);
     }
 
@@ -264,7 +264,7 @@ void MapTool::Update() {
     if (Input::GetKeyDown(eKeyCode::LButton)) {
         int mx = Input::GetMousePosition().x;
         int my = Input::GetMousePosition().y;
-        int baseX = 850, tileSize = 40, spacing = 10;
+        int baseX = 650, tileSize = 30, spacing = 8;
 
         // Floor Tiles
         for (int i = 0; i < 4; i++) {
@@ -356,8 +356,8 @@ void MapTool::Update() {
 
         if (walldrag || floordrag || emptydrag) {
             if (!drag) {
-                mx = Input::GetMousePosition().x / 20;
-                my = Input::GetMousePosition().y / 20;
+                mx = Input::GetMousePosition().x / 15;
+                my = Input::GetMousePosition().y / 15;
 
                 if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
                     drawRect.left = mx;
@@ -371,8 +371,8 @@ void MapTool::Update() {
     }
     else if (Input::GetKeyUp(eKeyCode::LButton)) {
         if (drag) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
+            int mx = Input::GetMousePosition().x / 15;
+            int my = Input::GetMousePosition().y / 15;
 
             if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
                 drawRect.right = mx + 1;
@@ -405,8 +405,8 @@ void MapTool::Update() {
             drag = false;
         }
         else if (ObjectCLK) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
+            int mx = Input::GetMousePosition().x / 15;
+            int my = Input::GetMousePosition().y / 15;
 
             if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
                 ObjectMap[mx][my] = selectedObject;
@@ -415,8 +415,8 @@ void MapTool::Update() {
     }
     else if (Input::GetKey(eKeyCode::LButton)) {
         if (drag) {
-            int mx = Input::GetMousePosition().x / 20;
-            int my = Input::GetMousePosition().y / 20;
+            int mx = Input::GetMousePosition().x / 15;
+            int my = Input::GetMousePosition().y / 15;
 
             if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
                 drawRect.right = mx + 1;

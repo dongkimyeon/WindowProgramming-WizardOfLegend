@@ -892,6 +892,60 @@ void TutorialStage::Render(HDC hdc)
             RestoreDC(particleDC, savedParticleDC);
         }
     }
+
+    // map object
+    for (auto& Candle : mCandle) {
+        HDC CandleDC = hdc;
+        int savedCandleDC = SaveDC(CandleDC);
+        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        Candle->Render(CandleDC);
+        RestoreDC(CandleDC, savedCandleDC);
+    }
+    for (auto& IceBigChunk : mIceBigChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceBigChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& IceSmallChunk : mIceSmallChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceSmallChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& MapObject : mIceFlag) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mJar) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mWindow) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mStatue) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+
+
+
     UI::Render(hdc);
 
     //몇 스테이지인지 텍스트 출력
@@ -925,6 +979,8 @@ void TutorialStage::Render(HDC hdc)
     TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
         static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
     }
+
+
 
     // 튜토리얼 텍스트 렌더링
     if (!currentTutorialStep.empty() || isShowingCompletion)

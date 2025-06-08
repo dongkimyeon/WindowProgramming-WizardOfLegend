@@ -131,6 +131,7 @@ void BossStage::LateUpdate()
 
 void BossStage::ObjectInitialize()
 {
+    LoadObject(L"StageBossObject.txt");
     iceBoss.Init();
 }
 
@@ -888,6 +889,58 @@ void BossStage::Render(HDC hdc)
         }
     }
 
+    // map object
+    for (auto& Candle : mCandle) {
+        HDC CandleDC = hdc;
+        int savedCandleDC = SaveDC(CandleDC);
+        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        Candle->Render(CandleDC);
+        RestoreDC(CandleDC, savedCandleDC);
+    }
+    for (auto& IceBigChunk : mIceBigChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceBigChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& IceSmallChunk : mIceSmallChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceSmallChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& MapObject : mIceFlag) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mJar) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mWindow) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mStatue) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+
+
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
     OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
@@ -1094,84 +1147,84 @@ void BossStage::LoadObject(const std::wstring& name) {
                         {
                             std::cout << Object << "\n";
                             archers.push_back(new Archer());
-                            archers.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            archers.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "SwordMan")
                         {
                             std::cout << Object << "\n";
                             swordmans.push_back(new SwordMan());
-                            swordmans.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            swordmans.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Wizard")
                         {
                             std::cout << Object << "\n";
                             wizards.push_back(new Wizard());
-                            wizards.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            wizards.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Candle")
                         {
                             std::cout << Object << "\n";
                             mCandle.push_back(new Candle());
-                            mCandle.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mCandle.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceChunk0")
                         {
                             std::cout << Object << "\n";
                             mIceBigChunk.push_back(new IceBigChunk());
                             mIceBigChunk.back()->SetImageNum(0);
-                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceChunk1")
                         {
                             std::cout << Object << "\n";
                             mIceBigChunk.push_back(new IceBigChunk());
                             mIceBigChunk.back()->SetImageNum(1);
-                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceFlag")
                         {
                             std::cout << Object << "\n";
                             mIceFlag.push_back(new IceFlag());
-                            mIceFlag.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceFlag.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceSmallChunk")
                         {
                             std::cout << Object << "\n";
                             mIceSmallChunk.push_back(new IceSmallChunk());
-                            mIceSmallChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceSmallChunk.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceWindow0")
                         {
                             std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
                             mWindow.back()->SetImageNum(0);
-                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mWindow.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceWindow1")
                         {
                             std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
                             mWindow.back()->SetImageNum(1);
-                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mWindow.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceWindow2")
                         {
                             std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
                             mWindow.back()->SetImageNum(2);
-                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mWindow.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Jar")
                         {
                             std::cout << Object << "\n";
                             mJar.push_back(new Jar());
-                            mJar.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mJar.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Statue")
                         {
                             std::cout << Object << "\n";
                             mStatue.push_back(new Statue());
-                            mStatue.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mStatue.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                     }
                 }

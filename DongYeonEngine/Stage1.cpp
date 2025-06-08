@@ -73,7 +73,6 @@ void Stage1::Initialize()
 {
     UI::Initialize();
     camera.SetTarget(SceneManager::GetSharedPlayer());
-    LoadObject(L"Stage1Object.txt");
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
     {
@@ -97,7 +96,7 @@ void Stage1::ObjectInitialize()
 
     swordmans.push_back(new SwordMan());
     swordmans.back()->SetPosition(230, 270);*/
-
+    LoadObject(L"Stage1Object.txt");
 
     portal.SetPosition(1350, 1875);
 }
@@ -138,6 +137,7 @@ void Stage1::Update()
     for (auto* archer : archers) archer->Update(*player, this);
     for (auto* wizard : wizards) wizard->Update(*player, this);
     for (auto* swordman : swordmans) swordman->Update(*player);
+    //플레이어 발사체 움직임
     for (auto* fireDragon : playerFireDragon)
     {
         if (fireDragon->IsActive())
@@ -165,6 +165,7 @@ void Stage1::Update()
         }
     }
 
+    // 발사체 벽 충돌 체크
     auto map = MapManager::GetInstance()->GetMap();
     if (map)
     {
@@ -174,6 +175,7 @@ void Stage1::Update()
             if ((*it)->IsActive())
             {
                 POINT* points = (*it)->GetHitboxPoints();
+                // POINT[4]에서 RECT 생성
                 LONG minX = points[0].x, maxX = points[0].x, minY = points[0].y, maxY = points[0].y;
                 for (int k = 1; k < 4; ++k)
                 {
@@ -197,17 +199,11 @@ void Stage1::Update()
                                 (i + 1) * TILE_SIZE
                             };
                             RECT intersect;
-                           /* RECT statueRect = mStatue.GetRect();
                             if (IntersectRect(&intersect, &wallRect, &projectileRect))
                             {
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
-                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
-                            {
-                                (*it)->SetActive(false);
-                                collided = true;
-                            }*/
                         }
                     }
                 }
@@ -262,13 +258,6 @@ void Stage1::Update()
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
-                            /*RECT statueRect = mStatue.GetRect();
-                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
-                            {
-                               
-                                (*it)->SetActive(false);
-                                collided = true;
-                            }*/
                         }
                     }
                 }
@@ -325,13 +314,6 @@ void Stage1::Update()
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
-                            /*RECT statueRect = mStatue.GetRect();                         
-                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
-                            {
-                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
-                                (*it)->SetActive(false);
-                                collided = true;
-                            }*/
                         }
                     }
                 }
@@ -424,14 +406,6 @@ void Stage1::Update()
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
-
-                            /*RECT statueRect = mStatue.GetRect();
-                            if (IntersectRect(&intersect, &statueRect, &projectileRect))
-                            {
-                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
-                                (*it)->SetActive(false);
-                                collided = true;
-                            }*/
                         }
                     }
                 }
@@ -538,15 +512,14 @@ void Stage1::Update()
         SceneManager::LoadScene(L"Stage2");
         MapManager::GetInstance()->LoadMap(L"Stage2.txt");
         SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
-        wizards.clear();
-        archers.clear();
-        swordmans.clear();
-        SceneManager::GetSharedPlayer()->SetPosition(180, 270);
+
+        SceneManager::GetSharedPlayer()->SetPosition(200, 270);
         SceneManager::GetSharedPlayer()->SetTelporting(true);
     }
-
+    //객체간에 충돌처리 밀어내는거
     HandleCollision();
 
+    // 플레이어 벽 충돌 처리
     if (map)
     {
         HandleCollisionMap(map, *player);
@@ -743,6 +716,58 @@ void Stage1::Render(HDC hdc)
             RestoreDC(particleDC, savedParticleDC);
         }
     }
+
+    // map object
+    for (auto& Candle : mCandle) {
+        HDC CandleDC = hdc;
+        int savedCandleDC = SaveDC(CandleDC);
+        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        Candle->Render(CandleDC);
+        RestoreDC(CandleDC, savedCandleDC);
+    }
+    for (auto& IceBigChunk : mIceBigChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceBigChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& IceSmallChunk : mIceSmallChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceSmallChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& MapObject : mIceFlag) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mJar) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mWindow) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mStatue) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+
 
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
@@ -956,84 +981,84 @@ void Stage1::LoadObject(const std::wstring& name) {
                         {
                             std::cout << Object << "\n";
                             archers.push_back(new Archer());
-                            archers.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            archers.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "SwordMan")
                         {
                             std::cout << Object << "\n";
                             swordmans.push_back(new SwordMan());
-                            swordmans.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            swordmans.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Wizard")
                         {
                             std::cout << Object << "\n";
                             wizards.push_back(new Wizard());
-                            wizards.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            wizards.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Candle")
                         {
                             std::cout << Object << "\n";
                             mCandle.push_back(new Candle());
-                            mCandle.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mCandle.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceChunk0")
                         {
                             std::cout << Object << "\n";
                             mIceBigChunk.push_back(new IceBigChunk());
                             mIceBigChunk.back()->SetImageNum(0);
-                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceChunk1")
                         {
                             std::cout << Object << "\n";
                             mIceBigChunk.push_back(new IceBigChunk());
                             mIceBigChunk.back()->SetImageNum(1);
-                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceBigChunk.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceFlag")
                         {
                             std::cout << Object << "\n";
                             mIceFlag.push_back(new IceFlag());
-                            mIceFlag.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceFlag.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceSmallChunk")
                         {
                             std::cout << Object << "\n";
                             mIceSmallChunk.push_back(new IceSmallChunk());
-                            mIceSmallChunk.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mIceSmallChunk.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceWindow0")
                         {
                             std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
                             mWindow.back()->SetImageNum(0);
-                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mWindow.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceWindow1")
                         {
                             std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
                             mWindow.back()->SetImageNum(1);
-                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mWindow.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "IceWindow2")
                         {
                             std::cout << Object << "\n";
                             mWindow.push_back(new IceWindow());
                             mWindow.back()->SetImageNum(2);
-                            mWindow.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mWindow.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Jar")
                         {
                             std::cout << Object << "\n";
                             mJar.push_back(new Jar());
-                            mJar.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mJar.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                         else if (Object == "Statue")
                         {
                             std::cout << Object << "\n";
                             mStatue.push_back(new Statue());
-                            mStatue.back()->SetPosition(j * TILE_SIZE, i * TILE_SIZE);
+                            mStatue.back()->SetPosition(j * TILE_SIZE + 25, i * TILE_SIZE + 25);
                         }
                     }
                 }
