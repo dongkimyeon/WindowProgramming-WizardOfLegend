@@ -353,7 +353,7 @@ void MapTool::Update() {
             for (int i = 0; i < 40; i++) {
                 for (int j = 0; j < 40; j++) {
                     fwprintf(Mapfp, L"%d ", map[j][i]);
-                    fwprintf(Imagefp, L"%S ", ImageMap[j][i].c_str()); // %S는 std::string을 유니코드로 출력
+                    fwprintf(Imagefp, L"%S ", ImageMap[j][i].c_str());
                     fwprintf(Objectfp, L"%S ", ObjectMap[j][i].c_str());
                 }
                 fwprintf(Mapfp, L"\n");
@@ -542,8 +542,16 @@ void MapTool::Update() {
             int mx = Input::GetMousePosition().x / 20;
             int my = Input::GetMousePosition().y / 20;
             if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
-                SaveMapState(); // 오브젝트 배치 전 상태 저장
+                SaveMapState();
                 ObjectMap[mx][my] = selectedObject;
+            }
+        }
+        else if (currentMode == EditMode::OBJECT_ERASE) {
+            int mx = Input::GetMousePosition().x / 20;
+            int my = Input::GetMousePosition().y / 20;
+            if (mx >= 0 && mx < 40 && my >= 0 && my < 40) {
+                SaveMapState(); // 단일 클릭 오브젝트 지우기 전에 상태 저장
+                ObjectMap[mx][my] = "empty";
             }
         }
     }
@@ -558,6 +566,5 @@ void MapTool::Update() {
         }
     }
 }
-
 void MapTool::LateUpdate() {
 }

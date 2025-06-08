@@ -65,6 +65,54 @@ void Stage1::ObjectDestroy()
         delete fireDragon;
     }
     playerFireDragon.clear();
+    // Release IceBigChunks
+    for (auto* iceBigChunk : mIceBigChunk)
+    {
+        delete iceBigChunk;
+    }
+    mIceBigChunk.clear();
+
+    // Release IceSmallChunks
+    for (auto* iceSmallChunk : mIceSmallChunk)
+    {
+        delete iceSmallChunk;
+    }
+    mIceSmallChunk.clear();
+
+    // Release Statues
+    for (auto* statue : mStatue)
+    {
+        delete statue;
+    }
+    mStatue.clear();
+
+    // Release Candles
+    for (auto* candle : mCandle)
+    {
+        delete candle;
+    }
+    mCandle.clear();
+
+    // Release IceFlags
+    for (auto* iceFlag : mIceFlag)
+    {
+        delete iceFlag;
+    }
+    mIceFlag.clear();
+
+    // Release IceWindows
+    for (auto* window : mWindow)
+    {
+        delete window;
+    }
+    mWindow.clear();
+
+    // Release Jars
+    for (auto* jar : mJar)
+    {
+        delete jar;
+    }
+    mJar.clear();
 
     // Clear particles
     mParticles.clear();
