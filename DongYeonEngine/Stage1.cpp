@@ -248,7 +248,19 @@ void Stage1::Update()
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
+                             
                         }
+                    }
+                }
+                for (auto* S : mStatue)
+                {
+
+                    RECT intersect;
+                    RECT statueRect = S->GetRect();
+                    if (IntersectRect(&intersect, &statueRect, &projectileRect))
+                    {
+                        (*it)->SetActive(false);
+                        collided = true;
                     }
                 }
                 if (!collided)
@@ -303,6 +315,17 @@ void Stage1::Update()
                                 collided = true;
                             }
                         }
+                    }
+                }
+                for (auto* S : mStatue)
+                {
+
+                    RECT intersect;
+                    RECT statueRect = S->GetRect();
+                    if (IntersectRect(&intersect, &statueRect, &projectileRect))
+                    {
+                        (*it)->SetActive(false);
+                        collided = true;
                     }
                 }
                 if (!collided)
@@ -400,6 +423,18 @@ void Stage1::Update()
                         }
                     }
                     if (!enemyCollided)
+                    {
+                        for (auto* s : mStatue)
+                        {
+                            if ((*it)->CheckCollision(*s))
+                            {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!enemyCollided)
                         ++it;
                 }
                 else
@@ -450,6 +485,8 @@ void Stage1::Update()
                                 (*it)->SetActive(false);
                                 collided = true;
                             }
+
+                           
                         }
                     }
                 }
@@ -484,6 +521,18 @@ void Stage1::Update()
                         for (auto* archer : archers)
                         {
                             if ((*it)->CheckCollision(*archer))
+                            {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!enemyCollided)
+                    {
+                        for (auto* s : mStatue)
+                        {
+                            if ((*it)->CheckCollision(*s))
                             {
                                 CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
@@ -586,8 +635,6 @@ void Stage1::Render(HDC hdc)
  
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
-   
-
     HDC MapObjectDC = hdc;
     int savedMapObjectDC = SaveDC(MapObjectDC);
     OffsetViewportOrgEx(MapObjectDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
@@ -615,6 +662,59 @@ void Stage1::Render(HDC hdc)
     portal.Render(portalDC);
     RestoreDC(portalDC, savedPortalDC);
 
+
+    // map object
+    for (auto& Candle : mCandle) {
+        HDC CandleDC = hdc;
+        int savedCandleDC = SaveDC(CandleDC);
+        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        Candle->Render(CandleDC);
+        RestoreDC(CandleDC, savedCandleDC);
+    }
+    for (auto& IceBigChunk : mIceBigChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceBigChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& IceSmallChunk : mIceSmallChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceSmallChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& MapObject : mIceFlag) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mJar) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mWindow) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mStatue) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+
+    //몬스터 렌더링
     for (auto* wizard : wizards)
     {
         RECT rect = wizard->GetRect();
@@ -761,56 +861,7 @@ void Stage1::Render(HDC hdc)
         }
     }
 
-    // map object
-    for (auto& Candle : mCandle) {
-        HDC CandleDC = hdc;
-        int savedCandleDC = SaveDC(CandleDC);
-        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        Candle->Render(CandleDC);
-        RestoreDC(CandleDC, savedCandleDC);
-    }
-    for (auto& IceBigChunk : mIceBigChunk) {
-        HDC IceChunkDC = hdc;
-        int savedIceChunkDC = SaveDC(IceChunkDC);
-        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        IceBigChunk->Render(IceChunkDC);
-        RestoreDC(IceChunkDC, savedIceChunkDC);
-    }
-    for (auto& IceSmallChunk : mIceSmallChunk) {
-        HDC IceChunkDC = hdc;
-        int savedIceChunkDC = SaveDC(IceChunkDC);
-        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        IceSmallChunk->Render(IceChunkDC);
-        RestoreDC(IceChunkDC, savedIceChunkDC);
-    }
-    for (auto& MapObject : mIceFlag) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mJar) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mWindow) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mStatue) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
+   
 
 
     HDC playerDC = hdc;
@@ -955,14 +1006,52 @@ void Stage1::HandleCollisionMap(int (*map)[40], GameObject& obj)
         }
     }
 
-    //// 플레이어와 스테츄와의 충돌 처리
-    //RECT playerRect = player->GetRect();
-    //RECT statueRect = mStatue.GetRect(); // Statue 클래스에 GetRect() 메서드가 있다고 가정
-    //RECT intersect;
-    //if (IntersectRect(&intersect, &statueRect, &playerRect))
-    //{
-    //    ResolveCollisionMap(statueRect, *player);
-    //}
+    // 플레이어와 스테츄와의 충돌 처리
+    RECT playerRect = player->GetRect();
+    for (auto* S : mStatue)
+    {
+        RECT statueRect = (*S).GetRect(); // Statue 클래스에 GetRect() 메서드가 있다고 가정
+        RECT intersect;
+        if (IntersectRect(&intersect, &statueRect, &playerRect))
+        {
+            ResolveCollisionMap(statueRect, *player);
+        }
+    }
+
+    for (auto* S : mStatue)
+    {
+        RECT intersect;
+        RECT statueRect = (*S).GetRect(); // Statue 클래스에 GetRect() 메서드가 있다고 가정
+        if (IntersectRect(&intersect, &statueRect, &playerRect))
+        {
+            ResolveCollisionMap(statueRect, *player);
+        }
+        for (auto* swordman : swordmans)
+        {
+            RECT enemyRect = swordman->GetRect();
+            if (IntersectRect(&intersect, &statueRect, &enemyRect))
+            {
+                ResolveCollisionMap(statueRect, *swordman);
+            }
+        }
+        for (auto* wizard : wizards)
+        {
+            RECT enemyRect = wizard->GetRect();
+            if (IntersectRect(&intersect, &statueRect, &enemyRect))
+            {
+                ResolveCollisionMap(statueRect, *wizard);
+            }
+        }
+        for (auto* archer : archers)
+        {
+            RECT enemyRect = archer->GetRect();
+            if (IntersectRect(&intersect, &statueRect, &enemyRect))
+            {
+                ResolveCollisionMap(statueRect, *archer);
+            }
+        }
+    }
+   
 }
 
 void Stage1::ResolveCollisionMap(RECT wallRect, GameObject& obj)

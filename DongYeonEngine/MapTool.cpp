@@ -36,9 +36,9 @@
 #define UI_OBJECT_Y 330
 #define UI_OBJECT_ERASER_Y 490
 
-std::wstring const mChangeStageMapfp = L"StageCustom.txt";
-std::wstring const mChangeStageImagefp = L"StageCustomImage.txt";
-std::wstring const mChangeStageObjectfp = L"StageCustomObject.txt";
+std::wstring const mChangeStageMapfp = L"Stage1.txt";
+std::wstring const mChangeStageImagefp = L"Stage1Image.txt";
+std::wstring const mChangeStageObjectfp = L"Stage1Object.txt";
 
 void MapTool::Initialize() {
     Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"r");
