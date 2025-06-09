@@ -769,264 +769,256 @@ void TutorialStage::Render(HDC hdc)
     //기타 렌더
 
     {
-    MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
+        MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
-    HDC portalDC = hdc;
-    int savedPortalDC = SaveDC(portalDC);
-    OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-    portal.Render(portalDC);
-    RestoreDC(portalDC, savedPortalDC);
+        HDC portalDC = hdc;
+        int savedPortalDC = SaveDC(portalDC);
+        OffsetViewportOrgEx(portalDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        portal.Render(portalDC);
+        RestoreDC(portalDC, savedPortalDC);
 
 
-    for (auto* wizard : wizards)
-    {
-        RECT rect = wizard->GetRect();
-        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
-            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        for (auto* wizard : wizards)
         {
-            HDC wizardDC = hdc;
-            int savedWizardDC = SaveDC(wizardDC);
-            OffsetViewportOrgEx(wizardDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            wizard->Render(wizardDC, *player);
-            RestoreDC(wizardDC, savedWizardDC);
-        }
-    }
-    for (auto* archer : archers)
-    {
-        RECT rect = archer->GetRect();
-        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
-            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
-        {
-            HDC archerDC = hdc;
-            int savedArcherDC = SaveDC(archerDC);
-            OffsetViewportOrgEx(archerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            archer->Render(archerDC, *player);
-            RestoreDC(archerDC, savedArcherDC);
-        }
-    }
-    for (auto* swordman : swordmans)
-    {
-        RECT rect = swordman->GetRect();
-        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
-            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
-        {
-            HDC swordmanDC = hdc;
-            int savedSwordmanDC = SaveDC(swordmanDC);
-            OffsetViewportOrgEx(swordmanDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            swordman->Render(swordmanDC, *player);
-            RestoreDC(swordmanDC, savedSwordmanDC);
-        }
-    }
-    for (auto* arrow : arrows)
-    {
-        POINT* points = arrow->GetHitboxPoints();
-        bool inView = false;
-        for (int i = 0; i < 4; ++i)
-        {
-            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
-                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            RECT rect = wizard->GetRect();
+            if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+                rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
             {
-                inView = true;
-                break;
+                HDC wizardDC = hdc;
+                int savedWizardDC = SaveDC(wizardDC);
+                OffsetViewportOrgEx(wizardDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                wizard->Render(wizardDC, *player);
+                RestoreDC(wizardDC, savedWizardDC);
             }
         }
-        if (inView)
+        for (auto* archer : archers)
         {
-            HDC arrowDC = hdc;
-            int savedArrowDC = SaveDC(arrowDC);
-            OffsetViewportOrgEx(arrowDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            arrow->Render(arrowDC);
-            RestoreDC(arrowDC, savedArrowDC);
-        }
-    }
-    for (auto* fireball : fireballs)
-    {
-        POINT* points = fireball->GetHitboxPoints();
-        bool inView = false;
-        for (int i = 0; i < 4; ++i)
-        {
-            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
-                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            RECT rect = archer->GetRect();
+            if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+                rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
             {
-                inView = true;
-                break;
+                HDC archerDC = hdc;
+                int savedArcherDC = SaveDC(archerDC);
+                OffsetViewportOrgEx(archerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                archer->Render(archerDC, *player);
+                RestoreDC(archerDC, savedArcherDC);
             }
         }
-        if (inView)
+        for (auto* swordman : swordmans)
         {
-            HDC fireballDC = hdc;
-            int savedFireballDC = SaveDC(fireballDC);
-            OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            fireball->Render(fireballDC);
-            RestoreDC(fireballDC, savedFireballDC);
-        }
-    }
-    for (auto* playerFireBall : playerFireballs)
-    {
-        POINT* points = playerFireBall->GetHitboxPoints();
-        bool inView = false;
-        for (int i = 0; i < 4; ++i)
-        {
-            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
-                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            RECT rect = swordman->GetRect();
+            if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+                rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
             {
-                inView = true;
-                break;
+                HDC swordmanDC = hdc;
+                int savedSwordmanDC = SaveDC(swordmanDC);
+                OffsetViewportOrgEx(swordmanDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                swordman->Render(swordmanDC, *player);
+                RestoreDC(swordmanDC, savedSwordmanDC);
             }
         }
-        if (inView)
+        for (auto* arrow : arrows)
         {
-            HDC fireballDC = hdc;
-            int savedFireballDC = SaveDC(fireballDC);
-            OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            playerFireBall->Render(fireballDC);
-            RestoreDC(fireballDC, savedFireballDC);
-        }
-    }
-    for (auto* FireDragon : playerFireDragon)
-    {
-        POINT* points = FireDragon->GetHitboxPoints();
-        bool inView = false;
-        for (int i = 0; i < 4; ++i)
-        {
-            if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
-                points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+            POINT* points = arrow->GetHitboxPoints();
+            bool inView = false;
+            for (int i = 0; i < 4; ++i)
             {
-                inView = true;
-                break;
+                if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                    points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+                {
+                    inView = true;
+                    break;
+                }
+            }
+            if (inView)
+            {
+                HDC arrowDC = hdc;
+                int savedArrowDC = SaveDC(arrowDC);
+                OffsetViewportOrgEx(arrowDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                arrow->Render(arrowDC);
+                RestoreDC(arrowDC, savedArrowDC);
             }
         }
-        if (inView)
+        for (auto* fireball : fireballs)
         {
-            HDC FireDragonDC = hdc;
-            int saveFireDragonDC = SaveDC(FireDragonDC);
-            OffsetViewportOrgEx(FireDragonDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            FireDragon->Render(FireDragonDC);
-            RestoreDC(FireDragonDC, saveFireDragonDC);
+            POINT* points = fireball->GetHitboxPoints();
+            bool inView = false;
+            for (int i = 0; i < 4; ++i)
+            {
+                if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                    points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+                {
+                    inView = true;
+                    break;
+                }
+            }
+            if (inView)
+            {
+                HDC fireballDC = hdc;
+                int savedFireballDC = SaveDC(fireballDC);
+                OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                fireball->Render(fireballDC);
+                RestoreDC(fireballDC, savedFireballDC);
+            }
         }
-    }
-    for(auto* dummy : dummies)
-    {
-        RECT rect = dummy->GetRect();
-        if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
-            rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+        for (auto* playerFireBall : playerFireballs)
         {
-            HDC dummyDC = hdc;
-            int savedDummyDC = SaveDC(dummyDC);
-            OffsetViewportOrgEx(dummyDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            dummy->Render(dummyDC, *player);
-            RestoreDC(dummyDC, savedDummyDC);
+            POINT* points = playerFireBall->GetHitboxPoints();
+            bool inView = false;
+            for (int i = 0; i < 4; ++i)
+            {
+                if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                    points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+                {
+                    inView = true;
+                    break;
+                }
+            }
+            if (inView)
+            {
+                HDC fireballDC = hdc;
+                int savedFireballDC = SaveDC(fireballDC);
+                OffsetViewportOrgEx(fireballDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                playerFireBall->Render(fireballDC);
+                RestoreDC(fireballDC, savedFireballDC);
+            }
         }
-	}
-    HDC playerDC = hdc;
-    int savedPlayerDC = SaveDC(playerDC);
-    OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-    player->Render(playerDC);
-    RestoreDC(playerDC, savedPlayerDC);
-
-    RestoreDC(hdc, savedDC);
-    // 파티클 렌더링
-    for (const auto& particle : mParticles)
-    {
-        if (particle.x >= cameraX && particle.x <= cameraX + viewWidth &&
-            particle.y >= cameraY && particle.y <= cameraY + viewHeight)
+        for (auto* FireDragon : playerFireDragon)
         {
-            HDC particleDC = hdc;
-            int savedParticleDC = SaveDC(particleDC);
-            OffsetViewportOrgEx(particleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-            mFireParticleImage[particle.frame].Draw(particleDC,
-                static_cast<int>(particle.x - 25),
-                static_cast<int>(particle.y - 25),
-                50, 50);
-            RestoreDC(particleDC, savedParticleDC);
+            POINT* points = FireDragon->GetHitboxPoints();
+            bool inView = false;
+            for (int i = 0; i < 4; ++i)
+            {
+                if (points[i].x >= cameraX && points[i].x <= cameraX + viewWidth &&
+                    points[i].y >= cameraY && points[i].y <= cameraY + viewHeight)
+                {
+                    inView = true;
+                    break;
+                }
+            }
+            if (inView)
+            {
+                HDC FireDragonDC = hdc;
+                int saveFireDragonDC = SaveDC(FireDragonDC);
+                OffsetViewportOrgEx(FireDragonDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                FireDragon->Render(FireDragonDC);
+                RestoreDC(FireDragonDC, saveFireDragonDC);
+            }
         }
-    }
+        for (auto* dummy : dummies)
+        {
+            RECT rect = dummy->GetRect();
+            if (rect.right >= cameraX && rect.left <= cameraX + viewWidth &&
+                rect.bottom >= cameraY && rect.top <= cameraY + viewHeight)
+            {
+                HDC dummyDC = hdc;
+                int savedDummyDC = SaveDC(dummyDC);
+                OffsetViewportOrgEx(dummyDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                dummy->Render(dummyDC, *player);
+                RestoreDC(dummyDC, savedDummyDC);
+            }
+        }
+        HDC playerDC = hdc;
+        int savedPlayerDC = SaveDC(playerDC);
+        OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        player->Render(playerDC);
+        RestoreDC(playerDC, savedPlayerDC);
 
-    // map object
-    for (auto& Candle : mCandle) {
-        HDC CandleDC = hdc;
-        int savedCandleDC = SaveDC(CandleDC);
-        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        Candle->Render(CandleDC);
-        RestoreDC(CandleDC, savedCandleDC);
-    }
-    for (auto& IceBigChunk : mIceBigChunk) {
-        HDC IceChunkDC = hdc;
-        int savedIceChunkDC = SaveDC(IceChunkDC);
-        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        IceBigChunk->Render(IceChunkDC);
-        RestoreDC(IceChunkDC, savedIceChunkDC);
-    }
-    for (auto& IceSmallChunk : mIceSmallChunk) {
-        HDC IceChunkDC = hdc;
-        int savedIceChunkDC = SaveDC(IceChunkDC);
-        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        IceSmallChunk->Render(IceChunkDC);
-        RestoreDC(IceChunkDC, savedIceChunkDC);
-    }
-    for (auto& MapObject : mIceFlag) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mJar) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mWindow) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mStatue) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
+        RestoreDC(hdc, savedDC);
+        // 파티클 렌더링
+        for (const auto& particle : mParticles)
+        {
+            if (particle.x >= cameraX && particle.x <= cameraX + viewWidth &&
+                particle.y >= cameraY && particle.y <= cameraY + viewHeight)
+            {
+                HDC particleDC = hdc;
+                int savedParticleDC = SaveDC(particleDC);
+                OffsetViewportOrgEx(particleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+                mFireParticleImage[particle.frame].Draw(particleDC,
+                    static_cast<int>(particle.x - 25),
+                    static_cast<int>(particle.y - 25),
+                    50, 50);
+                RestoreDC(particleDC, savedParticleDC);
+            }
+        }
+
+        // map object
+        for (auto& Candle : mCandle) {
+            HDC CandleDC = hdc;
+            int savedCandleDC = SaveDC(CandleDC);
+            OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            Candle->Render(CandleDC);
+            RestoreDC(CandleDC, savedCandleDC);
+        }
+        for (auto& IceBigChunk : mIceBigChunk) {
+            HDC IceChunkDC = hdc;
+            int savedIceChunkDC = SaveDC(IceChunkDC);
+            OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            IceBigChunk->Render(IceChunkDC);
+            RestoreDC(IceChunkDC, savedIceChunkDC);
+        }
+        for (auto& IceSmallChunk : mIceSmallChunk) {
+            HDC IceChunkDC = hdc;
+            int savedIceChunkDC = SaveDC(IceChunkDC);
+            OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            IceSmallChunk->Render(IceChunkDC);
+            RestoreDC(IceChunkDC, savedIceChunkDC);
+        }
+        for (auto& MapObject : mIceFlag) {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
+        for (auto& MapObject : mJar) {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
+        for (auto& MapObject : mWindow) {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
+        for (auto& MapObject : mStatue) {
+            HDC MapObDC = hdc;
+            int savedMapObDC = SaveDC(MapObDC);
+            OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+            MapObject->Render(MapObDC);
+            RestoreDC(MapObDC, savedMapObDC);
+        }
 
 
 
-    UI::Render(hdc);
+        UI::Render(hdc);
 
-    //몇 스테이지인지 텍스트 출력
-    //텍스트 설정 
-    SetTextColor(hdc, RGB(255, 255, 255));
-    HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-        DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
-    HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+        //몇 스테이지인지 텍스트 출력
+        //텍스트 설정 
+        SetTextColor(hdc, RGB(255, 255, 255));
+        HFONT hFont = CreateFont(20, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+            DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+        HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
 
-    wchar_t StageIdText[20];
-    swprintf_s(StageIdText, L"TutorialStage");
+        wchar_t StageIdText[20];
+        swprintf_s(StageIdText, L"TutorialStage");
 
 
-    SIZE textSize;
-    GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
+        SIZE textSize;
+        GetTextExtentPoint32(hdc, StageIdText, wcslen(StageIdText), &textSize);
 
-    int textX = viewWidth - textSize.cx;
-    int textY = viewHeight - textSize.cy;
+        int textX = viewWidth - textSize.cx;
+        int textY = viewHeight - textSize.cy;
 
-    TextOut(hdc, textX - 20, textY, StageIdText, wcslen(StageIdText));
+        TextOut(hdc, textX - 20, textY, StageIdText, wcslen(StageIdText));
 
-    SelectObject(hdc, hOldFont);
-    DeleteObject(hFont);
-  
-    WCHAR mousePosText[100];
-    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
-    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-    wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d",
-        static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
-    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
-        static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
+        SelectObject(hdc, hOldFont);
+        DeleteObject(hFont);
     }
 
 

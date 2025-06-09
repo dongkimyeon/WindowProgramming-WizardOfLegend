@@ -8,8 +8,6 @@
 #include "SoundManager.h"
 #include "UI.h"
 
-
-
 #define MAP_COLS 40
 #define MAP_ROWS 40
 #define TILE_SIZE 50
@@ -119,7 +117,7 @@ void StageCustom::ObjectDestroy()
 void StageCustom::Initialize()
 {
 	camera.SetTarget(SceneManager::GetSharedPlayer());
-	
+
 	// 파티클 이미지 로드
 	for (int i = 0; i < 20; ++i)
 	{
@@ -137,8 +135,8 @@ void StageCustom::Initialize()
 
 void StageCustom::ObjectInitialize()
 {
-	LoadObject(L"StageCustomObject.txt");
-	
+	LoadObject(L"resources/MapTextFile/StageCustomObject.txt");
+
 }
 
 // 파티클 생성 함수
@@ -244,6 +242,16 @@ void StageCustom::Update()
 						}
 					}
 				}
+				for (auto* S : mStatue)
+				{
+					RECT intersect;
+					RECT statueRect = S->GetRect();
+					if (IntersectRect(&intersect, &statueRect, &projectileRect))
+					{
+						(*it)->SetActive(false);
+						collided = true;
+					}
+				}
 				if (!collided)
 				{
 					(*it)->Update(*player);
@@ -296,6 +304,16 @@ void StageCustom::Update()
 								collided = true;
 							}
 						}
+					}
+				}
+				for (auto* S : mStatue)
+				{
+					RECT intersect;
+					RECT statueRect = S->GetRect();
+					if (IntersectRect(&intersect, &statueRect, &projectileRect))
+					{
+						(*it)->SetActive(false);
+						collided = true;
 					}
 				}
 				if (!collided)
@@ -385,6 +403,18 @@ void StageCustom::Update()
 						for (auto* archer : archers)
 						{
 							if ((*it)->CheckCollision(*archer))
+							{
+								CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+								enemyCollided = true;
+								break;
+							}
+						}
+					}
+					if (!enemyCollided)
+					{
+						for (auto* s : mStatue)
+						{
+							if ((*it)->CheckCollision(*s))
 							{
 								CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
 								enemyCollided = true;
@@ -485,6 +515,18 @@ void StageCustom::Update()
 						}
 					}
 					if (!enemyCollided)
+					{
+						for (auto* s : mStatue)
+						{
+							if ((*it)->CheckCollision(*s))
+							{
+								CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+								enemyCollided = true;
+								break;
+							}
+						}
+					}
+					if (!enemyCollided)
 						++it;
 				}
 				else
@@ -541,7 +583,6 @@ void StageCustom::Update()
 
 	RECT temp;
 	RECT playerRect = player->GetRect();
-	
 
 
 	HandleCollision();
@@ -567,25 +608,6 @@ void StageCustom::Render(HDC hdc)
 	int viewHeight = 720;
 
 	MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
-
-
-	//// 플레이어 스폰포인트 렌더링
-	//HDC spawnDC = hdc;
-	//int savedSpawnDC = SaveDC(spawnDC);
-	//OffsetViewportOrgEx(spawnDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-	//float spawnScale = 1.5f; // 스케일 값 (기본값 1.0, 필요 시 조정 가능)
-	//int spawnWidth = 100; // 기본 이미지 너비 (예시, 실제 이미지 크기에 맞게 조정)
-	//int spawnHeight = 100; // 기본 이미지 높이 (예시, 실제 이미지 크기에 맞게 조정)
-	//int scaledWidth = static_cast<int>(spawnWidth * spawnScale);
-	//int scaledHeight = static_cast<int>(spawnHeight * spawnScale);
-	//int spawnX = static_cast<int>(183 - scaledWidth / 2.0f); // 중심을 (183, 304)로 설정
-	//int spawnY = static_cast<int>(334 - scaledHeight / 2.0f);
-	//mPlayerSpawnPoint.Draw(spawnDC, spawnX, spawnY, scaledWidth, scaledHeight);
-	//RestoreDC(spawnDC, savedSpawnDC);
-
-
-
-
 
 	for (auto* wizard : wizards)
 	{
@@ -733,7 +755,6 @@ void StageCustom::Render(HDC hdc)
 		}
 	}
 
-
 	// map object
 	for (auto& Candle : mCandle) {
 		HDC CandleDC = hdc;
@@ -785,9 +806,6 @@ void StageCustom::Render(HDC hdc)
 		RestoreDC(MapObDC, savedMapObDC);
 	}
 
-
-
-
 	HDC playerDC = hdc;
 	int savedPlayerDC = SaveDC(playerDC);
 	OffsetViewportOrgEx(playerDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
@@ -819,7 +837,6 @@ void StageCustom::Render(HDC hdc)
 
 	SelectObject(hdc, hOldFont);
 	DeleteObject(hFont);
-
 }
 
 void StageCustom::HandleCollision()
@@ -926,6 +943,42 @@ void StageCustom::HandleCollisionMap(int (*map)[40], GameObject& obj)
 						ResolveCollisionMap(wallRect, *archer);
 					}
 				}
+			}
+		}
+	}
+
+	// 플레이어와 스테츄와의 충돌 처리
+	RECT playerRect = player->GetRect();
+	for (auto* S : mStatue)
+	{
+		RECT statueRect = S->GetRect();
+		RECT intersect;
+		if (IntersectRect(&intersect, &statueRect, &playerRect))
+		{
+			ResolveCollisionMap(statueRect, *player);
+		}
+		for (auto* swordman : swordmans)
+		{
+			RECT enemyRect = swordman->GetRect();
+			if (IntersectRect(&intersect, &statueRect, &enemyRect))
+			{
+				ResolveCollisionMap(statueRect, *swordman);
+			}
+		}
+		for (auto* wizard : wizards)
+		{
+			RECT enemyRect = wizard->GetRect();
+			if (IntersectRect(&intersect, &statueRect, &enemyRect))
+			{
+				ResolveCollisionMap(statueRect, *wizard);
+			}
+		}
+		for (auto* archer : archers)
+		{
+			RECT enemyRect = archer->GetRect();
+			if (IntersectRect(&intersect, &statueRect, &enemyRect))
+			{
+				ResolveCollisionMap(statueRect, *archer);
 			}
 		}
 	}

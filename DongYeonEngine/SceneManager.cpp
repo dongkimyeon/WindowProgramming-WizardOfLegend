@@ -63,6 +63,7 @@ Scene* SceneManager::LoadScene(const std::wstring& name)
         return nullptr;
 
     mActiveScene = iter->second;
+    mActiveScene->ObjectDestroy();
     mActiveScene->ObjectInitialize();
     return iter->second;
 }
@@ -176,7 +177,8 @@ void SceneManager::Render(HDC hdc)
 
     for (int i = 0; i < 30; ++i)
     {
-        if (SceneManager::GetActiveScene()->GetName() != L"MapTool")
+        if (SceneManager::GetActiveScene()->GetName() != L"MapTool" && SceneManager::GetActiveScene()->GetName() != L"GameOverScene"
+            && SceneManager::GetActiveScene()->GetName() != L"GameClearScene" &&  SceneManager::GetActiveScene()->GetName() != L"TitleScene")
         {
             mSnows[i].Render(hdc);
         }

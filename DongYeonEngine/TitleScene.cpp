@@ -165,7 +165,7 @@ void TitleScene::Update()
                 SceneManager::LoadScene(L"Stage1");
                 SoundManager::GetInstance()->mPlaySound("Earth", true);
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-                MapManager::GetInstance()->LoadMap(L"Stage1.txt");
+                MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/Stage1.txt");
                 SceneManager::GetSharedPlayer()->SetPosition(180, 300);
                 SceneManager::SetmIsGameStart(true);
             }
@@ -173,7 +173,7 @@ void TitleScene::Update()
             {
                 SceneManager::StartFadeIn();
                 SceneManager::LoadScene(L"TutorialStage");
-                MapManager::GetInstance()->LoadMap(L"StageTutorial.txt");
+                MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/StageTutorial.txt");
                 SoundManager::GetInstance()->mPlaySound("Tutorial_Jazz", true);
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
                 SceneManager::GetSharedPlayer()->SetPosition(949, 1124);
@@ -181,7 +181,7 @@ void TitleScene::Update()
             else if (mButtonHovered[2])
             {
                 SceneManager::StartFadeIn();
-                MapManager::GetInstance()->LoadMap(L"StageCustom.txt");
+                MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/StageCustom.txt");
                 SceneManager::LoadScene(L"StageCustom");
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
             }

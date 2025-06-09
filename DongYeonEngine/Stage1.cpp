@@ -140,7 +140,7 @@ void Stage1::Initialize()
 void Stage1::ObjectInitialize()
 {
    
-    LoadObject(L"Stage1Object.txt");
+    LoadObject(L"resources/MapTextFile/Stage1Object.txt");
 
     portal.SetPosition(1350, 1875);
 }
@@ -603,7 +603,7 @@ void Stage1::Update()
         SceneManager::StartFadeIn();
         ObjectDestroy();
         SceneManager::LoadScene(L"Stage2");
-        MapManager::GetInstance()->LoadMap(L"Stage2.txt");
+        MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/Stage2.txt");
         SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
 
         SceneManager::GetSharedPlayer()->SetPosition(200, 340);

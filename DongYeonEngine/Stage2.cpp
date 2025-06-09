@@ -158,7 +158,7 @@ void Stage2::CreateFireParticles(std::vector<Particle>& particles, float x, floa
 
 void Stage2::ObjectInitialize()
 {
-    LoadObject(L"Stage2Object.txt");
+    LoadObject(L"resources/MapTextFile/Stage2Object.txt");
     //포탈 위치 설정
     portal.SetPosition(1650, 1750);
 }
@@ -250,6 +250,16 @@ void Stage2::Update()
                         }
                     }
                 }
+                for (auto* S : mStatue)
+                {
+                    RECT intersect;
+                    RECT statueRect = S->GetRect();
+                    if (IntersectRect(&intersect, &statueRect, &projectileRect))
+                    {
+                        (*it)->SetActive(false);
+                        collided = true;
+                    }
+                }
                 if (!collided)
                 {
                     (*it)->Update(*player);
@@ -302,6 +312,16 @@ void Stage2::Update()
                                 collided = true;
                             }
                         }
+                    }
+                }
+                for (auto* S : mStatue)
+                {
+                    RECT intersect;
+                    RECT statueRect = S->GetRect();
+                    if (IntersectRect(&intersect, &statueRect, &projectileRect))
+                    {
+                        (*it)->SetActive(false);
+                        collided = true;
                     }
                 }
                 if (!collided)
@@ -391,6 +411,18 @@ void Stage2::Update()
                         for (auto* archer : archers)
                         {
                             if ((*it)->CheckCollision(*archer))
+                            {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!enemyCollided)
+                    {
+                        for (auto* s : mStatue)
+                        {
+                            if ((*it)->CheckCollision(*s))
                             {
                                 CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
                                 enemyCollided = true;
@@ -491,6 +523,18 @@ void Stage2::Update()
                         }
                     }
                     if (!enemyCollided)
+                    {
+                        for (auto* s : mStatue)
+                        {
+                            if ((*it)->CheckCollision(*s))
+                            {
+                                CreateFireParticles(mParticles, (minX + maxX) / 2.0f, (minY + maxY) / 2.0f);
+                                enemyCollided = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!enemyCollided)
                         ++it;
                 }
                 else
@@ -553,7 +597,7 @@ void Stage2::Update()
         SceneManager::StartFadeIn();
         ObjectDestroy();
         SceneManager::LoadScene(L"BossStage");
-        MapManager::GetInstance()->LoadMap(L"StageBoss.txt");
+        MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/StageBoss.txt");
         SoundManager::GetInstance()->mPlaySound("ExitPortal", false);
         SoundManager::GetInstance()->mPlaySound("Boss", true);
 
@@ -936,6 +980,42 @@ void Stage2::HandleCollisionMap(int (*map)[40], GameObject& obj)
                         ResolveCollisionMap(wallRect, *archer);
                     }
                 }
+            }
+        }
+    }
+
+    // 플레이어와 스테츄와의 충돌 처리
+    RECT playerRect = player->GetRect();
+    for (auto* S : mStatue)
+    {
+        RECT statueRect = S->GetRect();
+        RECT intersect;
+        if (IntersectRect(&intersect, &statueRect, &playerRect))
+        {
+            ResolveCollisionMap(statueRect, *player);
+        }
+        for (auto* swordman : swordmans)
+        {
+            RECT enemyRect = swordman->GetRect();
+            if (IntersectRect(&intersect, &statueRect, &enemyRect))
+            {
+                ResolveCollisionMap(statueRect, *swordman);
+            }
+        }
+        for (auto* wizard : wizards)
+        {
+            RECT enemyRect = wizard->GetRect();
+            if (IntersectRect(&intersect, &statueRect, &enemyRect))
+            {
+                ResolveCollisionMap(statueRect, *wizard);
+            }
+        }
+        for (auto* archer : archers)
+        {
+            RECT enemyRect = archer->GetRect();
+            if (IntersectRect(&intersect, &statueRect, &enemyRect))
+            {
+                ResolveCollisionMap(statueRect, *archer);
             }
         }
     }

@@ -133,6 +133,7 @@ void BossStage::ObjectDestroy()
     iceBoss.revive();
 
 }
+
 void BossStage::Initialize()
 {
     //카메라 설정
@@ -183,7 +184,7 @@ void BossStage::LateUpdate()
 
 void BossStage::ObjectInitialize()
 {
-    LoadObject(L"StageBossObject.txt");
+    LoadObject(L"resources/MapTextFile/StageBossObject.txt");
     iceBoss.Init();
     
 }
@@ -741,6 +742,58 @@ void BossStage::Render(HDC hdc)
 
     MapManager::GetInstance()->Render(hdc, cameraX, cameraY);
 
+    // map object
+    for (auto& Candle : mCandle) {
+        HDC CandleDC = hdc;
+        int savedCandleDC = SaveDC(CandleDC);
+        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        Candle->Render(CandleDC);
+        RestoreDC(CandleDC, savedCandleDC);
+    }
+    for (auto& IceBigChunk : mIceBigChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceBigChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& IceSmallChunk : mIceSmallChunk) {
+        HDC IceChunkDC = hdc;
+        int savedIceChunkDC = SaveDC(IceChunkDC);
+        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        IceSmallChunk->Render(IceChunkDC);
+        RestoreDC(IceChunkDC, savedIceChunkDC);
+    }
+    for (auto& MapObject : mIceFlag) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mJar) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mWindow) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+    for (auto& MapObject : mStatue) {
+        HDC MapObDC = hdc;
+        int savedMapObDC = SaveDC(MapObDC);
+        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
+        MapObject->Render(MapObDC);
+        RestoreDC(MapObDC, savedMapObDC);
+    }
+
+
     
     // mBossEntrance 그리기
     float scale = 2.9f; // 스케일 값 (예: 0.5로 50% 크기)
@@ -956,57 +1009,7 @@ void BossStage::Render(HDC hdc)
         }
     }
 
-    // map object
-    for (auto& Candle : mCandle) {
-        HDC CandleDC = hdc;
-        int savedCandleDC = SaveDC(CandleDC);
-        OffsetViewportOrgEx(CandleDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        Candle->Render(CandleDC);
-        RestoreDC(CandleDC, savedCandleDC);
-    }
-    for (auto& IceBigChunk : mIceBigChunk) {
-        HDC IceChunkDC = hdc;
-        int savedIceChunkDC = SaveDC(IceChunkDC);
-        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        IceBigChunk->Render(IceChunkDC);
-        RestoreDC(IceChunkDC, savedIceChunkDC);
-    }
-    for (auto& IceSmallChunk : mIceSmallChunk) {
-        HDC IceChunkDC = hdc;
-        int savedIceChunkDC = SaveDC(IceChunkDC);
-        OffsetViewportOrgEx(IceChunkDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        IceSmallChunk->Render(IceChunkDC);
-        RestoreDC(IceChunkDC, savedIceChunkDC);
-    }
-    for (auto& MapObject : mIceFlag) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mJar) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mWindow) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-    for (auto& MapObject : mStatue) {
-        HDC MapObDC = hdc;
-        int savedMapObDC = SaveDC(MapObDC);
-        OffsetViewportOrgEx(MapObDC, -static_cast<int>(cameraX), -static_cast<int>(cameraY), nullptr);
-        MapObject->Render(MapObDC);
-        RestoreDC(MapObDC, savedMapObDC);
-    }
-
+  
 
     HDC playerDC = hdc;
     int savedPlayerDC = SaveDC(playerDC);
