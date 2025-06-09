@@ -60,8 +60,8 @@ void Game::clearRenderTarget()
 
 void Game::copyRenderTarget(HDC source, HDC dest)
 {
-	BitBlt(dest, 0, 0, mWidth, mHeight
-		, source, 0, 0, SRCCOPY);
+	StretchBlt(dest, 0, 0, 1920, 1080, source, 0, 0, 1280, 720, SRCCOPY);
+	//BitBlt(dest, 0, 0, mWidth, mHeight, source, 0, 0, SRCCOPY);
 }
 
 void Game::adjustWindowRect(HWND hwnd, UINT width, UINT height)

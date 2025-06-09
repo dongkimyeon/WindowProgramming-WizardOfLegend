@@ -18,7 +18,7 @@ void Camera::Update()
         // Center camera on player (viewport 1280x720)
         mX = mTarget->GetPositionX() - 640.0f; // 1280 / 2
         mY = mTarget->GetPositionY() - 360.0f; // 720 / 2
-        // Clamp to map bounds (5000x5000)
+        // Clamp to map bounds (2000x2000)
         mX = max(0.0f, min(mX, 2000.0f - 1280.0f));
         mY = max(0.0f, min(mY, 2000.0f - 720.0f));
     }
