@@ -1,7 +1,8 @@
-#define _CRT_SECURE_NO_WARNINGS
+癤�#define _CRT_SECURE_NO_WARNINGS
 #include "MapTool.h"
 #include "SceneManager.h"
 #include <algorithm>
+#include <vector>
 
 #define GRID_SIZE 18
 #define MAP_WIDTH 40
@@ -15,9 +16,11 @@
 #define BUTTON_WIDTH 100
 #define BUTTON_HEIGHT 40
 #define BUTTON_OFFSET_X 300
+#define COPY_BUTTON_TOP 400
+#define PASTE_BUTTON_TOP 450
 #define SAVE_BUTTON_TOP 500
 #define REDO_BUTTON_TOP 550
-#define CANCEL_BUTTON_TOP 600
+#define UNDO_BUTTON_TOP 600
 #define EXIT_BUTTON_TOP 650
 #define TEXT_OFFSET_X 30
 #define TEXT_OFFSET_Y 15
@@ -36,9 +39,9 @@
 #define UI_OBJECT_Y 330
 #define UI_OBJECT_ERASER_Y 490
 
-std::wstring const mChangeStageMapfp = L"Stage1.txt";
-std::wstring const mChangeStageImagefp = L"Stage1Image.txt";
-std::wstring const mChangeStageObjectfp = L"Stage1Object.txt";
+std::wstring const mChangeStageMapfp = L"StageCustom.txt";
+std::wstring const mChangeStageImagefp = L"StageCustomImage.txt";
+std::wstring const mChangeStageObjectfp = L"StageCustomObject.txt";
 
 void MapTool::Initialize() {
     Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"r");
@@ -129,14 +132,16 @@ void MapTool::Initialize() {
     selectedObject = "";
     currentMode = EditMode::NONE;
     drag = false;
+    copyBuffer.clear();
+    copyRect = { 0, 0, 0, 0 };
 
-    // 버튼 위치 초기화
+    mCopyButton = { UI_BASE_X + BUTTON_OFFSET_X, COPY_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, COPY_BUTTON_TOP + BUTTON_HEIGHT };
+    mPasteButton = { UI_BASE_X + BUTTON_OFFSET_X, PASTE_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, PASTE_BUTTON_TOP + BUTTON_HEIGHT };
     mSaveButton = { UI_BASE_X + BUTTON_OFFSET_X, SAVE_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, SAVE_BUTTON_TOP + BUTTON_HEIGHT };
     mRedoButton = { UI_BASE_X + BUTTON_OFFSET_X, REDO_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, REDO_BUTTON_TOP + BUTTON_HEIGHT };
-    mCancelButton = { UI_BASE_X + BUTTON_OFFSET_X, CANCEL_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, CANCEL_BUTTON_TOP + BUTTON_HEIGHT };
+    mCancelButton = { UI_BASE_X + BUTTON_OFFSET_X, UNDO_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, UNDO_BUTTON_TOP + BUTTON_HEIGHT };
     mExitButton = { UI_BASE_X + BUTTON_OFFSET_X, EXIT_BUTTON_TOP, UI_BASE_X + BUTTON_OFFSET_X + BUTTON_WIDTH, EXIT_BUTTON_TOP + BUTTON_HEIGHT };
 
-    // redoStack 초기화
     while (!redoStack.empty()) {
         redoStack.pop();
     }
@@ -151,7 +156,6 @@ void MapTool::Render(HDC hdc) {
     HPEN hOldPen;
     SetTextColor(hdc, RGB(0, 0, 0));
 
-    // 맵 그리기
     for (int i = 0; i < MAP_WIDTH; i++) {
         for (int j = 0; j < MAP_HEIGHT; j++) {
             int left = i * GRID_SIZE;
@@ -186,7 +190,6 @@ void MapTool::Render(HDC hdc) {
                 EmptyTile.StretchBlt(hdc, left, top, right - left, bottom - top, SRCCOPY);
             }
 
-            // 오브젝트 그리기
             if (ObjectMap[i][j] != "empty") {
                 if (ObjectMap[i][j] == "Archer") {
                     TransparentBlt(hdc, left, top, right - left, bottom - top, Objects[0].GetDC(), 0, 0, Objects[0].GetWidth(), Objects[0].GetHeight(), RGB(0, 0, 0));
@@ -241,7 +244,6 @@ void MapTool::Render(HDC hdc) {
     SelectObject(hdc, hOldPen);
     DeleteObject(hPen);
 
-    // UI 그리기
     hOldBrush = (HBRUSH)SelectObject(hdc, hNullBrush);
     TextOut(hdc, UI_BASE_X, UI_BASE_Y, L"Floor Tiles:", 12);
     for (int i = 0; i < 4; i++) {
@@ -318,8 +320,19 @@ void MapTool::Render(HDC hdc) {
         SelectObject(hdc, hOldPen);
     }
 
-    // 버튼 그리기 및 텍스트 중앙 정렬
     SelectObject(hdc, hButtonBrush);
+    Rectangle(hdc, mCopyButton.left, mCopyButton.top, mCopyButton.right, mCopyButton.bottom);
+    SIZE copyTextSize;
+    GetTextExtentPoint32(hdc, L"Copy", 4, &copyTextSize);
+    TextOut(hdc, mCopyButton.left + (mCopyButton.right - mCopyButton.left - copyTextSize.cx) / 2,
+        mCopyButton.top + (mCopyButton.bottom - mCopyButton.top - copyTextSize.cy) / 2, L"Copy", 4);
+
+    Rectangle(hdc, mPasteButton.left, mPasteButton.top, mPasteButton.right, mPasteButton.bottom);
+    SIZE pasteTextSize;
+    GetTextExtentPoint32(hdc, L"Paste", 5, &pasteTextSize);
+    TextOut(hdc, mPasteButton.left + (mPasteButton.right - mPasteButton.left - pasteTextSize.cx) / 2,
+        mPasteButton.top + (mPasteButton.bottom - mPasteButton.top - pasteTextSize.cy) / 2, L"Paste", 5);
+
     Rectangle(hdc, mSaveButton.left, mSaveButton.top, mSaveButton.right, mSaveButton.bottom);
     SIZE saveTextSize;
     GetTextExtentPoint32(hdc, L"Save", 4, &saveTextSize);
@@ -345,11 +358,32 @@ void MapTool::Render(HDC hdc) {
         mExitButton.top + (mExitButton.bottom - mExitButton.top - exitTextSize.cy) / 2, L"Exit", 4);
     SelectObject(hdc, hOldBrush);
 
+    if (!copyBuffer.empty()) {
+        int left = copyRect.left * GRID_SIZE;
+        int top = copyRect.top * GRID_SIZE;
+        int right = copyRect.right * GRID_SIZE;
+        int bottom = copyRect.bottom * GRID_SIZE;
+        SelectObject(hdc, hRedPen);
+        SelectObject(hdc, hNullBrush);
+        Rectangle(hdc, left, top, right, bottom);
+        SelectObject(hdc, hOldPen);
+        SelectObject(hdc, hOldBrush);
+    }
+
     if (drag) {
-        int left = min(drawRect.left, drawRect.right) * GRID_SIZE;
-        int top = min(drawRect.top, drawRect.bottom) * GRID_SIZE;
-        int right = max(drawRect.left, drawRect.right) * GRID_SIZE;
-        int bottom = max(drawRect.top, drawRect.bottom) * GRID_SIZE;
+        int left, top, right, bottom;
+        if (currentMode == EditMode::PASTE && !copyBuffer.empty()) {
+            left = drawRect.left * GRID_SIZE;
+            top = drawRect.top * GRID_SIZE;
+            right = (drawRect.left + copyWidth) * GRID_SIZE;
+            bottom = (drawRect.top + copyHeight) * GRID_SIZE;
+        }
+        else {
+            left = min(drawRect.left, drawRect.right) * GRID_SIZE;
+            top = min(drawRect.top, drawRect.bottom) * GRID_SIZE;
+            right = max(drawRect.left, drawRect.right) * GRID_SIZE;
+            bottom = max(drawRect.top, drawRect.bottom) * GRID_SIZE;
+        }
         SelectObject(hdc, hRedPen);
         SelectObject(hdc, hNullBrush);
         Rectangle(hdc, left, top, right, bottom);
@@ -360,6 +394,7 @@ void MapTool::Render(HDC hdc) {
     DeleteObject(hButtonBrush);
     DeleteObject(hRedPen);
 }
+
 void MapTool::Update() {
     auto SaveMapState = [&]() {
         MapState state;
@@ -371,7 +406,6 @@ void MapTool::Update() {
             }
         }
         undoStack.push(state);
-        // 새로운 편집 작업 시 redoStack 비우기
         while (!redoStack.empty()) {
             redoStack.pop();
         }
@@ -381,7 +415,19 @@ void MapTool::Update() {
         int mx = Input::GetMousePosition().x;
         int my = Input::GetMousePosition().y;
 
-        // Save 버튼 클릭
+        if (mx >= mCopyButton.left && mx <= mCopyButton.right && my >= mCopyButton.top && my <= mCopyButton.bottom) {
+            currentMode = EditMode::COPY;
+            copyBuffer.clear();
+            return;
+        }
+
+        if (mx >= mPasteButton.left && mx <= mPasteButton.right && my >= mPasteButton.top && my <= mPasteButton.bottom) {
+            if (!copyBuffer.empty()) {
+                currentMode = EditMode::PASTE;
+            }
+            return;
+        }
+
         if (mx >= mSaveButton.left && mx <= mSaveButton.right && my >= mSaveButton.top && my <= mSaveButton.bottom) {
             Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"w");
             Imagefp = _wfopen(mChangeStageImagefp.c_str(), L"w");
@@ -420,10 +466,8 @@ void MapTool::Update() {
             return;
         }
 
-        // Redo 버튼 클릭
         if (mx >= mRedoButton.left && mx <= mRedoButton.right && my >= mRedoButton.top && my <= mRedoButton.bottom) {
             if (!redoStack.empty()) {
-                // 현재 상태를 undoStack에 저장
                 MapState currentState;
                 for (int i = 0; i < MAP_WIDTH; i++) {
                     for (int j = 0; j < MAP_HEIGHT; j++) {
@@ -434,7 +478,6 @@ void MapTool::Update() {
                 }
                 undoStack.push(currentState);
 
-                // redoStack에서 상태 복원
                 MapState nextState = redoStack.top();
                 redoStack.pop();
                 for (int i = 0; i < MAP_WIDTH; i++) {
@@ -448,10 +491,8 @@ void MapTool::Update() {
             return;
         }
 
-        // Cancel 버튼 클릭 (Undo)
         if (mx >= mCancelButton.left && mx <= mCancelButton.right && my >= mCancelButton.top && my <= mCancelButton.bottom) {
             if (!undoStack.empty()) {
-                // 현재 상태를 redoStack에 저장
                 MapState currentState;
                 for (int i = 0; i < MAP_WIDTH; i++) {
                     for (int j = 0; j < MAP_HEIGHT; j++) {
@@ -462,7 +503,6 @@ void MapTool::Update() {
                 }
                 redoStack.push(currentState);
 
-                // undoStack에서 상태 복원
                 MapState prevState = undoStack.top();
                 undoStack.pop();
                 for (int i = 0; i < MAP_WIDTH; i++) {
@@ -476,7 +516,6 @@ void MapTool::Update() {
             return;
         }
 
-        // Exit 버튼 클릭
         if (mx >= mExitButton.left && mx <= mExitButton.right && my >= mExitButton.top && my <= mExitButton.bottom) {
             Mapfp = _wfopen(mChangeStageMapfp.c_str(), L"w");
             Imagefp = _wfopen(mChangeStageImagefp.c_str(), L"w");
@@ -519,17 +558,26 @@ void MapTool::Update() {
         }
 
         if (mx >= 0 && mx < MAP_PIXEL_WIDTH && my >= 0 && my < MAP_PIXEL_HEIGHT) {
-            if (currentMode == EditMode::TILE_PLACE || currentMode == EditMode::TILE_ERASE || currentMode == EditMode::OBJECT_ERASE) {
-                SaveMapState();
+            if (currentMode == EditMode::TILE_PLACE || currentMode == EditMode::TILE_ERASE ||
+                currentMode == EditMode::OBJECT_ERASE || currentMode == EditMode::COPY ||
+                currentMode == EditMode::PASTE) {
+                if (currentMode != EditMode::COPY && currentMode != EditMode::PASTE) {
+                    SaveMapState();
+                }
                 drag = true;
                 drawRect.left = mx / GRID_SIZE;
                 drawRect.top = my / GRID_SIZE;
-                drawRect.right = drawRect.left + 1;
-                drawRect.bottom = drawRect.top + 1;
+                if (currentMode == EditMode::PASTE) {
+                    drawRect.right = drawRect.left + copyWidth;
+                    drawRect.bottom = drawRect.top + copyHeight;
+                }
+                else {
+                    drawRect.right = drawRect.left + 1;
+                    drawRect.bottom = drawRect.top + 1;
+                }
             }
         }
         else {
-            // UI 영역
             for (int i = 0; i < 4; i++) {
                 int x = UI_BASE_X + i * (UI_TILE_SIZE + UI_SPACING);
                 int y = UI_BASE_Y + UI_FLOOR_Y;
@@ -589,29 +637,81 @@ void MapTool::Update() {
             int mx = Input::GetMousePosition().x / GRID_SIZE;
             int my = Input::GetMousePosition().y / GRID_SIZE;
             if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
-                drawRect.right = mx + 1;
-                drawRect.bottom = my + 1;
+                if (currentMode != EditMode::PASTE) {
+                    drawRect.right = mx + 1;
+                    drawRect.bottom = my + 1;
+                }
                 int left = min(drawRect.left, drawRect.right - 1);
                 int right = max(drawRect.left, drawRect.right - 1);
                 int top = min(drawRect.top, drawRect.bottom - 1);
                 int bottom = max(drawRect.top, drawRect.bottom - 1);
-                for (int i = left; i <= right; i++) {
-                    for (int j = top; j <= bottom; j++) {
-                        if (currentMode == EditMode::TILE_PLACE) {
-                            if (selectedTile[0] == 'f') {
-                                map[i][j] = 0;
+
+                if (currentMode == EditMode::COPY) {
+                    copyBuffer.clear();
+                    for (int i = left; i <= right; i++) {
+                        for (int j = top; j <= bottom; j++) {
+                            if (i >= 0 && i < MAP_WIDTH && j >= 0 && j < MAP_HEIGHT) {
+                                CopyTile tile;
+                                tile.mapValue = map[i][j];
+                                tile.image = ImageMap[i][j];
+                                tile.object = ObjectMap[i][j];
+                                copyBuffer.push_back(tile);
                             }
-                            else if (selectedTile[0] == 'w' || selectedTile.substr(0, 2) == "wc") {
-                                map[i][j] = 1;
+                        }
+                    }
+                    copyWidth = right - left + 1;
+                    copyHeight = bottom - top + 1;
+                    copyRect = { left, top, right + 1, bottom + 1 };
+                    currentMode = EditMode::NONE;
+                }
+                else if (currentMode == EditMode::PASTE && !copyBuffer.empty()) {
+                    SaveMapState();
+                    int pasteIndex = 0;
+                    for (int j = 0; j < copyHeight && pasteIndex < copyBuffer.size(); j++) {
+                        for (int i = 0; i < copyWidth && pasteIndex < copyBuffer.size(); i++) {
+                            int pasteX = drawRect.left + i;
+                            int pasteY = drawRect.top + j;
+                            if (pasteX >= 0 && pasteX < MAP_WIDTH && pasteY >= 0 && pasteY < MAP_HEIGHT) {
+                                map[pasteX][pasteY] = copyBuffer[pasteIndex].mapValue;
+                                ImageMap[pasteX][pasteY] = copyBuffer[pasteIndex].image;
+                                ObjectMap[pasteX][pasteY] = copyBuffer[pasteIndex].object;
                             }
-                            ImageMap[i][j] = selectedTile;
+                            pasteIndex++;
                         }
-                        else if (currentMode == EditMode::TILE_ERASE) {
-                            map[i][j] = 2;
-                            ImageMap[i][j] = "e";
+                    }
+                    currentMode = EditMode::NONE;
+                }
+                else if (currentMode == EditMode::TILE_PLACE) {
+                    for (int i = left; i <= right; i++) {
+                        for (int j = top; j <= bottom; j++) {
+                            if (i >= 0 && i < MAP_WIDTH && j >= 0 && j < MAP_HEIGHT) {
+                                if (selectedTile[0] == 'f') {
+                                    map[i][j] = 0;
+                                }
+                                else if (selectedTile[0] == 'w' || selectedTile.substr(0, 2) == "wc") {
+                                    map[i][j] = 1;
+                                }
+                                ImageMap[i][j] = selectedTile;
+                            }
                         }
-                        else if (currentMode == EditMode::OBJECT_ERASE) {
-                            ObjectMap[i][j] = "empty";
+                    }
+                }
+                else if (currentMode == EditMode::TILE_ERASE) {
+                    for (int i = left; i <= right; i++) {
+                        for (int j = top; j <= bottom; j++) {
+                            if (i >= 0 && i < MAP_WIDTH && j >= 0 && j < MAP_HEIGHT) {
+                                map[i][j] = 2;
+                                ImageMap[i][j] = "e";
+                            }
+                        }
+                    }
+                }
+                else if (currentMode == EditMode::OBJECT_ERASE) {
+                    for (int i = left; i <= right; i++) {
+                        for (int j = top; j <= bottom; j++) {
+                            if (i >= 0 && i < MAP_WIDTH && j >= 0 && j < MAP_HEIGHT) {
+                                ObjectMap[i][j] = "empty";
+                            }
                         }
                     }
                 }
@@ -636,12 +736,22 @@ void MapTool::Update() {
         }
     }
     else if (Input::GetKey(eKeyCode::LButton)) {
-        if (drag) {
+        if (drag && currentMode != EditMode::PASTE) {
             int mx = Input::GetMousePosition().x / GRID_SIZE;
             int my = Input::GetMousePosition().y / GRID_SIZE;
             if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
                 drawRect.right = mx + 1;
                 drawRect.bottom = my + 1;
+            }
+        }
+        else if (currentMode == EditMode::PASTE && !copyBuffer.empty()) {
+            int mx = Input::GetMousePosition().x / GRID_SIZE;
+            int my = Input::GetMousePosition().y / GRID_SIZE;
+            if (mx >= 0 && mx < MAP_WIDTH && my >= 0 && my < MAP_HEIGHT) {
+                drawRect.left = mx;
+                drawRect.top = my;
+                drawRect.right = mx + copyWidth;
+                drawRect.bottom = my + copyHeight;
             }
         }
     }
