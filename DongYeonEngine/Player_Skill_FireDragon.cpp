@@ -7,7 +7,7 @@
 #include "SoundManager.h"
 
 Player_Skill_FireDragon::Player_Skill_FireDragon(float x, float y, float dirX, float dirY, float phaseOffset)
-    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(120),
+    : mX(x), mY(y), mDirectionX(dirX), mDirectionY(dirY), speed(800.0f), mIsActive(true), damage(25),
     mCurrentFrame(0), mAnimationTimer(0.0f), mWaveTime(0.0f), phaseOffset(phaseOffset),
     mInstantDirX(0.0f), mInstantDirY(0.0f), mParticleTimer(0.0f), mParticleSpawnInterval(0.05f),
     mFrameDuration(0.1f)
@@ -163,16 +163,7 @@ void Player_Skill_FireDragon::Render(HDC hdc)
         particleImage.ReleaseDC();
     }
 
-    // 히트박스 디버깅
-    HPEN hPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 0));
-    HPEN hOldPen = (HPEN)SelectObject(hdc, hPen);
-    MoveToEx(hdc, hitboxPoints[0].x, hitboxPoints[0].y, nullptr);
-    for (int i = 1; i < 4; ++i) {
-        LineTo(hdc, hitboxPoints[i].x, hitboxPoints[i].y);
-    }
-    LineTo(hdc, hitboxPoints[0].x, hitboxPoints[0].y);
-    SelectObject(hdc, hOldPen);
-    DeleteObject(hPen);
+   
 }
 
 void Player_Skill_FireDragon::UpdateHitbox()

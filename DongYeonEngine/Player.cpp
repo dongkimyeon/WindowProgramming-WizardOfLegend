@@ -11,7 +11,7 @@ Player::Player()
     mX = 1920 / 2;
     mY = 1080 / 2;
     rect = { (int)(mX - 20), (int)(mY + 200), (int)(mX + 20), (int)(mY + 20) };
-    speed = 800.0f;
+    speed = 200.0f;
     state = PlayerState::FRONT;
     hp = 300;
 	mp = 100;

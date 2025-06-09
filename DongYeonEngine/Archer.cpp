@@ -287,32 +287,7 @@ void Archer::LateUpdate()
 
 void Archer::Render(HDC hdc, Player& p)
 {
-    // 디버그 범위 그리기
-    HPEN attackPen = CreatePen(PS_SOLID, 1, RGB(255, 0, 0));
-    HPEN detectPen = CreatePen(PS_DOT, 1, RGB(0, 255, 0));
-    HBRUSH nullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
-    HPEN oldPen = (HPEN)SelectObject(hdc, attackPen);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, nullBrush);
-
-    Ellipse(hdc,
-        static_cast<int>(mX - AttackRange),
-        static_cast<int>(mY - AttackRange),
-        static_cast<int>(mX + AttackRange),
-        static_cast<int>(mY + AttackRange));
-
-    SelectObject(hdc, detectPen);
-    Ellipse(hdc,
-        static_cast<int>(mX - PlayerDetectRange),
-        static_cast<int>(mY - PlayerDetectRange),
-        static_cast<int>(mX + PlayerDetectRange),
-        static_cast<int>(mY + PlayerDetectRange));
-
-    SelectObject(hdc, oldPen);
-    SelectObject(hdc, oldBrush);
-    DeleteObject(attackPen);
-    DeleteObject(detectPen);
-
-    //Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
+   
 
 
 

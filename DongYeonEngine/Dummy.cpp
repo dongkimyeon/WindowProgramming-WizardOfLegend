@@ -56,11 +56,7 @@ void Dummy::Render(HDC hdc, Player& p)
         DeleteObject(hFont);
     }
 
-    // 충돌 사각형 디버깅용
-    HBRUSH nullBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, nullBrush);
-    Rectangle(hdc, rect.left, rect.top, rect.right, rect.bottom);
-    SelectObject(hdc, oldBrush);
+   
 }
 
 void Dummy::TakeDamage(int d)

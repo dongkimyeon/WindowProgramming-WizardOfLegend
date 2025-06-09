@@ -173,14 +173,7 @@ void BossSkill_AquaBall::Render(HDC hdc, Player& player)
         AquaBallExplosionEffectAnimation[mExplosionFrame].Draw(hdc, drawX, drawY, renderWidth, renderHeight);
     }
 
-    // 히트박스 그리기 (디버깅용)
-    HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-    HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-    Polygon(hdc, hitboxPoints, 4);
-    SelectObject(hdc, oldPen);
-    SelectObject(hdc, oldBrush);
-    DeleteObject(hitboxPen);
+ 
 }
 
 void BossSkill_AquaBall::ThrowAquaBall(Player& player, float mX, float mY, Scene* stage)

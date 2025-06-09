@@ -38,9 +38,6 @@ public:
 		int width = mStatueImage.GetWidth() + 50;
 		int height = mStatueImage.GetHeight() + 50;
 		mStatueImage.Draw(hdc, mX - width / 2, mY - height / 2, width, height);
-		//HBRUSH hNullBrush = (HBRUSH)GetStockObject(NULL_BRUSH); // 속이 빈 브러시 선택
-		//HBRUSH hOldBrush = (HBRUSH)SelectObject(hdc, hNullBrush); // 기존 브러시 저장
-		//Rectangle(hdc, mRect.left, mRect.top, mRect.right, mRect.bottom); // 테두리만 그리기
-		//SelectObject(hdc, hOldBrush); // 원래 브러시 복원
+		
 	}
 };

@@ -359,17 +359,7 @@ void Boss::Render(HDC hdc, Player& p)
 {
 
    
-    // 히트박스 디버그 그리기
-    if (mHasEffectHitbox)
-    {
-        HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-        HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-        HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-        Polygon(hdc, mEffectHitboxPoints, 4);
-        SelectObject(hdc, oldPen);
-        SelectObject(hdc, oldBrush);
-        DeleteObject(hitboxPen);
-    }
+    
 
     if (!mIsDead)
     {

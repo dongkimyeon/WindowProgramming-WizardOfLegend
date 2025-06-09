@@ -57,14 +57,7 @@ void FireBall::Render(HDC hdc)
 {
     if (!mIsActive) return;
 
-    // 히트박스 그리기
-    HPEN hitboxPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 255));
-    HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-    Polygon(hdc, hitboxPoints, 4);
-    SelectObject(hdc, oldPen);
-    SelectObject(hdc, oldBrush);
-    DeleteObject(hitboxPen);
+   
 
     // 파이어볼 이미지 렌더링
     int imageWidth = mFireBallAnimation[mCurrentFrame].GetWidth();

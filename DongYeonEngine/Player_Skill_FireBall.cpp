@@ -154,14 +154,7 @@ void Player_Skill_FireBall::Render(HDC hdc)
         particleImage.ReleaseDC();
     }
 
-    // 히트박스 디버깅
-    HPEN hitboxPen = CreatePen(PS_SOLID, 3, RGB(0, 0, 255));
-    HPEN oldPen = (HPEN)SelectObject(hdc, hitboxPen);
-    HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, (HBRUSH)GetStockObject(NULL_BRUSH));
-    Polygon(hdc, hitboxPoints, 4);
-    SelectObject(hdc, oldPen);
-    SelectObject(hdc, oldBrush);
-    DeleteObject(hitboxPen);
+    
 }
 
 void Player_Skill_FireBall::SpawnParticle()
