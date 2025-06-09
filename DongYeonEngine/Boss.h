@@ -20,11 +20,16 @@ public:
     void Render(HDC hdc, Player& p);
     void SetPosition(float x, float y) override;
 
+    void revive()
+    {
+        hp = 800;
+        mIsDead = false;
+    }
     void TakeDamage(int d);
 
     int GetDamage() { return damage; }
     int GetHp() { return hp; }
-
+   
     float GetPositionX() override { return mX; }
     float GetPositionY() override { return mY; }
     float GetSpeed() override { return speed; }
@@ -66,7 +71,7 @@ private:
     float mHitEffectAngle;
     bool mIsAttack = false;
     int mCurrenAttackFrame = 0;
-    bool mIsDead = false;
+    static bool mIsDead;
     bool mIsHit = false;
     int mCurrentHitFrame = 0;
     float mAttackDirectionX;

@@ -4,6 +4,7 @@
 #include "MapManager.h"
 #include "Time.h"
 #include "Input.h"
+#include "Boss.h"
 #include <cmath> // sin 함수 사용을 위해 추가
 
 extern const UINT width;
@@ -33,8 +34,10 @@ void GameOverScene::Update()
     {
         SceneManager::LoadScene(L"TitleScene");
         SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
+        Boss::GetInstance()->revive();
         SceneManager::GetSharedPlayer()->SetHp(300);
         SceneManager::GetSharedPlayer()->Setrevive();
+        SceneManager::GetActiveScene()->ObjectDestroy();
         SceneManager::ResetPlayTime();
         SceneManager::SetmIsGameStart(false);
     }

@@ -1,7 +1,7 @@
 #include "SceneManager.h"
 #include "Input.h"
 #include "Time.h"
-
+#include "Boss.h"
 
 static ULONG_PTR gdiplusToken;
 
@@ -136,6 +136,9 @@ void SceneManager::Update()
                 StartFadeIn();
                 mActiveScene->ObjectDestroy();
                 mSharedPlayer->SetHp(300);
+                
+                Boss::GetInstance()->revive();
+                
                 LoadScene(L"TitleScene");
                 SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
                 

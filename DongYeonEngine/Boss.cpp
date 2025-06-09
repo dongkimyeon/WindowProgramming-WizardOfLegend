@@ -7,6 +7,7 @@
 
 float detectionRadius = 700.0f;
 int Boss::hp;
+bool Boss::mIsDead;
 
 Boss::Boss()
 {

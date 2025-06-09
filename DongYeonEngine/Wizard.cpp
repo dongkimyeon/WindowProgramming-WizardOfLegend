@@ -256,19 +256,16 @@ void Wizard::Update(Player& p, Scene* stage)
         }
     }
 
-    static float walkFrameTime = 0.0f;
-    if (!mIsAttack && mIsMoving)
+    // 이동 애니메이션 프레임 업데이트 (소드맨과 동일)
+    if (!mIsDead && !mIsHit && !mIsAttack && mIsMoving)
     {
-        walkFrameTime += Time::DeltaTime();
-        if (walkFrameTime >= 0.1f)
+        static float frameTime = 0.0f;
+        frameTime += deltaTime;
+        if (frameTime >= 0.1f)
         {
-            mCurrentWalkFrame = (mCurrentWalkFrame + 1) % 4;
-            walkFrameTime = 0.0f;
+            mCurrentWalkFrame = (mCurrentWalkFrame + 1) % 4; // 아처는 5프레임
+            frameTime = 0.0f;
         }
-    }
-    else
-    {
-        walkFrameTime = 0.0f;
     }
 }
 

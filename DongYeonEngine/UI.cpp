@@ -110,7 +110,7 @@ void UI::Render(HDC hdc)
             SelectObject(hdc, hOldFont);
             DeleteObject(hFont);
 
-            float bossHpRatio = static_cast<float>(boss->GetHp()) / 500;
+            float bossHpRatio = static_cast<float>(boss->GetHp()) / 800;
             int bossHpBarWidth = static_cast<int>(UI_BOSS_HPBAR.GetWidth() * bossHpRatio);
             if (bossHpBarWidth > 0) {
                 int srcX = UI_BOSS_HPBAR.GetWidth() - bossHpBarWidth; // Start from right

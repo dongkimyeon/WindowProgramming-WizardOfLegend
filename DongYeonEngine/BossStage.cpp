@@ -705,6 +705,7 @@ void BossStage::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         ObjectDestroy();
+        iceBoss.revive();
         SceneManager::LoadScene(L"GameClearScene");
         SoundManager::GetInstance()->mPlaySound("EndScene", true);
         SceneManager::StartFadeIn();
