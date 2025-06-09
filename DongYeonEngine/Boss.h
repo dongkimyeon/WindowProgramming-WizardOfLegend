@@ -22,8 +22,36 @@ public:
 
     void revive()
     {
-        hp = 800;
+        SetPosition(1025, 600);
+        hp = 1000;
+        damage = 43;
+        speed = 100.0f;
+        mScale = 1.6f;
+        mSwordX = mX + 50.0f * mScale;
+        mSwordY = mY;
+        mHitTimer = 0.0f;
+        mHasEffectHitbox = false;
+        mHasAttackedPlayer = false;
+        mHasBeenHit = false;
+        mDamageTaken = 0;
+        mShowDamage = false;
+        mDamageTextY = mY;
+        mDamageTextSpeed = 50.0f;
         mIsDead = false;
+        mIsHit = false;
+        mIsAttack = false;
+        mCurrenAttackFrame = 0;
+        mCurrentHitFrame = 0;
+        mAttackDirectionX = 0.0f;
+        mAttackDirectionY = 0.0f;
+        mHitEffectAngle = 0.0f;
+        stateTimer = 0.0f;
+        currentState = 0;
+        playerDetected = false;
+        rect = { (int)(mX - 20), (int)(mY - 35), (int)(mX + 20), (int)(mY + 40) };
+        for (int i = 0; i < 4; ++i) {
+            mEffectHitboxPoints[i] = { 0, 0 };
+        }
     }
     void TakeDamage(int d);
 
@@ -47,8 +75,8 @@ public:
     void SetHitFlag(bool hit) { mHasBeenHit = hit; }
 
 private:
-    float mX;
-    float mY;
+    static float mX;
+    static float mY;
     static int hp;
     int damage;
     float mScale = 1.0f;

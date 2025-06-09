@@ -8,7 +8,8 @@
 float detectionRadius = 700.0f;
 int Boss::hp;
 bool Boss::mIsDead;
-
+float Boss::mX;
+float Boss::mY;
 Boss::Boss()
 {
     mX = 1025.0f;
@@ -78,7 +79,7 @@ void Boss::Init()
 {
     mX = 1025.0f;
     mY = 600.0f;
-    hp = 500;
+    hp = 800;
     damage = 43;
     speed = 100.0f;
     mScale = 1.6f;
@@ -532,7 +533,7 @@ void Boss::Render(HDC hdc, Player& p)
     }
 
     // 데미지 텍스트 렌더링
-    if (mShowDamage && mIsHit) {
+    if (mShowDamage) {
         SetTextColor(hdc, RGB(255, 255, 255));
         HFONT hFont = CreateFont(30, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
             OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,

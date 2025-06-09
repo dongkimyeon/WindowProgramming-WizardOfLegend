@@ -38,7 +38,7 @@ private:
     std::vector<Jar*> mJar;
     std::vector<IceFlag*> mFlag;
 
-
+    
     bool portalCreate;
     Boss iceBoss;
     Portal portal;

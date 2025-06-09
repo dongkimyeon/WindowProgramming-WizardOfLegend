@@ -14,6 +14,7 @@
 
 void BossStage::ObjectDestroy()
 {
+    std::cout << "보스스테이지 디스토로이 호출" << std::endl;
     // Release Wizards
     for (auto* wizard : wizards)
     {
@@ -129,6 +130,8 @@ void BossStage::ObjectDestroy()
     // Clear particles
     mParticles.clear();
 
+    iceBoss.revive();
+
 }
 void BossStage::Initialize()
 {
@@ -182,6 +185,7 @@ void BossStage::ObjectInitialize()
 {
     LoadObject(L"StageBossObject.txt");
     iceBoss.Init();
+    
 }
 
 void BossStage::Update()
@@ -696,8 +700,13 @@ void BossStage::Update()
 
     if (iceBoss.GetHp() <= 0) //보스죽으면
     {
-        portal.SetPosition(1035, 600);
+        portal.SetPosition(1035, 600); 
+        
         SceneManager::SetmIsGameStart(false);
+    }
+    else
+    {
+        portal.SetPosition(10000, 10000);
     }
     RECT temp;
     RECT playerRect = player->GetRect();
@@ -705,10 +714,11 @@ void BossStage::Update()
     if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
     {
         ObjectDestroy();
-        iceBoss.revive();
+        
         SceneManager::LoadScene(L"GameClearScene");
         SoundManager::GetInstance()->mPlaySound("EndScene", true);
         SceneManager::StartFadeIn();
+        iceBoss.revive();
     }
     //객체간에 충돌처리 밀어내는거
     HandleCollision();
@@ -1029,13 +1039,7 @@ void BossStage::Render(HDC hdc)
     SelectObject(hdc, hOldFont);
     DeleteObject(hFont);
 
-    WCHAR mousePosText[100];
-    float mouseWorldX = static_cast<float>(Input::GetMousePosition().x) + camera.GetPositionX();
-    float mouseWorldY = static_cast<float>(Input::GetMousePosition().y) + camera.GetPositionY();
-    wsprintf(mousePosText, L"마우스 좌표: X = %d, Y = %d",
-        static_cast<int>(mouseWorldX), static_cast<int>(mouseWorldY));
-    TextOut(hdc, static_cast<int>(Input::GetMousePosition().x) + 10,
-        static_cast<int>(Input::GetMousePosition().y), mousePosText, lstrlen(mousePosText));
+
 }
 
 void BossStage::HandleCollision()

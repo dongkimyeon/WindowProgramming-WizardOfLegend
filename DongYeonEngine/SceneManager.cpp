@@ -137,7 +137,7 @@ void SceneManager::Update()
                 mActiveScene->ObjectDestroy();
                 mSharedPlayer->SetHp(300);
                 
-                Boss::GetInstance()->revive();
+           
                 
                 LoadScene(L"TitleScene");
                 SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
