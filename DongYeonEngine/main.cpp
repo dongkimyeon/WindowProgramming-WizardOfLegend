@@ -5,7 +5,6 @@
 #define IDB_BITMAP1 129
 #define MAX_LOADSTRING 100
 
-
 Game GAME;
 // 전역 변수:
 extern const UINT width = 1280;
@@ -124,8 +123,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
     hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-        CW_USEDEFAULT, CW_USEDEFAULT, 1920, 1080, nullptr, nullptr, hInstance, nullptr);
+    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_POPUP,
+        0, 0, 1920, 1080, nullptr, nullptr, hInstance, nullptr);
     GAME.Initialize(hWnd, 1920, 1080); // 애플리케이션 초기화
 
     if (!hWnd)
@@ -133,7 +132,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
         return FALSE;
     }
 
-    ShowWindow(hWnd, nCmdShow);
+    SetWindowPos(hWnd, HWND_TOP, 0, 0, 1920, 1080, SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    ShowWindow(hWnd, SW_MAXIMIZE);
     UpdateWindow(hWnd);
     LoadScenes();
 
