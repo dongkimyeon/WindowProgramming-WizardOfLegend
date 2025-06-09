@@ -5,7 +5,6 @@
 #define IDB_BITMAP1 129
 #define MAX_LOADSTRING 100
 
-#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
 
 Game GAME;
 // 전역 변수:
