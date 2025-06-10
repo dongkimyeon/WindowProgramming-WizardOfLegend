@@ -667,8 +667,8 @@ void MapTool::Update() {
                 else if (currentMode == EditMode::PASTE && !copyBuffer.empty()) {
                     SaveMapState();
                     int pasteIndex = 0;
-                    for (int j = 0; j < copyHeight && pasteIndex < copyBuffer.size(); j++) {
-                        for (int i = 0; i < copyWidth && pasteIndex < copyBuffer.size(); i++) {
+                    for (int i = 0; i < copyWidth && pasteIndex < copyBuffer.size(); i++) {
+                        for (int j = 0; j < copyHeight && pasteIndex < copyBuffer.size(); j++) {
                             int pasteX = drawRect.left + i;
                             int pasteY = drawRect.top + j;
                             if (pasteX >= 0 && pasteX < MAP_WIDTH && pasteY >= 0 && pasteY < MAP_HEIGHT) {
