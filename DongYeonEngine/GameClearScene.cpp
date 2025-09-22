@@ -124,29 +124,50 @@ void GameClearScene::Render(HDC hdc)
 			std::cout << "Failed to open TimeRecords.txt for reading." << std::endl;
         else
         {
-			float bestTime;
-			if (fscanf_s(fp, "%f", &bestTime) == 1)
+            float timeRecords[10];
+
+            for (int i = 0; i < 10; i++)
+            {
+				fscanf_s(fp, "%f", &timeRecords[i]);
+            }
+
+            
+
+            // Sort timeRecords
+			for (int i = 0; i < 9; i++)
 			{
-				if (playTime < bestTime || bestTime == 0.0f)
+				for (int j = i + 1; j < 10; j++)
 				{
-					fclose(fp);
-					_wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"w");
-					if (fp != nullptr)
+					if (timeRecords[i] > timeRecords[j])
 					{
-						fprintf_s(fp, "%.2f\n", playTime);
-						std::wcout << L"New record! TimeRecords.txt updated with time: " << playTime << L" seconds." << std::endl;
-					}
-					else
-					{
-						std::cout << "Failed to open TimeRecords.txt for writing." << std::endl;
+						float temp = timeRecords[i]; 
+						timeRecords[i] = timeRecords[j];
+						timeRecords[j] = temp;
 					}
 				}
 			}
-			else
-			{
-				std::cout << "Failed to read best time from TimeRecords.txt." << std::endl;
-			}
+
+            for (int i = 0; i < 10; i++)
+            {
+				if (playTime < timeRecords[i])
+				{
+					for (int j = 9; j > i; j--)
+					{
+						timeRecords[j] = timeRecords[j - 1];
+					}
+					timeRecords[i] = playTime;
+					break;
+				}
+				wprintf(L"%f\n", timeRecords[i]);
+            }
+
+            // save timeRecords
+            for (int i = 0; i < 10; i++)
+            {
+				fprintf(fp, "%.2f\n", timeRecords[i]);
+            }
         }
+        fclose(fp);
     }
 
     std::wstring deadStageName = SceneManager::GetSharedPlayer()->GetDeadStage();
