@@ -4,6 +4,7 @@
 #include "SoundManager.h"
 #include "Time.h"
 #include "Input.h"
+#include <fstream>
 #include <cmath> // sin 함수 사용을 위해 추가
 
 extern const UINT width;
@@ -115,6 +116,59 @@ void GameClearScene::Render(HDC hdc)
     int seconds = static_cast<int>(playTime) % 60;
     wchar_t playTimeText[32];
     swprintf_s(playTimeText, L"Play Time: %02d:%02d", minutes, seconds);
+    {
+        FILE* fp = nullptr;
+		_wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"r");
+
+		if (fp == nullptr)
+			std::cout << "Failed to open TimeRecords.txt for reading." << std::endl;
+        else
+        {
+            float timeRecords[10];
+
+            for (int i = 0; i < 10; i++)
+            {
+				fscanf_s(fp, "%f", &timeRecords[i]);
+            }
+
+            
+
+            // Sort timeRecords
+			for (int i = 0; i < 9; i++)
+			{
+				for (int j = i + 1; j < 10; j++)
+				{
+					if (timeRecords[i] > timeRecords[j])
+					{
+						float temp = timeRecords[i]; 
+						timeRecords[i] = timeRecords[j];
+						timeRecords[j] = temp;
+					}
+				}
+			}
+
+            for (int i = 0; i < 10; i++)
+            {
+				if (playTime < timeRecords[i])
+				{
+					for (int j = 9; j > i; j--)
+					{
+						timeRecords[j] = timeRecords[j - 1];
+					}
+					timeRecords[i] = playTime;
+					break;
+				}
+				wprintf(L"%f\n", timeRecords[i]);
+            }
+
+            // save timeRecords
+            for (int i = 0; i < 10; i++)
+            {
+				fprintf(fp, "%.2f\n", timeRecords[i]);
+            }
+        }
+        fclose(fp);
+    }
 
     std::wstring deadStageName = SceneManager::GetSharedPlayer()->GetDeadStage();
     int killcount = SceneManager::GetSharedPlayer()->GetKillCount();
