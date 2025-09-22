@@ -2,6 +2,9 @@
 #include "Editor_Window.h"
 #include "Game.h"
 #include "LoadScenes.h"
+
+#pragma comment(linker, "/entry:wWinMainCRTStartup /subsystem:console")
+
 #define IDB_BITMAP1 129
 #define MAX_LOADSTRING 100
 

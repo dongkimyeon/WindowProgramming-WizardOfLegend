@@ -4,6 +4,7 @@
 #include "SoundManager.h"
 #include "Time.h"
 #include "Input.h"
+#include <fstream>
 #include <cmath> // sin 함수 사용을 위해 추가
 
 extern const UINT width;
@@ -115,6 +116,38 @@ void GameClearScene::Render(HDC hdc)
     int seconds = static_cast<int>(playTime) % 60;
     wchar_t playTimeText[32];
     swprintf_s(playTimeText, L"Play Time: %02d:%02d", minutes, seconds);
+    {
+        FILE* fp = nullptr;
+		_wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"r");
+
+		if (fp == nullptr)
+			std::cout << "Failed to open TimeRecords.txt for reading." << std::endl;
+        else
+        {
+			float bestTime;
+			if (fscanf_s(fp, "%f", &bestTime) == 1)
+			{
+				if (playTime < bestTime || bestTime == 0.0f)
+				{
+					fclose(fp);
+					_wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"w");
+					if (fp != nullptr)
+					{
+						fprintf_s(fp, "%.2f\n", playTime);
+						std::wcout << L"New record! TimeRecords.txt updated with time: " << playTime << L" seconds." << std::endl;
+					}
+					else
+					{
+						std::cout << "Failed to open TimeRecords.txt for writing." << std::endl;
+					}
+				}
+			}
+			else
+			{
+				std::cout << "Failed to read best time from TimeRecords.txt." << std::endl;
+			}
+        }
+    }
 
     std::wstring deadStageName = SceneManager::GetSharedPlayer()->GetDeadStage();
     int killcount = SceneManager::GetSharedPlayer()->GetKillCount();
