@@ -12,6 +12,10 @@ public:
     void LateUpdate() override;
     void Render(HDC hdc) override;
 
+
+    std::wstring userID[10];
+    float timeRecord[10];
+
 private:
 
     CImage mBackGroundImage;
