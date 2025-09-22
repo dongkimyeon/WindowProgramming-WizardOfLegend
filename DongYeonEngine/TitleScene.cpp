@@ -193,6 +193,7 @@ void TitleScene::Update()
                 std::wstring inputText = Input::GetInputText();
                 if (!inputText.empty())
                 {
+                    SceneManager::SetUserID(inputText); // SceneManager에 사용자 ID 저장
                     SceneManager::StartFadeIn();
                     SceneManager::LoadScene(L"Stage1");
                     SoundManager::GetInstance()->mPlaySound("Earth", true);
@@ -200,6 +201,7 @@ void TitleScene::Update()
                     MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/Stage1.txt");
                     SceneManager::GetSharedPlayer()->SetPosition(180, 300);
                     SceneManager::SetmIsGameStart(true);
+
                     mInputWindowFlag = false;
                     mInputText = L"";
                     Input::ClearInputText();

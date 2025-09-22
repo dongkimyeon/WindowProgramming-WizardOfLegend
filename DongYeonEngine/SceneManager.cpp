@@ -14,6 +14,7 @@ float SceneManager::playTime = 0.0f;
 bool SceneManager::mIsGameStart = false;
 bool SceneManager::mESCstate = false;
 Snow SceneManager::mSnows[30];
+std::wstring SceneManager::mUserID = L""; // 사용자 ID 초기화
 
 // 페이드 관련 초기화
 SceneManager::eFadeState SceneManager::mFadeState = eFadeState::None;
@@ -22,23 +23,20 @@ float SceneManager::mFadeTimer = 0.0f;
 const float SceneManager::mFadeDuration = 2.0f;
 std::wstring SceneManager::mTargetScene = L"";
 
-
 static RECT resumeButtonRect;
 static RECT titleButtonRect;
 
 void SceneManager::Initialize()
 {
-
-
     mMouseCursorImage.Load(L"resources/MouseCursor.png");
     mSharedPlayer = new Player();
     playTime = 0.0f;
+    mUserID = L""; // 초기화
     MapManager::GetInstance()->Initialize();
 
     // GDI+ 초기화
     Gdiplus::GdiplusStartupInput gdiplusStartupInput;
     Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, nullptr);
-
 }
 
 void SceneManager::StartFadeOut(const std::wstring& name)
@@ -65,6 +63,10 @@ Scene* SceneManager::LoadScene(const std::wstring& name)
     mActiveScene = iter->second;
     mActiveScene->ObjectDestroy();
     mActiveScene->ObjectInitialize();
+    if (name == L"TitleScene")
+    {
+        mUserID = L""; // 타이틀 화면으로 돌아갈 때 사용자 ID 리셋
+    }
     return iter->second;
 }
 
@@ -134,15 +136,12 @@ void SceneManager::Update()
                 Time::SetTimeStop(false);
                 playTime = 0.0f; // 게임 시간 초기화
                 mIsGameStart = false; // 게임 시작 상태 초기화
+                mUserID = L""; // 사용자 ID 리셋
                 StartFadeIn();
                 mActiveScene->ObjectDestroy();
                 mSharedPlayer->SetHp(300);
-                
-           
-                
                 LoadScene(L"TitleScene");
                 SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
-                
             }
         }
     }
@@ -167,7 +166,6 @@ void SceneManager::LateUpdate()
 
 void SceneManager::Render(HDC hdc)
 {
-
     using namespace Gdiplus;
     Graphics graphics(hdc);
     graphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
@@ -178,11 +176,10 @@ void SceneManager::Render(HDC hdc)
     for (int i = 0; i < 30; ++i)
     {
         if (SceneManager::GetActiveScene()->GetName() != L"MapTool" && SceneManager::GetActiveScene()->GetName() != L"GameOverScene"
-            && SceneManager::GetActiveScene()->GetName() != L"GameClearScene" &&  SceneManager::GetActiveScene()->GetName() != L"TitleScene")
+            && SceneManager::GetActiveScene()->GetName() != L"GameClearScene" && SceneManager::GetActiveScene()->GetName() != L"TitleScene")
         {
             mSnows[i].Render(hdc);
         }
-        
     }
     // 플레이 타임 렌더링
     if (mIsGameStart && !SceneManager::GetSharedPlayer()->GetIsDead())
@@ -199,6 +196,12 @@ void SceneManager::Render(HDC hdc)
         swprintf_s(playTimeText, L"Play Time: %02d:%02d", minutes, seconds);
 
         graphics.DrawString(playTimeText, -1, &font, PointF(1000, 0), &stringFormat, &brush);
+
+        // 유저 ID 렌더링 (디버그용)
+        wchar_t userIDText[64];
+        swprintf_s(userIDText, L"UserID: %s", mUserID.c_str());
+        graphics.DrawString(userIDText, -1, &font, PointF(1000, 40), &stringFormat, &brush); // 화면에 UserID 표시
+        OutputDebugStringW((L"SceneManager::Render - Rendering UserID: " + mUserID + L"\n").c_str()); // 디버그 메시지
     }
 
     // 페이드 효과 렌더링

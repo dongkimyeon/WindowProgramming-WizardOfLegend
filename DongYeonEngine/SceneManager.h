@@ -22,7 +22,7 @@ public:
         scene->SetName(name);
         scene->Initialize();
         mScene.insert(std::make_pair(name, scene));
-        return scene;   
+        return scene;
     }
 
     static Scene* LoadScene(const std::wstring& name);
@@ -37,6 +37,8 @@ public:
     static void SetmIsGameStart(bool isGameStart) { mIsGameStart = isGameStart; }
     static float GetPlayTime() { return playTime; }
     static void ResetPlayTime() { playTime = 0; }
+    static void SetUserID(const std::wstring& userID) { mUserID = userID; }
+    static std::wstring GetUserID() { return mUserID; }
 
 private:
     static Player* mSharedPlayer;
@@ -53,6 +55,5 @@ private:
     static float mFadeTimer;         // 페이드 진행 시간
     static const float mFadeDuration; // 페이드 지속 시간 (초)
     static std::wstring mTargetScene; // 전환할 대상 씬 이름
-
-
+    static std::wstring mUserID;      // 사용자 ID
 };
