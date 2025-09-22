@@ -43,10 +43,7 @@ void GameClearScene::Update()
 		{
 			for (int i = 0; i < 10; i++)
 			{
-				if (userID[i] != L"" && timeRecord[i] != 9999.0f) // 유효한 기록만 저장
-				{
-					fwprintf(fp, L"%s %.2f\n", userID[i].c_str(), timeRecord[i]);
-				}
+				fwprintf(fp, L"%s %.2f\n", userID[i].c_str(), timeRecord[i]);
 			}
 		}
 
@@ -139,74 +136,7 @@ void GameClearScene::Render(HDC hdc)
 
 
 
-	std::wstring CurrentUserID = SceneManager::GetUserID();
 
-
-	// load UserID and TimeRecord
-	FILE* fp = nullptr;
-	_wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"r+");
-
-	if (fp == nullptr)
-	{
-		wprintf(L"File open error\n");
-	}
-	else 
-	{
-		// 파일에서 기존 기록 읽기
-
-		for (int i = 0; i < 10; i++)
-		{
-			wchar_t idBuffer[50];
-			float timeBuffer;
-			if (fwscanf_s(fp, L"%49s %f", idBuffer, &timeBuffer) == 2)
-			{
-				if (idBuffer != L"Dummy" && timeBuffer != 9999.0f)
-				{
-					userID[i] = idBuffer;
-					timeRecord[i] = timeBuffer;
-				}
-				
-			}
-			else
-			{
-				// 읽기 실패 시 기본값 설정
-				userID[i] = L"";
-				timeRecord[i] = 9999.0f; // 매우 큰 값으로 초기화
-			}
-		}
-
-		// 정렬
-
-		for (int i = 0; i < 10; i++)
-		{
-			for (int j = i + 1; j < 10; j++)
-			{
-				if (timeRecord[i] > timeRecord[j])
-				{
-					std::swap(timeRecord[i], timeRecord[j]);
-					std::swap(userID[i], userID[j]);
-				}
-			}
-		}
-
-
-		// 새 기록 추가 또는 기존 기록 업데이트
-
-
-		for (int i = 0; i < 10; i++)
-		{
-		
-			if (playTime < timeRecord[i])
-			{
-				timeRecord[i] = playTime; // 더 빠른 기록으로 업데이트
-				userID[i] = CurrentUserID; // 현재 사용자 ID로 업데이트
-			}
-		
-		}
-
-		
-	}
-	fclose(fp);
 
 	std::wstring deadStageName = SceneManager::GetSharedPlayer()->GetDeadStage();
 	int killcount = SceneManager::GetSharedPlayer()->GetKillCount();
@@ -244,4 +174,73 @@ void GameClearScene::Render(HDC hdc)
 
 	SelectObject(hdc, hOldFont);
 	DeleteObject(hFont);
+}
+
+void GameClearScene::LoadUserRecord()
+{
+	std::wstring CurrentUserID = SceneManager::GetUserID();
+	float playTime = SceneManager::GetPlayTime();
+
+	// load UserID and TimeRecord
+	FILE* fp = nullptr;
+	_wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"r+");
+
+	if (fp == nullptr)
+	{
+		wprintf(L"File open error\n");
+	}
+	else
+	{
+		// 파일에서 기존 기록 읽기
+
+		for (int i = 0; i < 10; i++)
+		{
+			wchar_t idBuffer[50];
+			float timeBuffer;
+			if (fwscanf_s(fp, L"%49s %f", idBuffer, &timeBuffer) == 2)
+			{
+				userID[i] = idBuffer;
+				timeRecord[i] = timeBuffer;
+
+			}
+			else
+			{
+				// 읽기 실패 시 기본값 설정
+				userID[i] = L"dummy";
+				timeRecord[i] = 9999.0f; // 매우 큰 값으로 초기화
+			}
+		}
+
+		// 정렬
+
+		for (int i = 0; i < 10; i++)
+		{
+			for (int j = i + 1; j < 10; j++)
+			{
+				if (timeRecord[i] > timeRecord[j])
+				{
+					std::swap(timeRecord[i], timeRecord[j]);
+					std::swap(userID[i], userID[j]);
+				}
+			}
+		}
+
+
+		// 새 기록 추가 또는 기존 기록 업데이트
+
+
+		for (int i = 0; i < 10; i++)
+		{
+
+			if (playTime < timeRecord[i])
+			{
+				timeRecord[i] = playTime; // 더 빠른 기록으로 업데이트
+				userID[i] = CurrentUserID; // 현재 사용자 ID로 업데이트
+			}
+
+		}
+
+
+	}
+	fclose(fp);
 }

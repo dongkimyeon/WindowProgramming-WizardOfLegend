@@ -12,6 +12,8 @@ public:
     void LateUpdate() override;
     void Render(HDC hdc) override;
 
+    void LoadUserRecord();
+
 
     std::wstring userID[10];
     float timeRecord[10];
