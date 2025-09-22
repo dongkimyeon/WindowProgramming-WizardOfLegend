@@ -218,10 +218,10 @@ void Player::Update(Scene* stage)
     static float mpTimer = 0.0f;
     mpTimer += Time::DeltaTime();
 
-    // 1초마다 마나 5 회복
+    // 1초마다 마나 2.5 회복
     if (mpTimer >= 1.0f)
     {
-        mp += 5.0f;
+        mp += 2.5f;
         if (mp > 100.0f) mp = 100.0f; // 마나 최대치 100 제한
         mpTimer -= 1.0f;
     }

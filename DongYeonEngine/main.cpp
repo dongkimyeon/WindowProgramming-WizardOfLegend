@@ -157,6 +157,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_CHAR:
+    {
+        Input::ProcessChar(wParam);
+        break;
+    }
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -178,6 +183,8 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             return (INT_PTR)TRUE;
         }
         break;
+   
     }
+    
     return (INT_PTR)FALSE;
 }

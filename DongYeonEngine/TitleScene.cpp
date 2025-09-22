@@ -58,12 +58,12 @@ void TitleScene::Initialize()
         return buttonHeight + spacing;
         };
 
-    startY += setButtonRect(mStartButtonRect, startY, L"Start", scaleStart);
-    startY += setButtonRect(mTutorialButtonRect, startY, L"Tutorial", scaleTutorial);
-    startY += setButtonRect(mCustomStageButtonRect, startY, L"Custom Stage", scaleCustom);
-    startY += setButtonRect(mMapToolButtonRect, startY, L"Map Tool", scaleMapTool);
-    startY += setButtonRect(mSettingButtonRect, startY, L"Settings", scaleSetting);
-    startY += setButtonRect(mQuitButtonRect, startY, L"Quit", scaleQuit);
+    startY += setButtonRect(mStartButtonRect, startY, L"START", scaleStart);
+    startY += setButtonRect(mTutorialButtonRect, startY, L"TUTORIAL", scaleTutorial);
+    startY += setButtonRect(mCustomStageButtonRect, startY, L"CUSTOM STAGE", scaleCustom);
+    startY += setButtonRect(mMapToolButtonRect, startY, L"MAP TOOL", scaleMapTool);
+    startY += setButtonRect(mSettingButtonRect, startY, L"SETTINGS", scaleSetting);
+    startY += setButtonRect(mQuitButtonRect, startY, L"QUIT", scaleQuit);
 
     // GitHub 버튼 사각형 초기화 (좌측 하단)
     int githubIconSize = 150;
@@ -76,6 +76,29 @@ void TitleScene::Initialize()
     int settingWindowHeight = 300;
     mSettingWindowRect = { static_cast<LONG>((width - settingWindowWidth) / 2), static_cast<LONG>((height - settingWindowHeight) / 2),
                            static_cast<LONG>((width + settingWindowWidth) / 2), static_cast<LONG>((height + settingWindowHeight) / 2) };
+
+    // 아이디 입력 창 초기화
+    mInputWindowFlag = false;
+    int inputWindowWidth = 400;
+    int inputWindowHeight = 200;
+    mInputWindowRect = { static_cast<LONG>((width - inputWindowWidth) / 2), static_cast<LONG>((height - inputWindowHeight) / 2),
+                         static_cast<LONG>((width + inputWindowWidth) / 2), static_cast<LONG>((height + inputWindowHeight) / 2) };
+
+    // 확인 버튼 초기화
+    int confirmButtonWidth = 100;
+    int confirmButtonHeight = 50;
+    mConfirmButtonRect = { mInputWindowRect.left + (inputWindowWidth - confirmButtonWidth) / 2,
+                           mInputWindowRect.bottom - confirmButtonHeight - 20,
+                           mInputWindowRect.left + (inputWindowWidth + confirmButtonWidth) / 2,
+                           mInputWindowRect.bottom - 20 };
+
+    // 아이디 입력 필드 초기화
+    int inputFieldWidth = 300;
+    int inputFieldHeight = 40;
+    mInputFieldRect = { mInputWindowRect.left + (inputWindowWidth - inputFieldWidth) / 2,
+                        mInputWindowRect.top + 80,
+                        mInputWindowRect.left + (inputWindowWidth + inputFieldWidth) / 2,
+                        mInputWindowRect.top + 80 + inputFieldHeight };
 
     // Close 버튼 초기화
     int closeButtonWidth = 100;
@@ -99,10 +122,12 @@ void TitleScene::Initialize()
     mSEVolume = SoundManager::GetInstance()->GetSEVolume();
 
     // 버튼 호버 및 드래그 상태 초기화
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 10; i++)
         mButtonHovered[i] = false;
     mDraggingBGM = false;
     mDraggingSE = false;
+    mInputActive = false;
+    mInputText = L"";
 
     delete[] fontFamilies;
     ReleaseDC(GetActiveWindow(), hdc);
@@ -117,8 +142,7 @@ void TitleScene::Update()
     ScreenToClient(GetActiveWindow(), &mousePos);
 
     // 호버 상태 업데이트
-    // 설정 창이 열려 있으면 타이틀 화면 버튼 호버 비활성화
-    if (!mSettingWindowFlag)
+    if (!mSettingWindowFlag && !mInputWindowFlag)
     {
         mButtonHovered[0] = PtInRect(&mStartButtonRect, mousePos);
         mButtonHovered[1] = PtInRect(&mTutorialButtonRect, mousePos);
@@ -130,21 +154,27 @@ void TitleScene::Update()
     }
     else
     {
-        // 설정 창이 열려 있으면 타이틀 버튼 호버 초기화
         for (int i = 0; i <= 6; i++)
             mButtonHovered[i] = false;
     }
-    mButtonHovered[7] = mSettingWindowFlag && PtInRect(&mCloseButtonRect, mousePos);
-    mButtonHovered[8] = mSettingWindowFlag && (PtInRect(&mBGMVolumeBarRect, mousePos) || PtInRect(&mSEVolumeBarRect, mousePos));
+
+    if (mSettingWindowFlag)
+    {
+        mButtonHovered[7] = PtInRect(&mCloseButtonRect, mousePos);
+        mButtonHovered[8] = PtInRect(&mBGMVolumeBarRect, mousePos) || PtInRect(&mSEVolumeBarRect, mousePos);
+    }
+    else if (mInputWindowFlag)
+    {
+        mButtonHovered[9] = PtInRect(&mConfirmButtonRect, mousePos);
+    }
 
     if (Input::GetKeyDown(eKeyCode::LButton))
     {
         if (mSettingWindowFlag)
         {
-            // 설정 창이 열려 있을 때
             if (mButtonHovered[7])
             {
-                mSettingWindowFlag = false; // 설정 창 닫기
+                mSettingWindowFlag = false;
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
             }
             else if (PtInRect(&mBGMVolumeBarRect, mousePos))
@@ -156,18 +186,41 @@ void TitleScene::Update()
                 mDraggingSE = true;
             }
         }
+        else if (mInputWindowFlag)
+        {
+            if (mButtonHovered[9])
+            {
+                std::wstring inputText = Input::GetInputText();
+                if (!inputText.empty())
+                {
+                    SceneManager::StartFadeIn();
+                    SceneManager::LoadScene(L"Stage1");
+                    SoundManager::GetInstance()->mPlaySound("Earth", true);
+                    SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
+                    MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/Stage1.txt");
+                    SceneManager::GetSharedPlayer()->SetPosition(180, 300);
+                    SceneManager::SetmIsGameStart(true);
+                    mInputWindowFlag = false;
+                    mInputText = L"";
+                    Input::ClearInputText();
+                }
+            }
+            else if (PtInRect(&mInputFieldRect, mousePos))
+            {
+                mInputActive = true;
+                Input::ClearInputText();
+            }
+            else
+            {
+                mInputActive = false;
+            }
+        }
         else
         {
-            // 설정 창이 닫혀 있을 때
             if (mButtonHovered[0])
             {
-                SceneManager::StartFadeIn();
-                SceneManager::LoadScene(L"Stage1");
-                SoundManager::GetInstance()->mPlaySound("Earth", true);
+                mInputWindowFlag = true;
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
-                MapManager::GetInstance()->LoadMap(L"resources/MapTextFile/Stage1.txt");
-                SceneManager::GetSharedPlayer()->SetPosition(180, 300);
-                SceneManager::SetmIsGameStart(true);
             }
             else if (mButtonHovered[1])
             {
@@ -192,7 +245,7 @@ void TitleScene::Update()
             }
             else if (mButtonHovered[4])
             {
-                mSettingWindowFlag = true; // 설정 창 열기
+                mSettingWindowFlag = true;
                 SoundManager::GetInstance()->mPlaySound("MenuOpen", false);
             }
             else if (mButtonHovered[5])
@@ -224,6 +277,12 @@ void TitleScene::Update()
             mSEVolume = max(0.0f, min(1.0f, t));
             SoundManager::GetInstance()->SetSEVolume(mSEVolume);
         }
+    }
+
+    // 입력 텍스트 업데이트
+    if (mInputActive)
+    {
+        mInputText = Input::GetInputText();
     }
 
     // 마우스 버튼 뗄 때 드래그 종료
@@ -267,7 +326,7 @@ void TitleScene::Render(HDC hdc)
         format.SetLineAlignment(Gdiplus::StringAlignmentCenter);
         format.SetFormatFlags(Gdiplus::StringFormatFlagsNoWrap);
 
-        Gdiplus::Graphics graphics(hdc); // 한 번만 생성
+        Gdiplus::Graphics graphics(hdc);
 
         auto renderButton = [&](RECT& rect, const wchar_t* text, bool isHovered) {
             brush.SetColor(isHovered ? Gdiplus::Color(255, 0, 0, 0) : Gdiplus::Color(100, 0, 0, 0));
@@ -280,20 +339,20 @@ void TitleScene::Render(HDC hdc)
         renderButton(mTutorialButtonRect, L"TUTORIAL", mButtonHovered[1]);
         renderButton(mCustomStageButtonRect, L"CUSTOM STAGE", mButtonHovered[2]);
         renderButton(mMapToolButtonRect, L"MAP TOOL", mButtonHovered[3]);
-        renderButton(mSettingButtonRect, L"SETTING", mButtonHovered[4]);
-        renderButton(mQuitButtonRect, L"EXIT", mButtonHovered[5]);
+        renderButton(mSettingButtonRect, L"SETTINGS", mButtonHovered[4]);
+        renderButton(mQuitButtonRect, L"QUIT", mButtonHovered[5]);
 
         // 설정 창 렌더링
         if (mSettingWindowFlag)
         {
-            brush.SetColor(Gdiplus::Color(200, 50, 50, 50)); // 기존 brush 재사용
+            brush.SetColor(Gdiplus::Color(200, 50, 50, 50));
             graphics.FillRectangle(&brush, static_cast<INT>(mSettingWindowRect.left), static_cast<INT>(mSettingWindowRect.top),
                 static_cast<INT>(mSettingWindowRect.right - mSettingWindowRect.left), static_cast<INT>(mSettingWindowRect.bottom - mSettingWindowRect.top));
 
             HFONT hFont = CreateFont(25, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                 OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                 DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
-            HFONT hOldFont = (HFONT)SelectObject(hdc, hFont); // 이전 폰트 저장
+            HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
             SetTextColor(hdc, RGB(255, 255, 255));
             const wchar_t* titleText = L"SETTINGS";
             SIZE titleSize;
@@ -306,29 +365,25 @@ void TitleScene::Render(HDC hdc)
             hFont = CreateFont(15, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
                 OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
                 DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
-            SelectObject(hdc, hFont); // 새 폰트 선택
+            SelectObject(hdc, hFont);
             SetTextColor(hdc, RGB(255, 255, 255));
 
-         
             const wchar_t* seLabel = L"SE VOLUME";
             SIZE seSize;
             GetTextExtentPoint32(hdc, seLabel, static_cast<int>(wcslen(seLabel)), &seSize);
             TextOut(hdc, mSettingWindowRect.left + 100, mBGMVolumeBarRect.top - 30 - seSize.cy / 2, seLabel, static_cast<int>(wcslen(seLabel)));
 
-          
             const wchar_t* bgmLabel = L"BGM VOLUME";
             SIZE bgmSize;
             GetTextExtentPoint32(hdc, bgmLabel, static_cast<int>(wcslen(bgmLabel)), &bgmSize);
             TextOut(hdc, mSettingWindowRect.left + 100, mSEVolumeBarRect.top - 30 - bgmSize.cy / 2, bgmLabel, static_cast<int>(wcslen(bgmLabel)));
 
-         
             brush.SetColor(Gdiplus::Color(255, 100, 100, 100));
             graphics.FillRectangle(&brush, static_cast<INT>(mBGMVolumeBarRect.left), static_cast<INT>(mBGMVolumeBarRect.top),
                 static_cast<INT>(mBGMVolumeBarRect.right - mBGMVolumeBarRect.left), static_cast<INT>(mBGMVolumeBarRect.bottom - mBGMVolumeBarRect.top));
             graphics.FillRectangle(&brush, static_cast<INT>(mSEVolumeBarRect.left), static_cast<INT>(mSEVolumeBarRect.top),
                 static_cast<INT>(mSEVolumeBarRect.right - mSEVolumeBarRect.left), static_cast<INT>(mSEVolumeBarRect.bottom - mSEVolumeBarRect.top));
 
-           
             int barWidth = mBGMVolumeBarRect.right - mBGMVolumeBarRect.left;
             int handleWidth = 10;
             brush.SetColor(Gdiplus::Color(255, 255, 255, 255));
@@ -337,14 +392,54 @@ void TitleScene::Render(HDC hdc)
             graphics.FillRectangle(&brush, static_cast<INT>(mSEVolumeBarRect.left + (int)(mSEVolume * barWidth) - handleWidth / 2),
                 static_cast<INT>(mSEVolumeBarRect.top), handleWidth, static_cast<INT>(mSEVolumeBarRect.bottom - mSEVolumeBarRect.top));
 
-            SelectObject(hdc, hOldFont); 
+            SelectObject(hdc, hOldFont);
             DeleteObject(hFont);
 
-            renderButton(mCloseButtonRect, L"EXIT", mButtonHovered[7]);
+            renderButton(mCloseButtonRect, L"CLOSE", mButtonHovered[7]);
+        }
+
+        // 아이디 입력 창 렌더링
+        if (mInputWindowFlag)
+        {
+            brush.SetColor(Gdiplus::Color(200, 50, 50, 50));
+            graphics.FillRectangle(&brush, static_cast<INT>(mInputWindowRect.left), static_cast<INT>(mInputWindowRect.top),
+                static_cast<INT>(mInputWindowRect.right - mInputWindowRect.left), static_cast<INT>(mInputWindowRect.bottom - mInputWindowRect.top));
+
+            HFONT hFont = CreateFont(25, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+                OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+            HFONT hOldFont = (HFONT)SelectObject(hdc, hFont);
+            SetTextColor(hdc, RGB(255, 255, 255));
+            const wchar_t* titleText = L"ENTER ID";
+            SIZE titleSize;
+            GetTextExtentPoint32(hdc, titleText, static_cast<int>(wcslen(titleText)), &titleSize);
+            int titleX = mInputWindowRect.left + (mInputWindowRect.right - mInputWindowRect.left - titleSize.cx) / 2;
+            int titleY = mInputWindowRect.top + 20;
+            TextOut(hdc, titleX, titleY, titleText, static_cast<int>(wcslen(titleText)));
+
+            DeleteObject(hFont);
+            hFont = CreateFont(15, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
+                OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+                DEFAULT_PITCH | FF_DONTCARE, L"8BIT WONDER");
+            SelectObject(hdc, hFont);
+
+            // 입력 필드 렌더링
+            brush.SetColor(mInputActive ? Gdiplus::Color(255, 255, 255, 255) : Gdiplus::Color(255, 200, 200, 200));
+            graphics.FillRectangle(&brush, static_cast<INT>(mInputFieldRect.left), static_cast<INT>(mInputFieldRect.top),
+                static_cast<INT>(mInputFieldRect.right - mInputFieldRect.left), static_cast<INT>(mInputFieldRect.bottom - mInputFieldRect.top));
+
+            SetTextColor(hdc, RGB(0, 0, 0));
+            TextOut(hdc, mInputFieldRect.left + 5, mInputFieldRect.top + 10, mInputText.c_str(), static_cast<int>(mInputText.length()));
+
+            SelectObject(hdc, hOldFont);
+            DeleteObject(hFont);
+
+            renderButton(mConfirmButtonRect, L"CONFIRM", mButtonHovered[9]);
         }
 
         delete[] fontFamilies;
     }
+
     if (!mGithubIconImage.IsNull())
     {
         int maxIconSize = mGithubButtonRect.right - mGithubButtonRect.left;

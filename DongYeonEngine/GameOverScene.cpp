@@ -2,6 +2,7 @@
 #include "SceneManager.h"
 #include "SoundManager.h"
 #include "MapManager.h"
+#include "TitleScene.h"
 #include "Time.h"
 #include "Input.h"
 #include "Boss.h"
@@ -26,6 +27,7 @@ GameOverScene::~GameOverScene()
 void GameOverScene::Initialize()
 {
     mBackGroundImage.Load(L"resources/GameOverImage.png");
+	
 }
 
 void GameOverScene::Update()
