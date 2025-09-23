@@ -436,7 +436,7 @@ void TitleScene::Render(HDC hdc)
             SelectObject(hdc, hOldFont);
             DeleteObject(hFont);
 
-            renderButton(mConfirmButtonRect, L"CONFIRM", mButtonHovered[9]);
+            renderButton(mConfirmButtonRect, L"OK", mButtonHovered[9]);
         }
 
         delete[] fontFamilies;

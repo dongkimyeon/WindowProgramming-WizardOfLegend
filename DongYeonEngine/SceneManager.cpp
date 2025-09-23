@@ -199,11 +199,11 @@ void SceneManager::Render(HDC hdc)
 
         graphics.DrawString(playTimeText, -1, &font, PointF(1000, 0), &stringFormat, &brush);
 
-        // 유저 ID 렌더링 (디버그용)
-        wchar_t userIDText[64];
-        swprintf_s(userIDText, L"UserID: %s", mUserID.c_str());
-        graphics.DrawString(userIDText, -1, &font, PointF(1000, 40), &stringFormat, &brush); // 화면에 UserID 표시
-        OutputDebugStringW((L"SceneManager::Render - Rendering UserID: " + mUserID + L"\n").c_str()); // 디버그 메시지
+        //// 유저 ID 렌더링 (디버그용)
+        //wchar_t userIDText[64];
+        //swprintf_s(userIDText, L"UserID: %s", mUserID.c_str());
+        //graphics.DrawString(userIDText, -1, &font, PointF(1000, 40), &stringFormat, &brush); // 화면에 UserID 표시
+        //OutputDebugStringW((L"SceneManager::Render - Rendering UserID: " + mUserID + L"\n").c_str()); // 디버그 메시지
     }
 
     // 페이드 효과 렌더링

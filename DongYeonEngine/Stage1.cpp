@@ -598,8 +598,29 @@ void Stage1::Update()
     RECT temp;
     RECT playerRect = player->GetRect();
     RECT portalRect = portal.GetRect();
-    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F)
-        &&archers.empty() && wizards.empty() && swordmans.empty())
+
+    
+	
+    
+    // 모든 몬스터가 죽었는지 확인하는 함수
+    auto AllMonstersDead = [&]() -> bool {
+        // Swordmans 확인
+        for (auto* swordman : swordmans) {
+            if (!swordman->GetIsDead()) return false;
+        }
+        // Wizards 확인
+        for (auto* wizard : wizards) {
+            if (!wizard->GetIsDead()) return false;
+        }
+        // Archers 확인
+        for (auto* archer : archers) {
+            if (!archer->GetIsDead()) return false;
+        }
+        return true;
+        };
+
+    // 포탈 활성화 조건: 플레이어가 포탈에 닿고 F키를 누르고, 모든 몬스터가 죽었을 때
+    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F) && AllMonstersDead())
     {
         SceneManager::StartFadeIn();
         ObjectDestroy();

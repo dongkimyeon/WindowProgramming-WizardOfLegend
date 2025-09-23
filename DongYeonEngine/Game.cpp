@@ -60,7 +60,7 @@ void Game::clearRenderTarget()
 
 void Game::copyRenderTarget(HDC source, HDC dest)
 {
-	StretchBlt(dest, 0, 0, 1920, 1080, source, 0, 0, 1280, 720, SRCCOPY);
+	StretchBlt(dest, 0, 0, 2560, 1440, source, 0, 0, 1280, 720, SRCCOPY);
 	//BitBlt(dest, 0, 0, mWidth, mHeight, source, 0, 0, SRCCOPY);
 }
 
