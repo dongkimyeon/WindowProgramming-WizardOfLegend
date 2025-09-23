@@ -39,6 +39,7 @@ public:
     static void ResetPlayTime() { playTime = 0; }
     static void SetUserID(const std::wstring& userID) { mUserID = userID; }
     static std::wstring GetUserID() { return mUserID; }
+	static void ResetUserID() { mUserID = L""; }    
 
 private:
     static Player* mSharedPlayer;

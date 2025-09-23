@@ -11,7 +11,7 @@
 #include "SoundManager.h"
 #include "MapManager.h"
 #include "StageCustom.h"
-
+#include "RankingScene.h"
 void LoadScenes()
 {
 	SceneManager::CreateScene<TitleScene>(L"TitleScene");
@@ -23,6 +23,7 @@ void LoadScenes()
 	SceneManager::CreateScene<GameClearScene>(L"GameClearScene");
 	SceneManager::CreateScene<StageCustom>(L"StageCustom");
 	SceneManager::CreateScene<MapTool>(L"MapTool");
+	SceneManager::CreateScene<RankingScene>(L"RankingScene");
 
 	
 	SceneManager::LoadScene(L"TitleScene");

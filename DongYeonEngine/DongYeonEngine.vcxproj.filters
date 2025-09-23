@@ -213,6 +213,9 @@
     <ClInclude Include="Candle.h">
       <Filter>Object\MapObject</Filter>
     </ClInclude>
+    <ClInclude Include="RankingScene.h">
+      <Filter>Scenes\Extra</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp">
@@ -343,6 +346,9 @@
     </ClCompile>
     <ClCompile Include="IceFlag.cpp">
       <Filter>Object\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="RankingScene.cpp">
+      <Filter>Scenes\Extra</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

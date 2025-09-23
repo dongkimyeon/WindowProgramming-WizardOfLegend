@@ -45,8 +45,8 @@ void GameClearScene::Update()
         // 현재 플레이어 기록을 랭킹에 반영
         SaveCurrentRecord();
 
-        SceneManager::LoadScene(L"TitleScene");
-        SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
+        SceneManager::LoadScene(L"RankingScene");
+        //SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
         SceneManager::GetSharedPlayer()->SetHp(300);
         SceneManager::GetSharedPlayer()->Setrevive();
         SceneManager::ResetPlayTime();
@@ -151,29 +151,7 @@ void GameClearScene::Render(HDC hdc)
     int xKillCount = rightMargin - textSize.cx;
     TextOut(hdc, xKillCount, y + 70, killCountText, wcslen(killCountText));
 
-    // 랭킹 표시 (상위 5개)
-    HFONT hRankFont = CreateFont(30, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, DEFAULT_CHARSET,
-        OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-        DEFAULT_PITCH | FF_DONTCARE, L"EXO 2");
-    HFONT hOldRankFont = (HFONT)SelectObject(hdc, hRankFont);
-
-    SetTextColor(hdc, RGB(255, 255, 100)); // 금색으로 랭킹 강조
-    wchar_t rankText[64];
-    int rankY = 400;
-
-    for (int i = 0; i < 5 && timeRecord[i] < 9999.0f; i++)
-    {
-        int rankMinutes = static_cast<int>(timeRecord[i]) / 60;
-        int rankSeconds = static_cast<int>(timeRecord[i]) % 60;
-        swprintf_s(rankText, L"%d. %s: %02d:%02d", i + 1, userID[i].c_str(), rankMinutes, rankSeconds);
-
-        GetTextExtentPoint32(hdc, rankText, wcslen(rankText), &textSize);
-        int xRank = (width - textSize.cx) / 2; // 중앙 정렬
-        TextOut(hdc, xRank, rankY + (i * 40), rankText, wcslen(rankText));
-    }
-
-    SelectObject(hdc, hOldRankFont);
-    DeleteObject(hRankFont);
+    
 
     // GDI+로 "Press Space to Title"만 반투명 처리
     Gdiplus::Graphics graphics(hdc);

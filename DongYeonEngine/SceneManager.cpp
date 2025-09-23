@@ -111,7 +111,8 @@ void SceneManager::Update()
 
     // ESC 키 입력 처리
     if (Input::GetKeyDown(eKeyCode::ESC) && mActiveScene->GetName() != L"TitleScene"
-        && mActiveScene->GetName() != L"GameOverScene" && mActiveScene->GetName() != L"GameClearScene")
+        && mActiveScene->GetName() != L"GameOverScene" && mActiveScene->GetName() != L"GameClearScene"
+        && mActiveScene->GetName() != L"RankingScene")
     {
         mESCstate = !mESCstate;
         Time::SetTimeStop(mESCstate);
