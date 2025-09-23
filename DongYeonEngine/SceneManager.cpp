@@ -63,6 +63,7 @@ Scene* SceneManager::LoadScene(const std::wstring& name)
     mActiveScene = iter->second;
     mActiveScene->ObjectDestroy();
     mActiveScene->ObjectInitialize();
+    
     if (name == L"TitleScene")
     {
         mUserID = L""; // 타이틀 화면으로 돌아갈 때 사용자 ID 리셋

@@ -598,7 +598,8 @@ void Stage1::Update()
     RECT temp;
     RECT playerRect = player->GetRect();
     RECT portalRect = portal.GetRect();
-    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
+    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F)
+        &&archers.empty() && wizards.empty() && swordmans.empty())
     {
         SceneManager::StartFadeIn();
         ObjectDestroy();

@@ -110,11 +110,54 @@ void TutorialStage::ObjectDestroy()
     {
         delete jar;
     }
+
+   
     mJar.clear();
     // Clear particles
 
-
     mParticles.clear();
+}
+void TutorialStage::ObjectInitialize()
+{
+    // 카메라 설정
+    camera.SetTarget(SceneManager::GetSharedPlayer());
+
+    // 기존 객체 및 상태 제거
+    ObjectDestroy();
+
+	for (dummies.clear(); !dummies.empty(); dummies.pop_back());
+    // 더미 추가
+    dummies.push_back(new Dummy());
+    dummies.back()->SetPosition(736, 942);
+    dummies.push_back(new Dummy());
+    dummies.back()->SetPosition(1136, 942);
+    dummies.push_back(new Dummy());
+    dummies.back()->SetPosition(1136, 1342);
+    dummies.push_back(new Dummy());
+    dummies.back()->SetPosition(736, 1342);
+
+    // 튜토리얼 메세지 큐 초기화
+    while (!tutorialQue.empty()) tutorialQue.pop();
+    tutorialQue.push(L"시작안내");
+    tutorialQue.push(L"움직이기");
+    tutorialQue.push(L"대쉬");
+    tutorialQue.push(L"기본공격 연습");
+    tutorialQue.push(L"스킬: 파이어볼 연습");
+    tutorialQue.push(L"스킬: 파이어드래곤 연습");
+    tutorialQue.push(L"종료 안내");
+
+    // 상태 변수 초기화
+    isStepCompleted = false;
+    isShowingCompletion = false;
+    completionMessageTimer = 0.0f;
+    completionMessageAlpha = 255.0f;
+    currentTutorialStep = L"";
+    TutorialMoveTimer = 0.0f;
+
+    mParticleTimer = 0.0f;
+    mParticleSpawnInterval = 0.1f;
+
+
 }
 // 파티클 생성 함수
 void TutorialStage::CreateFireParticles(std::vector<Particle>& particles, float x, float y)
@@ -145,7 +188,10 @@ void TutorialStage::Initialize()
     // 카메라 설정
     camera.SetTarget(SceneManager::GetSharedPlayer());
 
-    // 몬스터 추가
+    // 기존 객체 및 상태 제거
+    ObjectDestroy();
+
+    // 더미 추가
     dummies.push_back(new Dummy());
     dummies.back()->SetPosition(736, 942);
     dummies.push_back(new Dummy());
@@ -155,7 +201,8 @@ void TutorialStage::Initialize()
     dummies.push_back(new Dummy());
     dummies.back()->SetPosition(736, 1342);
 
-    // 튜토리얼 메세지 큐 (완료 메시지 제외)
+    // 튜토리얼 메세지 큐 초기화
+    while (!tutorialQue.empty()) tutorialQue.pop();
     tutorialQue.push(L"시작안내");
     tutorialQue.push(L"움직이기");
     tutorialQue.push(L"대쉬");
@@ -164,12 +211,19 @@ void TutorialStage::Initialize()
     tutorialQue.push(L"스킬: 파이어드래곤 연습");
     tutorialQue.push(L"종료 안내");
 
-    // 초기화
+    // 상태 변수 초기화
     isStepCompleted = false;
     isShowingCompletion = false;
     completionMessageTimer = 0.0f;
     completionMessageAlpha = 255.0f;
     currentTutorialStep = L"";
+    TutorialMoveTimer = 0.0f;
+
+    mParticleTimer = 0.0f;
+    mParticleSpawnInterval = 0.1f;
+
+
+
     // 파티클 이미지 로드
     for (int i = 0; i < 20; ++i)
     {
@@ -179,11 +233,8 @@ void TutorialStage::Initialize()
             std::cout << "Failed to load particle image: " << i << std::endl;
         }
     }
-    // 파티클 관련 변수 초기화
-    mParticleTimer = 0.0f;
-    mParticleSpawnInterval = 0.1f;
-}
 
+}
 void TutorialStage::LateUpdate()
 {
 }
@@ -744,6 +795,7 @@ void TutorialStage::Update()
             if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F))
             {
                 isStepCompleted = true;
+                ObjectDestroy();
             }
         }
 
