@@ -194,12 +194,12 @@ void GameClearScene::LoadUserRecord()
 {
     // load UserID and TimeRecord
     FILE* fp = nullptr;
-    _wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"r");
+    errno_t err = _wfopen_s(&fp, L"resources/TimeRecords/TimeRecords.txt", L"r");
 
-    if (fp == nullptr)
+    if (err != 0 || fp == nullptr)
     {
         // 파일이 없는 경우 초기화
-        wprintf(L"File not found, creating new record file\n");
+        wprintf(L"File not found or error opening, creating new record file (error: %d)\n", err);
         for (int i = 0; i < 10; i++)
         {
             userID[i] = L"";
@@ -210,22 +210,58 @@ void GameClearScene::LoadUserRecord()
 
     // 파일에서 기존 기록 읽기
     int recordCount = 0;
-    for (int i = 0; i < 10 && recordCount < 10; i++)
-    {
-        wchar_t idBuffer[50];
-        float timeBuffer;
+    wchar_t lineBuffer[256];
 
-        if (fwscanf_s(fp, L"%49s %f", idBuffer, &timeBuffer) == 2)
+    // 라인 단위로 읽기
+    while (recordCount < 10 && fgetws(lineBuffer, sizeof(lineBuffer) / sizeof(wchar_t), fp))
+    {
+        // 줄 끝의 개행문자 제거
+        size_t len = wcslen(lineBuffer);
+        if (len > 0 && (lineBuffer[len - 1] == L'\n' || lineBuffer[len - 1] == L'\r'))
         {
-            userID[i] = idBuffer;
-            timeRecord[i] = timeBuffer;
-            recordCount++;
+            lineBuffer[len - 1] = L'\0';
+            len--;
         }
-        else
+        if (len > 0 && lineBuffer[len - 1] == L'\r')
         {
-            // 더 이상 읽을 데이터가 없으면 나머지는 기본값
-            userID[i] = L"";
-            timeRecord[i] = 9999.0f;
+            lineBuffer[len - 1] = L'\0';
+        }
+
+        // 문자열 파싱 (스페이스나 탭으로 구분)
+        wchar_t* idStart = lineBuffer;
+        wchar_t* timeStart = wcschr(lineBuffer, L' ');
+        if (timeStart == nullptr)
+            timeStart = wcschr(lineBuffer, L'\t'); // 탭도 확인
+
+        if (timeStart != nullptr)
+        {
+            *timeStart = L'\0'; // ID와 시간 분리
+            timeStart++;
+
+            // ID 끝의 공백 제거
+            wchar_t* idEnd = wcsrchr(idStart, L' ');
+            if (idEnd != nullptr && idEnd < timeStart - 1)
+            {
+                *idEnd = L'\0';
+                idStart = idEnd + 1;
+            }
+
+            // 시간 문자열을 float으로 변환
+            wchar_t* endPtr;
+            float timeValue = wcstod(timeStart, &endPtr);
+
+            if (endPtr != timeStart && *endPtr == L'\0') // 성공적으로 변환된 경우
+            {
+                // ID 길이 제한
+                size_t idLen = wcslen(idStart);
+                if (idLen > 0 && idLen < 50)
+                {
+                    userID[recordCount] = idStart;
+                    timeRecord[recordCount] = timeValue;
+                    recordCount++;
+                    wprintf(L"Loaded record: %s %.2f\n", idStart, timeValue);
+                }
+            }
         }
     }
 
@@ -243,7 +279,7 @@ void GameClearScene::LoadUserRecord()
     {
         for (int j = i + 1; j < 10; j++)
         {
-            if (timeRecord[i] > timeRecord[j] && timeRecord[j] < 9999.0f)
+            if (timeRecord[i] > timeRecord[j] && timeRecord[j] < 9999.0f && !userID[j].empty())
             {
                 std::swap(timeRecord[i], timeRecord[j]);
                 std::swap(userID[i], userID[j]);
@@ -251,7 +287,7 @@ void GameClearScene::LoadUserRecord()
         }
     }
 
-    wprintf(L"Loaded %d records from file\n", recordCount);
+    wprintf(L"Successfully loaded %d records from file\n", recordCount);
 }
 
 void GameClearScene::SaveCurrentRecord()
