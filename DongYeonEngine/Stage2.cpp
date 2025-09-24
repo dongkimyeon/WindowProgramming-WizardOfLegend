@@ -611,7 +611,7 @@ void Stage2::Update()
 
     // 포탈 활성화 조건: 플레이어가 포탈에 닿고 F키를 누르고, 모든 몬스터가 죽었을 때
 
-    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F) && AllMonstersDead())
+    if (IntersectRect(&temp, &playerRect, &portalRect) && Input::GetKeyDown(eKeyCode::F) && AllMonstersDead() || Input::GetKeyDown(eKeyCode::O))
     {
         SceneManager::StartFadeIn();
         ObjectDestroy();

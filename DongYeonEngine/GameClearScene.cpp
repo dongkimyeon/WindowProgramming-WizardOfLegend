@@ -44,7 +44,7 @@ void GameClearScene::Update()
     {
         // 현재 플레이어 기록을 랭킹에 반영
         SaveCurrentRecord();
-
+        SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"RankingScene");
         //SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
         SceneManager::GetSharedPlayer()->SetHp(300);

@@ -30,6 +30,7 @@ void RankingScene::Update()
 
     if (Input::GetKeyDown(eKeyCode::SPACE))
     {
+        SceneManager::StartFadeIn();
         SceneManager::LoadScene(L"TitleScene");
         SoundManager::GetInstance()->mPlaySound("TitleScreen", true);
         SceneManager::ResetUserID();

@@ -6,7 +6,7 @@
 void SoundManager::Initialize() {
     // Create FMOD system
 
-    mBGMVolume = 0.1f;
+    mBGMVolume = 0.15f;
     mSEVolume = 0.1f;
     FMOD_RESULT result = FMOD::System_Create(&mSystem);
     if (result != FMOD_OK) return;

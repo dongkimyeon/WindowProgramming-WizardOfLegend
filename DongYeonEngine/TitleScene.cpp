@@ -190,7 +190,9 @@ void TitleScene::Update()
         {
             if (mButtonHovered[9])
             {
+             
                 std::wstring inputText = Input::GetInputText();
+              
                 if (!inputText.empty())
                 {
                     SceneManager::SetUserID(inputText); // SceneManager에 사용자 ID 저장
@@ -261,7 +263,11 @@ void TitleScene::Update()
             }
         }
     }
-
+     
+    if (Input::GetKey(eKeyCode::R))
+    {
+		SceneManager::LoadScene(L"RankingScene");    
+    }
     // 마우스 드래그로 볼륨 조절
     if (Input::GetKey(eKeyCode::LButton) && mSettingWindowFlag)
     {
@@ -269,7 +275,7 @@ void TitleScene::Update()
         {
             int barWidth = mBGMVolumeBarRect.right - mBGMVolumeBarRect.left;
             float t = (float)(mousePos.x - mBGMVolumeBarRect.left) / barWidth;
-            mBGMVolume = max(0.0f, min(1.0f, t));
+            mBGMVolume = max(0.0f, min(1.5f, t));
             SoundManager::GetInstance()->SetBGMVolume(mBGMVolume);
         }
         else if (mDraggingSE)
@@ -397,7 +403,7 @@ void TitleScene::Render(HDC hdc)
             SelectObject(hdc, hOldFont);
             DeleteObject(hFont);
 
-            renderButton(mCloseButtonRect, L"CLOSE", mButtonHovered[7]);
+            renderButton(mCloseButtonRect, L"X", mButtonHovered[7]);
         }
 
         // 아이디 입력 창 렌더링
